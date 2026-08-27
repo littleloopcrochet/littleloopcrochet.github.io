@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Firebase SDK -->
+  <!-- Added: Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -154,26 +154,53 @@
     <span class="close" onclick="closeModal()">&times;</span>
     <div class="auth-loading" id="authLoading"><span>Please wait...</span></div>
     <h2 class="modal-title" id="modalTitle">Welcome back</h2>
+
     <div class="modal-tabs">
       <div class="modal-tab active" id="signInTab" onclick="switchTab('signin')">Sign In</div>
       <div class="modal-tab" id="signUpTab" onclick="switchTab('signup')">Sign Up</div>
     </div>
 
     <form id="signInForm">
-      <div class="form-group"><label for="email">Email</label><input type="email" id="email" placeholder="you@example.com" required><span class="error-msg" id="emailError"></span></div>
-      <div class="form-group"><label for="password">Password</label><input type="password" id="password" placeholder="Enter password" required><span class="error-msg" id="passwordError"></span></div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" required>
+        <span class="error-msg" id="emailError"></span>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password" required>
+        <span class="error-msg" id="passwordError"></span>
+      </div>
       <a class="forgot-link" onclick="forgotPassword()">Forgot Password?</a>
       <button type="submit" class="login-submit">Sign In</button>
-      <button type="button" class="google-btn" onclick="googleSignIn()"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#EA4335" d="M12 22c2.95 0 5.43-.98 7.24-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.67 1.06-2.82 0-5.21-1.9-6.07-4.46H2.29v2.84C4.1 19.89 7.77 22 12 22z"/><path fill="#4285F4" d="M5.93 13.18c-.2-.63-.32-1.3-.32-1.98s.12-1.35.32-1.98V6.38H2.29A10.94 10.94 0 0 0 1 12c0 1.77.43 3.45 1.29 4.92l4.64-3.74z"/><path fill="#FBBC05" d="M12 5.36c1.6 0 3.04.55 4.17 1.63l3.13-3.13C17.43 2.18 14.95 1 12 1 7.77 1 4.1 3.11 2.29 6.38l4.64 3.74c.86-2.56 3.25-4.46 5.07-4.46z"/></svg>Sign in with Google</button>
+      <button type="button" class="google-btn" onclick="googleSignIn()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#EA4335" d="M12 22c2.95 0 5.43-.98 7.24-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.67 1.06-2.82 0-5.21-1.9-6.07-4.46H2.29v2.84C4.1 19.89 7.77 22 12 22z"/><path fill="#4285F4" d="M5.93 13.18c-.2-.63-.32-1.3-.32-1.98s.12-1.35.32-1.98V6.38H2.29A10.94 10.94 0 0 0 1 12c0 1.77.43 3.45 1.29 4.92l4.64-3.74z"/><path fill="#FBBC05" d="M12 5.36c1.6 0 3.04.55 4.17 1.63l3.13-3.13C17.43 2.18 14.95 1 12 1 7.77 1 4.1 3.11 2.29 6.38l4.64 3.74c.86-2.56 3.25-4.46 5.07-4.46z"/></svg>
+        Sign in with Google
+      </button>
       <div class="modal-alt"><span>Don't have an account? <a onclick="switchTab('signup')">Sign Up</a></span></div>
     </form>
 
     <form id="signUpForm" style="display:none">
-      <div class="form-group"><label for="name">Name</label><input type="text" id="name" placeholder="Your name" required><span class="error-msg" id="nameError"></span></div>
-      <div class="form-group"><label for="signupEmail">Email</label><input type="email" id="signupEmail" placeholder="you@example.com" required><span class="error-msg" id="signupEmailError"></span></div>
-      <div class="form-group"><label for="signupPassword">Password</label><input type="password" id="signupPassword" placeholder="At least 6 characters" required><span class="error-msg" id="signupPasswordError"></span></div>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" placeholder="Your name" required>
+        <span class="error-msg" id="nameError"></span>
+      </div>
+      <div class="form-group">
+        <label for="signupEmail">Email</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" required>
+        <span class="error-msg" id="signupEmailError"></span>
+      </div>
+      <div class="form-group">
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" placeholder="At least 6 characters" required>
+        <span class="error-msg" id="signupPasswordError"></span>
+      </div>
       <button type="submit" class="login-submit">Create Account</button>
-      <button type="button" class="google-btn" onclick="googleSignIn()"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#EA4335" d="M12 22c2.95 0 5.43-.98 7.24-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.67 1.06-2.82 0-5.21-1.9-6.07-4.46H2.29v2.84C4.1 19.89 7.77 22 12 22z"/><path fill="#4285F4" d="M5.93 13.18c-.2-.63-.32-1.3-.32-1.98s.12-1.35.32-1.98V6.38H2.29A10.94 10.94 0 0 0 1 12c0 1.77.43 3.45 1.29 4.92l4.64-3.74z"/><path fill="#FBBC05" d="M12 5.36c1.6 0 3.04.55 4.17 1.63l3.13-3.13C17.43 2.18 14.95 1 12 1 7.77 1 4.1 3.11 2.29 6.38l4.64 3.74c.86-2.56 3.25-4.46 5.07-4.46z"/></svg>Sign up with Google</button>
+      <button type="button" class="google-btn" onclick="googleSignIn()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#EA4335" d="M12 22c2.95 0 5.43-.98 7.24-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.67 1.06-2.82 0-5.21-1.9-6.07-4.46H2.29v2.84C4.1 19.89 7.77 22 12 22z"/><path fill="#4285F4" d="M5.93 13.18c-.2-.63-.32-1.3-.32-1.98s.12-1.35.32-1.98V6.38H2.29A10.94 10.94 0 0 0 1 12c0 1.77.43 3.45 1.29 4.92l4.64-3.74z"/><path fill="#FBBC05" d="M12 5.36c1.6 0 3.04.55 4.17 1.63l3.13-3.13C17.43 2.18 14.95 1 12 1 7.77 1 4.1 3.11 2.29 6.38l4.64 3.74c.86-2.56 3.25-4.46 5.07-4.46z"/></svg>
+        Sign up with Google
+      </button>
       <div class="modal-alt"><span>Already have an account? <a onclick="switchTab('signin')">Sign In</a></span></div>
     </form>
   </div>
@@ -203,13 +230,16 @@
       <li><a href="about.html" class="magic-hover">About</a></li>
       <li><a href="contact.html" class="magic-hover">Contact</a></li>
     </ul>
+    
     <button class="signin-btn" id="authButton" onclick="openAuthModal()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       <span id="authButtonText">Sign In</span>
     </button>
+
     <button id="logoutBtn" class="logout-btn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text);" onclick="logout()" title="Logout">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
     </button>
+
     <div class="theme-wrapper magic-hover">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme"><span class="theme-icon" id="themeIcon">☀️</span></button>
     </div>
@@ -240,9 +270,7 @@
 </footer>
 
 <script>
-  // ====================================================================
-  // ===== PASTE YOUR REAL FIREBASE CONFIG HERE =========================
-  // ====================================================================
+  // ===== PASTE YOUR FIREBASE CONFIG HERE =====
   const firebaseConfig = {
     apiKey: "AIzaSyCeiXIZhofwxkUrWkowZuiMSHyRcsfeHE0",
   authDomain: "littleloopcrochet-2dcdf.firebaseapp.com",
@@ -252,21 +280,22 @@
   appId: "1:837032344744:web:41f17ab83bb6071240969d",
   measurementId: "G-1F2GVL84HC"
   };
-  // ====================================================================
+  // ============================================
 
+  // Initialize Firebase (Try-Catch to prevent crash if keys are missing)
   let auth, db;
   try {
     firebase.initializeApp(firebaseConfig);
     auth = firebase.auth();
     db = firebase.firestore();
   } catch (e) {
-    console.warn("Firebase not configured. Login and chat disabled.");
+    console.warn("Firebase not configured, auth and chat disabled.", e);
   }
 
   (function() {
     'use strict';
 
-    // ===== Loader (FIXED TO NOT CRASH) =====
+    // ===== Loader =====
     const pageLoader = document.getElementById('pageLoader');
     const progressBar = document.querySelector('.yarn-progress');
     const percentDisplay = document.getElementById('loaderPercent');
@@ -351,7 +380,11 @@
     };
 
     window.logout = function() {
-      if (auth) { auth.signOut().then(function() { window.location.href = 'index.html'; }); }
+      if (auth) {
+        auth.signOut().then(function() {
+          window.location.href = 'index.html';
+        });
+      }
     };
 
     window.switchTab = function(tab) {
@@ -481,7 +514,7 @@
     function setError(id, msg) { document.getElementById(id).textContent = msg; }
     function clearErrors() { ['emailError', 'passwordError', 'nameError', 'signupEmailError', 'signupPasswordError'].forEach(function(id) { document.getElementById(id).textContent = ''; }); }
 
-    // ===== IMMERSIVE LANDSCAPE =====
+    // ===== FULL-SITE IMMERSIVE LANDSCAPE (Complete JS) =====
     (function() {
       const canvas=document.getElementById('aboutCanvas'); if(!canvas)return;
       const ctx=canvas.getContext('2d',{alpha:true});
@@ -505,6 +538,7 @@
       }
 
       function hill(y,amp,phase){ctx.beginPath();ctx.moveTo(-10,height*y);for(let x=-10;x<=width+10;x+=Math.max(18,width/20)){const n=x/width;const yy=height*(y+Math.sin(n*7+phase)*amp+Math.sin(n*2.8+phase)*amp*.5);ctx.lineTo(x,yy);}ctx.lineTo(width+10,height);ctx.lineTo(-10,height);ctx.closePath();}
+
       function drawSky(){
         const g=ctx.createLinearGradient(0,0,0,height);
         if(isDark){g.addColorStop(0,'#070918');g.addColorStop(.34,'#111a34');g.addColorStop(.63,'#263c53');g.addColorStop(1,'#10272b');}
