@@ -88,6 +88,9 @@
     .close { position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: 700; cursor: pointer; color: var(--muted); transition: color .3s ease; }
     .close:hover { color: var(--text); }
     .modal-title { font-size: 1.5rem; margin-bottom: 20px; text-align: center; color: var(--text); }
+    .modal-tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid rgba(120,100,120,.15); }
+    .modal-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; color: var(--muted); font-weight: 600; border-bottom: 2px solid transparent; transition: color .3s ease; }
+    .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; margin-bottom: 8px; font-size: .9rem; color: var(--text-soft); }
     .form-group input { width: 100%; padding: 14px; border: 1px solid rgba(120,100,120,.2); border-radius: 12px; background: var(--card); color: var(--text); font-size: 1rem; outline: none; transition: border-color .3s ease, box-shadow .3s ease; }
@@ -140,28 +143,24 @@
 
     /* ====== CONTACT PAGE SPECIFIC STYLES ====== */
     .contact-page { min-height: 80vh; padding: 100px 7%; text-align: center; }
-    .contact-content {
-      max-width: 650px;
-      margin: auto;
-      position: relative;
-      z-index: 2;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(5px);
-      padding: 2rem 2.5rem;
-      border-radius: 30px;
-      border: 1px solid rgba(255,255,255,0.3);
-      box-shadow: 0 20px 60px var(--shadow);
-    }
-    body.dark .contact-content {
-      background: rgba(0,0,0,0.2);
-      border-color: rgba(255,255,255,0.1);
-    }
-    .contact-content h2 { color: var(--text); font-size: 3rem; margin-bottom: 20px; text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
-    body.dark .contact-content h2 { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
-    .contact-content p { color: var(--text-soft); line-height: 1.8; }
-    .contact-details { margin-top: 40px; display: flex; flex-direction: column; gap: 15px; }
-    .contact-item { display: flex; justify-content: center; align-items: center; gap: 15px; color: var(--text-soft); font-size: 1.1rem; }
-    .contact-item .icon { font-size: 1.5rem; color: var(--accent); }
+    
+    /* Chat Interface */
+    .chat-container { max-width: 800px; margin: 0 auto; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 30px; padding: 30px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 20px 60px var(--shadow); }
+    body.dark .chat-container { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
+    .chat-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; text-align: left; }
+    .chat-header img { width: 50px; height: 50px; border-radius: 50%; background: var(--pink); padding: 10px; }
+    .chat-header h3 { margin: 0; color: var(--text); font-size: 1.2rem; }
+    .chat-header p { margin: 0; color: var(--muted); font-size: .8rem; }
+    .chat-window { background: var(--card); border-radius: 20px; padding: 20px; height: 400px; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(120,100,120,.1); }
+    .chat-msg { max-width: 80%; padding: 12px 18px; border-radius: 18px; line-height: 1.4; font-size: .9rem; position: relative; text-align: left; }
+    .chat-msg.user { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+    .chat-msg.bot { align-self: flex-start; background: var(--surface); color: var(--text); border-bottom-left-radius: 4px; box-shadow: 0 4px 12px var(--shadow); }
+    .chat-msg .time { display: block; font-size: 0.65rem; margin-top: 5px; opacity: 0.7; }
+    .chat-input-area { display: flex; gap: 10px; }
+    .chat-input { flex: 1; padding: 14px; border: 1px solid rgba(120,100,120,.2); border-radius: 30px; background: var(--card); color: var(--text); font-size: 1rem; outline: none; transition: border-color .3s ease; }
+    .chat-input:focus { border-color: var(--accent); }
+    .chat-send { padding: 12px 24px; border: none; border-radius: 30px; background: var(--accent); color: white; cursor: pointer; font-weight: 600; transition: background .3s ease; }
+    .chat-send:hover { background: var(--accent-hover); }
 
     /* Footer */
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
@@ -169,6 +168,7 @@
     @media(max-width:750px){
       nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
       .contact-page{padding: 60px 6%}
+      .chat-container{padding: 20px}
     }
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
@@ -245,16 +245,20 @@
   </div>
 </nav>
 
-<!-- ===== CONTACT CONTENT ===== -->
+<!-- ===== CONTACT CONTENT (Chat UI Added) ===== -->
 <section class="contact-page">
-  <div class="contact-content">
-    <h2>Let's Chat!</h2>
-    <p>Have a question about a custom order, or just want to say hi? We'd love to hear from you.</p>
-    
-    <div class="contact-details">
-      <div class="contact-item"><span class="icon">📍</span><span>123 Yarn Lane, Stitch City, SC 45678</span></div>
-      <div class="contact-item"><span class="icon">📧</span><span>hello@littleloop.com</span></div>
-      <div class="contact-item"><span class="icon">📞</span><span>+91 98765 43210</span></div>
+  <div class="chat-container">
+    <div class="chat-header">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d795a7' stroke-width='2'%3E%3Cpath d='M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'/%3E%3C/svg%3E" alt="Support">
+      <div>
+        <h3>Little Loop Support</h3>
+        <p>We're here to help!</p>
+      </div>
+    </div>
+    <div class="chat-window" id="chatWindow"></div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." />
+      <button class="chat-send" onclick="sendMessage()">Send</button>
     </div>
   </div>
 </section>
@@ -265,7 +269,7 @@
 </footer>
 
 <script>
-  // ===== Firebase Config (Copied exactly from About page) =====
+  // ===== Firebase Config =====
   const firebaseConfig = {
     apiKey: "AIzaSyCeiXIZhofwxkUrWkowZuiMSHyRcsfeHE0",
     authDomain: "littleloopcrochet-2dcdf.firebaseapp.com",
@@ -283,7 +287,7 @@
   (function() {
     'use strict';
 
-    // ===== Loader (Copied exactly from About page) =====
+    // ===== Loader =====
     const pageLoader = document.getElementById('pageLoader');
     const progressBar = document.querySelector('.yarn-progress');
     const percentDisplay = document.getElementById('loaderPercent');
@@ -328,7 +332,7 @@
     function stopHeartMagic(){activeHeartElement=null;if(heartInterval!==null){clearInterval(heartInterval);heartInterval=null;}}
     document.querySelectorAll('.heart-hover').forEach(function(heart){heart.addEventListener('mouseenter',function(){startHeartMagic(heart);});heart.addEventListener('mouseleave',stopHeartMagic);});
 
-    // ===== AUTH LOGIC (Copied exactly from About page) =====
+    // ===== AUTH LOGIC =====
     let currentUser = null;
     const authButton = document.getElementById('authButton');
     const authButtonText = document.getElementById('authButtonText');
@@ -341,14 +345,20 @@
     const authLoading = document.getElementById('authLoading');
     const logoutBtn = document.getElementById('logoutBtn');
 
+    // Chat Elements
+    const chatWindow = document.getElementById('chatWindow');
+    const chatInput = document.getElementById('chatInput');
+
     auth.onAuthStateChanged(function(user) {
       currentUser = user;
       if (user) {
         authButtonText.textContent = user.displayName || 'Account';
         logoutBtn.style.display = 'inline-flex';
+        loadChatHistory();
       } else {
         authButtonText.textContent = 'Sign In';
         logoutBtn.style.display = 'none';
+        chatWindow.innerHTML = '<div class="chat-msg bot">Please sign in to start chatting.</div>';
       }
     });
 
@@ -440,7 +450,57 @@
     function setError(id, msg) { document.getElementById(id).textContent = msg; }
     function clearErrors() { ['emailError', 'passwordError', 'nameError', 'signupEmailError', 'signupPasswordError'].forEach(function(id) { document.getElementById(id).textContent = ''; }); }
 
-    // ===== FULL-SITE IMMERSIVE LANDSCAPE (Complete JS) =====
+    // ===== NEW: CHAT LOGIC =====
+    function loadChatHistory() {
+      if (!currentUser) return;
+      chatWindow.innerHTML = '';
+      db.collection('chats').doc(currentUser.uid).collection('messages').orderBy('timestamp', 'asc').get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            const data = doc.data();
+            appendMessage(data.sender, data.text, data.timestamp.toDate());
+          });
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+        })
+        .catch(function(err) { console.error("Error loading chat: ", err); });
+    }
+
+    function appendMessage(sender, text, date) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('chat-msg');
+      msgDiv.classList.add(sender === 'user' ? 'user' : 'bot');
+      msgDiv.innerHTML = text + '<span class="time">' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</span>';
+      chatWindow.appendChild(msgDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    window.sendMessage = function() {
+      const text = chatInput.value.trim();
+      if (!text || !currentUser) return;
+      const user = currentUser;
+      db.collection('chats').doc(user.uid).collection('messages').add({
+        sender: 'user',
+        text: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        appendMessage('user', text, new Date());
+        chatInput.value = '';
+        setTimeout(function() {
+          const botText = "Thanks for reaching out! Our team will get back to you soon. Meanwhile, is there anything else I can help with?";
+          db.collection('chats').doc(user.uid).collection('messages').add({
+            sender: 'bot',
+            text: botText,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(function() { appendMessage('bot', botText, new Date()); });
+        }, 1500);
+      }).catch(function(err) { console.error("Error sending message: ", err); });
+    };
+
+    chatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
+    });
+
+    // ===== FULL-SITE IMMERSIVE LANDSCAPE =====
     (function() {
       const canvas=document.getElementById('aboutCanvas'); if(!canvas)return;
       const ctx=canvas.getContext('2d',{alpha:true});
