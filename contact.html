@@ -88,40 +88,45 @@
     .close { position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: 700; cursor: pointer; color: var(--muted); transition: color .3s ease; }
     .close:hover { color: var(--text); }
     .modal-title { font-size: 1.5rem; margin-bottom: 20px; text-align: center; color: var(--text); }
+    .modal-tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid rgba(120,100,120,.15); }
+    .modal-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; color: var(--muted); font-weight: 600; border-bottom: 2px solid transparent; transition: color .3s ease; }
+    .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; margin-bottom: 8px; font-size: .9rem; color: var(--text-soft); }
     .form-group input { width: 100%; padding: 14px; border: 1px solid rgba(120,100,120,.2); border-radius: 12px; background: var(--card); color: var(--text); font-size: 1rem; outline: none; transition: border-color .3s ease, box-shadow .3s ease; }
     .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(215,149,167,0.2); }
     .login-submit { width: 100%; padding: 14px; border: none; border-radius: 50px; background: var(--accent); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .3s ease, transform .3s ease; margin-bottom: 10px; }
     .login-submit:hover { background: var(--accent-hover); transform: translateY(-2px); }
-    .modal-alt { text-align: center; font-size: .85rem; color: var(--muted); }
+    .google-btn { width: 100%; padding: 14px; border: 1px solid rgba(120,100,120,.2); border-radius: 50px; background: transparent; color: var(--text); font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .google-btn:hover { background: rgba(120,100,120,.08); }
+    .google-btn svg { width: 20px; height: 20px; }
+    .modal-alt { text-align: center; font-size: .85rem; color: var(--muted); margin-top: 15px; }
     .modal-alt a { color: var(--accent); font-weight: 600; cursor: pointer; }
     .error-msg { color: #ff6b6b; font-size: .8rem; margin-top: 5px; display: block; min-height: 12px; }
+    .forgot-link { display: block; text-align: right; font-size: .8rem; color: var(--accent); cursor: pointer; margin-bottom: 10px; }
+    .forgot-link:hover { text-decoration: underline; }
+    .auth-loading { position: absolute; inset: 0; background: rgba(255,255,255,0.8); display: none; align-items: center; justify-content: center; border-radius: 30px; z-index: 10; }
+    body.dark .auth-loading { background: rgba(0,0,0,0.8); }
+    .auth-loading.show { display: flex; }
+    .auth-loading span { font-size: 1rem; color: var(--accent); font-weight: 600; }
 
-    /* Loader */
-    body.is-loading{overflow:hidden}
-    body.is-loading > *:not(#pageLoader){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
-    .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
-    .page-loader.loaded{opacity:0;visibility:hidden;pointer-events:none}
-    .loader-backdrop{position:absolute;inset:0;background:rgba(255,253,251,.58);backdrop-filter:blur(3px);transition:background .6s ease}
-    body.dark .loader-backdrop{background:rgba(7,4,11,.64)}
-    .loader-card{position:relative;width:min(390px,calc(100vw - 38px));padding:28px;border:1px solid rgba(190,150,175,.18);border-radius:30px;background:rgba(255,255,255,.88);box-shadow:0 25px 80px rgba(80,55,75,.18),0 8px 25px rgba(80,55,75,.08);backdrop-filter:blur(20px);text-align:center;animation:loaderCardFloat 4s ease-in-out infinite;transition:background .6s ease,border-color .6s ease,box-shadow .6s ease}
-    body.dark .loader-card{background:rgba(24,16,32,.92);border-color:rgba(190,120,255,.22);box-shadow:0 25px 90px rgba(0,0,0,.55),0 0 50px rgba(150,75,255,.10)}
-    @keyframes loaderCardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-    .loader-cat{width:130px;height:105px;margin:-4px auto 5px;display:flex;align-items:center;justify-content:center;position:relative}
-    #loaderCat{width:130px;height:105px;display:block}
-    .cat-placeholder{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:58px;animation:catBob 1.8s ease-in-out infinite}
-    @keyframes catBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
-    .loader-copy{display:flex;flex-direction:column;gap:4px;margin-bottom:22px}
-    .loader-title{color:var(--text);font-size:1rem;font-weight:700}.loader-subtitle{color:var(--muted);font-size:.7rem}
-    .yarn-loader{position:relative;width:100%;padding:0 7px}.yarn-track{height:18px;border-radius:20px;background:repeating-linear-gradient(-35deg,rgba(215,149,167,.17) 0 5px,rgba(215,149,167,.07) 5px 10px);border:1px solid rgba(215,149,167,.18);overflow:hidden;box-shadow:inset 0 2px 6px rgba(80,50,70,.08)}
-    body.dark .yarn-track{background:repeating-linear-gradient(-35deg,rgba(189,124,255,.15) 0 5px,rgba(189,124,255,.06) 5px 10px);border-color:rgba(189,124,255,.2)}
-    .yarn-progress{position:relative;height:100%;width:0;border-radius:20px;background:repeating-linear-gradient(-35deg,var(--accent) 0 5px,var(--accent-hover) 5px 10px);box-shadow:0 2px 10px rgba(215,149,167,.32);transition:width .35s cubic-bezier(.22,.61,.36,1)}
-    .yarn-progress::after{content:"";position:absolute;right:3px;top:50%;width:13px;height:13px;transform:translateY(-50%);border-radius:50%;background:var(--accent-hover);box-shadow:0 0 0 3px rgba(255,255,255,.6),0 2px 7px rgba(90,60,80,.18)}
-    body.dark .yarn-progress::after{box-shadow:0 0 0 3px rgba(30,20,40,.65),0 0 12px rgba(190,120,255,.7)}
-    .yarn-ends{display:flex;justify-content:space-between;margin-top:-4px}.yarn-ends span{font-size:17px;animation:yarnBounce 1.6s ease-in-out infinite}.yarn-ends span:last-child{animation-delay:.35s}
-    @keyframes yarnBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}}
-    .loader-percent{margin-top:13px;color:var(--accent);font-size:.68rem;font-weight:700}
+    /* Chat Interface */
+    .chat-container { max-width: 800px; margin: 0 auto; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 30px; padding: 30px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 20px 60px var(--shadow); }
+    body.dark .chat-container { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
+    .chat-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .chat-header img { width: 50px; height: 50px; border-radius: 50%; background: var(--pink); padding: 10px; }
+    .chat-header h3 { margin: 0; color: var(--text); font-size: 1.2rem; }
+    .chat-header p { margin: 0; color: var(--muted); font-size: .8rem; }
+    .chat-window { background: var(--card); border-radius: 20px; padding: 20px; height: 400px; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(120,100,120,.1); }
+    .chat-msg { max-width: 80%; padding: 12px 18px; border-radius: 18px; line-height: 1.4; font-size: .9rem; position: relative; }
+    .chat-msg.user { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+    .chat-msg.bot { align-self: flex-start; background: var(--surface); color: var(--text); border-bottom-left-radius: 4px; box-shadow: 0 4px 12px var(--shadow); }
+    .chat-msg .time { display: block; font-size: 0.65rem; margin-top: 5px; opacity: 0.7; }
+    .chat-input-area { display: flex; gap: 10px; }
+    .chat-input { flex: 1; padding: 14px; border: 1px solid rgba(120,100,120,.2); border-radius: 30px; background: var(--card); color: var(--text); font-size: 1rem; outline: none; transition: border-color .3s ease; }
+    .chat-input:focus { border-color: var(--accent); }
+    .chat-send { padding: 12px 24px; border: none; border-radius: 30px; background: var(--accent); color: white; cursor: pointer; font-weight: 600; transition: background .3s ease; }
+    .chat-send:hover { background: var(--accent-hover); }
 
     /* Background & Z-index */
     body{position:relative;isolation:isolate}
@@ -129,39 +134,12 @@
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))}
     nav,.hero,.products-section,.about,footer{position:relative;z-index:2}
 
-    /* ===== Contact Page Specific Styles ===== */
-    .contact-page { min-height: 80vh; padding: 100px 7%; }
-    .contact-container { display: flex; flex-wrap: wrap; gap: 60px; }
-    .contact-info { flex: 1; min-width: 300px; }
-    .contact-info h2 { font-size: 3rem; margin-bottom: 20px; color: var(--text); text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
-    body.dark .contact-info h2 { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
-    .contact-info p { color: var(--text-soft); margin-bottom: 30px; line-height: 1.8; }
-    .info-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; color: var(--text-soft); }
-    .info-item .icon { font-size: 1.5rem; color: var(--accent); }
-    
-    .contact-form-container { flex: 1.5; min-width: 300px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 35px; padding: 40px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 20px 60px var(--shadow); }
-    body.dark .contact-form-container { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
-    
-    .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
-    .form-row .form-group { flex: 1; }
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; margin-bottom: 8px; font-size: .9rem; color: var(--text-soft); }
-    .form-group input, .form-group textarea { width: 100%; padding: 14px; border: 1px solid rgba(120,100,120,.2); border-radius: 12px; background: var(--card); color: var(--text); font-size: 1rem; outline: none; transition: border-color .3s ease, box-shadow .3s ease; font-family: inherit; }
-    .form-group textarea { resize: vertical; min-height: 120px; }
-    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(215,149,167,0.2); }
-    .contact-submit { width: 100%; padding: 14px; border: none; border-radius: 50px; background: var(--accent); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .3s ease, transform .3s ease; }
-    .contact-submit:hover { background: var(--accent-hover); transform: translateY(-2px); }
-    
-    .social-links { display: flex; gap: 20px; margin-top: 30px; }
-    .social-btn { width: 50px; height: 50px; border-radius: 50%; background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: transform 0.3s ease, background 0.3s ease; box-shadow: 0 5px 15px var(--shadow); }
-    .social-btn:hover { transform: translateY(-5px); background: var(--accent); color: white; }
-
     /* Footer */
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
 
     @media(max-width:750px){
       nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
-      .contact-page{padding: 60px 6%}
+      .chat-container{padding: 20px}
     }
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
@@ -279,47 +257,20 @@
   </div>
 </nav>
 
-<!-- ===== CONTACT CONTENT ===== -->
-<section class="contact-page">
-  <div class="contact-container">
-    <div class="contact-info">
-      <h2>Let's Chat!</h2>
-      <p>Have a question about a custom order, or just want to say hi? We'd love to hear from you.</p>
-      
-      <div class="info-item"><span class="icon">📍</span><span>123 Yarn Lane, Stitch City, SC 45678</span></div>
-      <div class="info-item"><span class="icon">📧</span><span>hello@littleloop.com</span></div>
-      <div class="info-item"><span class="icon">📞</span><span>+91 98765 43210</span></div>
-      
-      <div class="social-links">
-        <a href="#" class="social-btn magic-hover">📷</a>
-        <a href="#" class="social-btn magic-hover">🐦</a>
-        <a href="#" class="social-btn magic-hover">📌</a>
+<!-- ===== CHAT CONTENT (Replaces old contact form) ===== -->
+<section class="about" id="contact">
+  <div class="chat-container">
+    <div class="chat-header">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d795a7' stroke-width='2'%3E%3Cpath d='M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'/%3E%3C/svg%3E" alt="Support">
+      <div>
+        <h3>Little Loop Support</h3>
+        <p>We're here to help!</p>
       </div>
     </div>
-
-    <div class="contact-form-container">
-      <form id="contactForm">
-        <h3 style="margin-bottom: 20px; color: var(--text);">Send us a message</h3>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" placeholder="Your name" required>
-          </div>
-          <div class="form-group">
-            <label for="contactEmail">Email</label>
-            <input type="email" id="contactEmail" placeholder="you@example.com" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="subject">Subject</label>
-          <input type="text" id="subject" placeholder="How can we help?" required>
-        </div>
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" placeholder="Tell us more..." required></textarea>
-        </div>
-        <button type="submit" class="contact-submit">Send Message</button>
-      </form>
+    <div class="chat-window" id="chatWindow"></div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." />
+      <button class="chat-send" onclick="sendMessage()">Send</button>
     </div>
   </div>
 </section>
@@ -330,6 +281,22 @@
 </footer>
 
 <script>
+  // ===== PASTE YOUR FIREBASE CONFIG HERE (SAME AS INDEX) =====
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  // =========================================================
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
   (function() {
     'use strict';
 
@@ -378,17 +345,173 @@
     function stopHeartMagic(){activeHeartElement=null;if(heartInterval!==null){clearInterval(heartInterval);heartInterval=null;}}
     document.querySelectorAll('.heart-hover').forEach(function(heart){heart.addEventListener('mouseenter',function(){startHeartMagic(heart);});heart.addEventListener('mouseleave',stopHeartMagic);});
 
-    // ===== Login Modal Logic =====
-    window.openModal = function() { document.getElementById('loginModal').classList.add('show'); }
-    window.closeModal = function() { document.getElementById('loginModal').classList.remove('show'); }
-    document.getElementById('loginForm').addEventListener('submit', function(e) { e.preventDefault(); var email = document.getElementById('email').value; var pass = document.getElementById('password').value; document.getElementById('emailError').textContent = ''; document.getElementById('passwordError').textContent = ''; if(!email || !email.includes('@')) { document.getElementById('emailError').textContent = 'Please enter a valid email.'; return; } if(pass.length < 6) { document.getElementById('passwordError').textContent = 'Password must be at least 6 characters.'; return; } localStorage.setItem('user', JSON.stringify({email: email})); alert('Login successful! (Demo)'); closeModal(); });
-    window.addEventListener('click', function(e) { if(e.target === document.getElementById('loginModal')) closeModal(); });
+    // ===== AUTH LOGIC =====
+    let currentUser = null;
+    const authButton = document.getElementById('authButton');
+    const authButtonText = document.getElementById('authButtonText');
+    const loginModal = document.getElementById('loginModal');
+    const signInForm = document.getElementById('signInForm');
+    const signUpForm = document.getElementById('signUpForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const signInTab = document.getElementById('signInTab');
+    const signUpTab = document.getElementById('signUpTab');
+    const authLoading = document.getElementById('authLoading');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatInput = document.getElementById('chatInput');
 
-    // ===== Contact Form Logic =====
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
+    auth.onAuthStateChanged(function(user) {
+      currentUser = user;
+      if (user) {
+        authButtonText.textContent = user.displayName || 'Account';
+        logoutBtn.style.display = 'inline-flex';
+        loadChatHistory();
+      } else {
+        authButtonText.textContent = 'Sign In';
+        logoutBtn.style.display = 'none';
+        chatWindow.innerHTML = '<div class="chat-msg bot">Please sign in to start chatting.</div>';
+      }
+    });
+
+    window.openAuthModal = function() {
+      if (currentUser) {
+        return;
+      }
+      loginModal.classList.add('show');
+      switchTab('signin');
+    };
+
+    window.logout = function() {
+      auth.signOut().then(function() {
+        window.location.href = 'index.html';
+      });
+    };
+
+    window.switchTab = function(tab) {
+      if (tab === 'signin') {
+        signInForm.style.display = 'block';
+        signUpForm.style.display = 'none';
+        modalTitle.textContent = 'Welcome back';
+        signInTab.classList.add('active');
+        signUpTab.classList.remove('active');
+      } else {
+        signInForm.style.display = 'none';
+        signUpForm.style.display = 'block';
+        modalTitle.textContent = 'Create your account';
+        signUpTab.classList.add('active');
+        signInTab.classList.remove('active');
+      }
+    };
+
+    signInForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      alert('Thank you! Your message has been sent.');
-      this.reset();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      clearErrors();
+      authLoading.classList.add('show');
+      auth.signInWithEmailAndPassword(email, password)
+        .then(function() { closeModal(); })
+        .catch(function(error) {
+          let msg = 'Login failed. Please try again.';
+          if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
+          else if (error.code === 'auth/wrong-password') msg = 'Incorrect password.';
+          else if (error.code === 'auth/invalid-email') msg = 'Invalid email format.';
+          setError('emailError', msg);
+        })
+        .finally(function() { authLoading.classList.remove('show'); });
+    });
+
+    signUpForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      clearErrors();
+      if (password.length < 6) { setError('signupPasswordError', 'Password must be at least 6 characters.'); return; }
+      authLoading.classList.add('show');
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(function(userCredential) {
+          return userCredential.user.updateProfile({ displayName: name });
+        })
+        .then(function() { closeModal(); })
+        .catch(function(error) {
+          let msg = 'Signup failed. Please try again.';
+          if (error.code === 'auth/email-already-in-use') msg = 'Email already registered.';
+          else if (error.code === 'auth/invalid-email') msg = 'Invalid email format.';
+          setError('signupEmailError', msg);
+        })
+        .finally(function() { authLoading.classList.remove('show'); });
+    });
+
+    window.googleSignIn = function() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      authLoading.classList.add('show');
+      auth.signInWithPopup(provider)
+        .then(function() { closeModal(); })
+        .catch(function(error) { alert('Google sign-in failed: ' + error.message); })
+        .finally(function() { authLoading.classList.remove('show'); });
+    };
+
+    window.forgotPassword = function() {
+      const email = document.getElementById('email').value;
+      if (!email) { setError('emailError', 'Please enter your email first.'); return; }
+      auth.sendPasswordResetEmail(email)
+        .then(function() { alert('Password reset email sent! Check your inbox.'); })
+        .catch(function(error) { setError('emailError', 'Could not send reset email. Check email.'); });
+    };
+
+    window.closeModal = function() { loginModal.classList.remove('show'); clearErrors(); };
+    function setError(id, msg) { document.getElementById(id).textContent = msg; }
+    function clearErrors() { ['emailError', 'passwordError', 'nameError', 'signupEmailError', 'signupPasswordError'].forEach(function(id) { document.getElementById(id).textContent = ''; }); }
+
+    // ===== CHAT LOGIC =====
+    function loadChatHistory() {
+      if (!currentUser) return;
+      chatWindow.innerHTML = '';
+      db.collection('chats').doc(currentUser.uid).collection('messages').orderBy('timestamp', 'asc').get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            const data = doc.data();
+            appendMessage(data.sender, data.text, data.timestamp.toDate());
+          });
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+        })
+        .catch(function(err) { console.error("Error loading chat: ", err); });
+    }
+
+    function appendMessage(sender, text, date) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('chat-msg');
+      msgDiv.classList.add(sender === 'user' ? 'user' : 'bot');
+      msgDiv.innerHTML = text + '<span class="time">' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</span>';
+      chatWindow.appendChild(msgDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    window.sendMessage = function() {
+      const text = chatInput.value.trim();
+      if (!text || !currentUser) return;
+      const user = currentUser;
+      db.collection('chats').doc(user.uid).collection('messages').add({
+        sender: 'user',
+        text: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        appendMessage('user', text, new Date());
+        chatInput.value = '';
+        setTimeout(function() {
+          const botText = "Thanks for reaching out! Our team will get back to you soon. Meanwhile, is there anything else I can help with?";
+          db.collection('chats').doc(user.uid).collection('messages').add({
+            sender: 'bot',
+            text: botText,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(function() { appendMessage('bot', botText, new Date()); });
+        }, 1500);
+      }).catch(function(err) { console.error("Error sending message: ", err); });
+    };
+
+    chatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
     });
 
     // ===== FULL-SITE IMMERSIVE LANDSCAPE (Complete JS) =====
@@ -487,57 +610,6 @@
     })();
 
   })();
-</script>
-<script>
-  // ===== PASTE YOUR FIREBASE CONFIG HERE (SAME AS INDEX) =====
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // ===== AUTH LOGIC =====
-  document.addEventListener("DOMContentLoaded", function() {
-    const authButton = document.getElementById('authButton');
-    const authButtonText = document.getElementById('authButtonText');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    auth.onAuthStateChanged(function(user) {
-      if (user) {
-        authButtonText.textContent = user.displayName || 'Account';
-        authButton.style.display = 'inline-flex';
-        logoutBtn.style.display = 'inline-flex';
-      } else {
-        authButtonText.textContent = 'Sign In';
-        authButton.style.display = 'inline-flex';
-        logoutBtn.style.display = 'none';
-      }
-    });
-
-    window.openAuthModal = function() {
-      if (auth.currentUser) {
-        return; // Only open modal if not logged in
-      }
-      document.getElementById('loginModal').classList.add('show');
-    };
-
-    window.logout = function() {
-      auth.signOut().then(function() {
-        window.location.href = 'index.html'; // Redirect to home on logout
-      });
-    };
-
-    document.getElementById('closeModal').onclick = function() { 
-      document.getElementById('loginModal').classList.remove('show'); 
-    };
-  });
 </script>
 </body>
 </html>
