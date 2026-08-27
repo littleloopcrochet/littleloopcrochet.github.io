@@ -170,6 +170,21 @@
       .contact-page{padding: 60px 6%}
       .chat-container{padding: 20px}
     }
+    /* Magic Particles & Hearts */
+    .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
+    .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s cubic-bezier(.25,.65,.35,1) forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
+    .butterfly .body{position:absolute;left:50%;top:50%;width:3px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#7d6877;z-index:3;}
+    .butterfly .wing{position:absolute;top:3px;width:8px;height:11px;border-radius:80% 20% 70% 30%;background:linear-gradient(135deg,#f6c5d9,#d9a7d7);transform-origin:center right;}
+    .butterfly .wing.left{right:50%;transform:rotate(-25deg) scaleX(1);animation:flapLeft .48s ease-in-out infinite alternate;}
+    .butterfly .wing.right{left:50%;border-radius:20% 80% 30% 70%;transform:rotate(25deg) scaleX(1);animation:flapRight .48s ease-in-out infinite alternate;}
+    @keyframes flapLeft{from{transform:rotate(-25deg) scaleX(1)}to{transform:rotate(-10deg) scaleX(.48)}}
+    @keyframes flapRight{from{transform:rotate(25deg) scaleX(1)}to{transform:rotate(10deg) scaleX(.48)}}
+    @keyframes butterflyDrift{0%{opacity:0;transform:translate(0,7px) rotate(-8deg) scale(.55)}10%{opacity:.18}24%{opacity:.82;transform:translate(var(--x1),var(--y1)) rotate(5deg) scale(.88)}45%{opacity:.95;transform:translate(var(--x2),var(--y2)) rotate(-5deg) scale(1)}68%{opacity:.78;transform:translate(var(--x3),var(--y3)) rotate(7deg) scale(.92)}84%{opacity:.35;transform:translate(var(--x4),var(--y4)) rotate(-4deg) scale(.72)}100%{opacity:0;transform:translate(calc(var(--x4) * 1.08),calc(var(--y4) - 8px)) rotate(2deg) scale(.5)}}
+    .firefly{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;background:#e1b8ff;box-shadow:0 0 5px #d19cff,0 0 12px #b86aff,0 0 23px rgba(168,80,255,.8);opacity:0;animation:fireflyDrift 3.8s ease-in-out forwards;}
+    @keyframes fireflyDrift{0%{opacity:0;transform:translate(0,5px) scale(.25)}12%{opacity:.18}28%{opacity:.72;transform:translate(var(--x1),var(--y1)) scale(.75)}46%{opacity:1;transform:translate(var(--x2),var(--y2)) scale(1)}62%{opacity:.72;transform:translate(var(--x3),var(--y3)) scale(.85)}82%{opacity:.35;transform:translate(var(--x4),var(--y4)) scale(.62)}100%{opacity:0;transform:translate(calc(var(--x4) * 1.05),calc(var(--y4) - 7px)) scale(.2)}}
+    body.dark .magic-hover:hover{filter:drop-shadow(0 0 7px rgba(189,124,255,.5));}
+    .heart-bubble{position:fixed;pointer-events:none;z-index:10000;font-size:13px;opacity:0;animation:heartBubble 1.25s cubic-bezier(.2,.7,.3,1) forwards;}
+    @keyframes heartBubble{0%{opacity:0;transform:translate(0,5px) scale(.25) rotate(-12deg)}15%{opacity:1;transform:translate(0,0) scale(.85) rotate(5deg)}45%{transform:translate(var(--heart-x),-24px) scale(1) rotate(-8deg)}75%{opacity:.85;transform:translate(calc(var(--heart-x) * .7),-45px) scale(.85) rotate(9deg)}100%{opacity:0;transform:translate(calc(var(--heart-x) * 1.4),-70px) scale(.05) rotate(-15deg)}}
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 </head>
@@ -596,6 +611,113 @@
     })();
 
   })();
+  // Magic Particles (Butterfly/Firefly on hover)
+let particleInterval=null, activeMagicElement=null;
+const magicContainer=document.createElement('div');
+magicContainer.className='magic-particles';
+document.body.appendChild(magicContainer);
+
+function randomNumber(min,max){return Math.random()*(max-min)+min;}
+
+function createMagicParticle(element){
+  if(!element||!element.isConnected)return;
+  if(element.classList.contains('heart-hover'))return;
+  const rect=element.getBoundingClientRect();
+  const angle=Math.random()*Math.PI*2;
+  const radius=Math.max(rect.width,rect.height)*0.35+Math.random()*18;
+  const startX=rect.left+rect.width/2+Math.cos(angle)*radius;
+  const startY=rect.top+rect.height/2+Math.sin(angle)*radius;
+  const isNight=document.body.classList.contains('dark');
+  const particle=document.createElement('span');
+  if(isNight){
+    particle.className='firefly';
+  } else {
+    particle.className='butterfly';
+    particle.innerHTML='<span class="wing left"></span><span class="body"></span><span class="wing right"></span>';
+  }
+  particle.style.left=startX+'px';
+  particle.style.top=startY+'px';
+  particle.style.setProperty('--x1',randomNumber(-25,25)+'px');
+  particle.style.setProperty('--y1',randomNumber(-25,-5)+'px');
+  particle.style.setProperty('--x2',randomNumber(-40,40)+'px');
+  particle.style.setProperty('--y2',randomNumber(-45,-15)+'px');
+  particle.style.setProperty('--x3',randomNumber(-50,50)+'px');
+  particle.style.setProperty('--y3',randomNumber(-65,-30)+'px');
+  particle.style.setProperty('--x4',randomNumber(-70,70)+'px');
+  particle.style.setProperty('--y4',randomNumber(-85,-45)+'px');
+  particle.style.animationDuration=isNight?randomNumber(3.3,4.7)+'s':randomNumber(4.2,5.8)+'s';
+  magicContainer.appendChild(particle);
+  setTimeout(function(){particle.remove();},7000);
+}
+
+function startMagic(element){
+  if(element.classList.contains('heart-hover'))return;
+  activeMagicElement=element;
+  if(particleInterval!==null)return;
+  createMagicParticle(element);
+  particleInterval=setInterval(function(){if(activeMagicElement){createMagicParticle(activeMagicElement);}},850);
+}
+
+function stopMagic(){
+  activeMagicElement=null;
+  if(particleInterval!==null){clearInterval(particleInterval);particleInterval=null;}
+}
+
+document.querySelectorAll('.magic-hover').forEach(function(element){
+  element.addEventListener('mouseenter',function(){if(element.classList.contains('heart-hover'))return;startMagic(element);});
+  element.addEventListener('mouseleave',stopMagic);
+});
+
+// Hearts (Hover on text with hearts)
+function getHeartColour(text){
+  if(text.includes('🤍'))return'🤍';
+  if(text.includes('🖤'))return'🖤';
+  if(text.includes('💜'))return'💜';
+  if(text.includes('❤️')||text.includes('♥'))return'♥';
+  return'♥';
+}
+
+document.querySelectorAll('*').forEach(function(element){
+  const directText=Array.from(element.childNodes).filter(function(node){return node.nodeType===Node.TEXT_NODE;}).map(function(node){return node.textContent;}).join('');
+  if(directText.includes('♡')||directText.includes('♥')||directText.includes('❤️')||directText.includes('🤍')||directText.includes('🖤')||directText.includes('💜')){
+    element.classList.add('heart-hover');
+    element.classList.remove('magic-hover');
+  }
+});
+
+let heartInterval=null, activeHeartElement=null;
+
+function createHeartBubble(element){
+  if(!element||!element.isConnected)return;
+  const rect=element.getBoundingClientRect();
+  const heart=document.createElement('span');
+  heart.className='heart-bubble';
+  heart.textContent=getHeartColour(element.textContent);
+  heart.style.setProperty('--heart-x',Math.floor(Math.random()*40-20)+'px');
+  heart.style.fontSize=(10+Math.random()*8)+'px';
+  heart.style.left=(rect.left+rect.width/2+randomNumber(-5,5))+'px';
+  heart.style.top=(rect.top+rect.height/2)+'px';
+  document.body.appendChild(heart);
+  setTimeout(function(){heart.remove();},1400);
+}
+
+function startHeartMagic(element){
+  stopMagic();
+  activeHeartElement=element;
+  if(heartInterval!==null)return;
+  createHeartBubble(element);
+  heartInterval=setInterval(function(){if(activeHeartElement){createHeartBubble(activeHeartElement);}},420);
+}
+
+function stopHeartMagic(){
+  activeHeartElement=null;
+  if(heartInterval!==null){clearInterval(heartInterval);heartInterval=null;}
+}
+
+document.querySelectorAll('.heart-hover').forEach(function(heart){
+  heart.addEventListener('mouseenter',function(){startHeartMagic(heart);});
+  heart.addEventListener('mouseleave',stopHeartMagic);
+});
 </script>
 </body>
 </html>
