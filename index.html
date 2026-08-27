@@ -1173,6 +1173,7 @@
     });
 
     // ===== NEW: Firebase Auth & Chat Logic =====
+        // ===== AUTH LOGIC (WORKING FROM ABOUT PAGE) =====
     let currentUser = null;
     const authButton = document.getElementById('authButton');
     const authButtonText = document.getElementById('authButtonText');
@@ -1183,35 +1184,47 @@
     const signInTab = document.getElementById('signInTab');
     const signUpTab = document.getElementById('signUpTab');
     const authLoading = document.getElementById('authLoading');
-    const chatWindow = document.getElementById('chatWindow');
-    const chatInput = document.getElementById('chatInput');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-    // Listen to auth state changes
     auth.onAuthStateChanged(function(user) {
       currentUser = user;
       if (user) {
         authButtonText.textContent = user.displayName || 'Account';
-        loadChatHistory();
+        logoutBtn.style.display = 'inline-flex';
       } else {
         authButtonText.textContent = 'Sign In';
-        chatWindow.innerHTML = '<div class="chat-msg bot">Please sign in to start chatting.</div>';
+        logoutBtn.style.display = 'none';
       }
     });
 
-    // Open auth modal
     window.openAuthModal = function() {
-      if (currentUser) {
-        if (confirm('Are you sure you want to logout?')) {
-          auth.signOut().then(function() {
-            authButtonText.textContent = 'Sign In';
-          });
-        }
-      } else {
-        loginModal.classList.add('show');
-        switchTab('signin');
-      }
+      if (currentUser) { return; }
+      loginModal.classList.add('show');
+      switchTab('signin');
     };
 
+    window.logout = function() {
+      auth.signOut().then(function() {
+        window.location.href = 'index.html';
+      });
+    };
+
+    window.switchTab = function(tab) {
+      if (tab === 'signin') {
+        signInForm.style.display = 'block';
+        signUpForm.style.display = 'none';
+        modalTitle.textContent = 'Welcome back';
+        signInTab.classList.add('active');
+        signUpTab.classList.remove('active');
+      } else {
+        signInForm.style.display = 'none';
+        signUpForm.style.display = 'block';
+        modalTitle.textContent = 'Create your account';
+        signUpTab.classList.add('active');
+        signInTab.classList.remove('active');
+      }
+    };
+    
     // Switch tabs
     window.switchTab = function(tab) {
       if (tab === 'signin') {
