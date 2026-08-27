@@ -1,0 +1,557 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Little Loop — Handmade Crochet</title>
+
+  <!-- Cute Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    /* =========================
+       RESET & BASE
+    ========================== */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Comfortaa", sans-serif;
+      background: #fffdfb;
+      color: #514b4a;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* =========================
+       NAVIGATION
+    ========================== */
+
+    nav {
+      width: 100%;
+      padding: 24px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 253, 251, 0.9);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #6e5a57;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+      font-size: 0.9rem;
+    }
+
+    .nav-links a {
+      transition: color 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: #d795a7;
+    }
+
+    /* =========================
+       HERO
+    ========================== */
+
+    .hero {
+      min-height: 88vh;
+      padding: 70px 7%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 70px;
+    }
+
+    .hero-text {
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .eyebrow {
+      color: #d795a7;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 1.1;
+      color: #514645;
+      margin-bottom: 25px;
+    }
+
+    .hero p {
+      max-width: 500px;
+      color: #817775;
+      font-size: 1rem;
+      margin-bottom: 32px;
+    }
+
+    .button {
+      display: inline-block;
+      background: #e9b8c5;
+      color: white;
+      padding: 14px 25px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: transform 0.25s ease, background 0.25s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-4px);
+      background: #d99aaa;
+    }
+
+    /* Crochet photo placeholder */
+
+    .hero-image {
+      height: 500px;
+      border-radius: 35px;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(247, 221, 228, 0.85),
+          rgba(224, 237, 229, 0.9)
+        );
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+      color: #817775;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-image::before {
+      content: "🧶";
+      font-size: 5rem;
+      position: absolute;
+      opacity: 0.35;
+      top: 30px;
+      right: 40px;
+      transform: rotate(15deg);
+    }
+
+    .photo-placeholder {
+      padding: 35px;
+      border: 2px dashed rgba(120, 100, 100, 0.25);
+      border-radius: 25px;
+      background: rgba(255,255,255,0.3);
+    }
+
+    .photo-placeholder span {
+      display: block;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    /* =========================
+       PRODUCTS
+    ========================== */
+
+    .products-section {
+      padding: 100px 7%;
+      background: #fff;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 55px;
+    }
+
+    .section-heading h2 {
+      font-size: 2.2rem;
+      color: #514645;
+      margin-bottom: 10px;
+    }
+
+    .section-heading p {
+      color: #918887;
+      font-size: 0.95rem;
+    }
+
+    .product-grid {
+      max-width: 1000px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 35px;
+    }
+
+    .product-card {
+      background: #fffaf9;
+      border-radius: 25px;
+      overflow: hidden;
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 18px 40px rgba(90, 70, 70, 0.08);
+    }
+
+    .product-image {
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+    }
+
+    .pink {
+      background: #f8dce4;
+    }
+
+    .green {
+      background: #dfeee5;
+    }
+
+    .yellow {
+      background: #f8edcc;
+    }
+
+    .blue {
+      background: #dceaf3;
+    }
+
+    .product-info {
+      padding: 22px;
+    }
+
+    .product-info h3 {
+      color: #5b504f;
+      margin-bottom: 5px;
+      font-size: 1.05rem;
+    }
+
+    .product-info p {
+      color: #958b89;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    .price {
+      color: #d795a7;
+      font-weight: 700;
+    }
+
+    /* =========================
+       ABOUT
+    ========================== */
+
+    .about {
+      padding: 100px 7%;
+      text-align: center;
+      background: #f8f3ef;
+    }
+
+    .about-content {
+      max-width: 650px;
+      margin: auto;
+    }
+
+    .about h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #514645;
+    }
+
+    .about p {
+      color: #7d7472;
+      font-size: 0.95rem;
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    footer {
+      padding: 35px 7%;
+      text-align: center;
+      background: #fffdfb;
+      color: #968b89;
+      font-size: 0.8rem;
+    }
+
+    /* =========================
+       FLOATING ANIMATION
+    ========================== */
+
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    .floating {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    /* =========================
+       MOBILE
+    ========================== */
+
+    @media (max-width: 750px) {
+
+      nav {
+        padding: 20px 6%;
+      }
+
+      .nav-links {
+        gap: 15px;
+        font-size: 0.75rem;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 60px 6%;
+        gap: 45px;
+        text-align: center;
+      }
+
+      .hero p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-image {
+        height: 350px;
+      }
+
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .products-section,
+      .about {
+        padding: 75px 6%;
+      }
+    }
+
+    @media (max-width: 450px) {
+
+      .nav-links {
+        gap: 10px;
+      }
+
+      .logo {
+        font-size: 1.1rem;
+      }
+
+      .hero h1 {
+        font-size: 2.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       NAVIGATION
+  ========================== -->
+
+  <nav>
+    <a href="#" class="logo">♡ Little Loop</a>
+
+    <ul class="nav-links">
+      <li><a href="#shop">Shop</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+
+  <!-- =========================
+       HERO
+  ========================== -->
+
+  <section class="hero">
+
+    <div class="hero-text">
+      <div class="eyebrow">HANDMADE WITH LOVE ♡</div>
+
+      <h1>
+        Tiny stitches,<br>
+        big smiles.
+      </h1>
+
+      <p>
+        Soft, cozy and carefully handmade crochet pieces
+        designed to bring a little extra happiness to your day.
+      </p>
+
+      <a href="#shop" class="button">Explore the collection →</a>
+    </div>
+
+
+    <!-- Replace this entire div with an actual image later -->
+
+    <div class="hero-image floating">
+
+      <div class="photo-placeholder">
+        <span>🧶</span>
+        <strong>Your crochet photo here</strong>
+        <p>Add your favorite product photo</p>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       PRODUCTS
+  ========================== -->
+
+  <section class="products-section" id="shop">
+
+    <div class="section-heading">
+      <h2>Made with love ♡</h2>
+      <p>A few of our favorite little creations.</p>
+    </div>
+
+
+    <div class="product-grid">
+
+      <article class="product-card floating">
+
+        <div class="product-image pink">
+          🧸
+        </div>
+
+        <div class="product-info">
+          <h3>Cozy Teddy</h3>
+          <p>A tiny handmade friend for your shelf or someone special.</p>
+          <div class="price">₹799</div>
+        </div>
+
+      </article>
+
+
+      <article class="product-card">
+
+        <div class="product-image green">
+          🌷
+        </div>
+
+        <div class="product-info">
+          <h3>Mini Flower Bouquet</h3>
+          <p>Flowers that never wilt, carefully crocheted by hand.</p>
+          <div class="price">₹599</div>
+        </div>
+
+      </article>
+
+
+      <article class="product-card">
+
+        <div class="product-image yellow">
+          ☀️
+        </div>
+
+        <div class="product-info">
+          <h3>Sunny Pouch</h3>
+          <p>A soft little pouch for your everyday essentials.</p>
+          <div class="price">₹699</div>
+        </div>
+
+      </article>
+
+
+      <article class="product-card floating">
+
+        <div class="product-image blue">
+          🐳
+        </div>
+
+        <div class="product-info">
+          <h3>Little Whale</h3>
+          <p>A squishy ocean friend made with soft yarn.</p>
+          <div class="price">₹499</div>
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       ABOUT
+  ========================== -->
+
+  <section class="about" id="about">
+
+    <div class="about-content">
+
+      <h2>Small business, handmade heart ♡</h2>
+
+      <p>
+        Every piece is crocheted slowly and lovingly by hand.
+        From choosing the yarn to making the final stitch,
+        each creation is made with care and a little bit of joy.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       FOOTER
+  ========================== -->
+
+  <footer id="contact">
+    <p>♡ Little Loop Crochet</p>
+    <p>Made by hand · Made with love</p>
+  </footer>
+
+</body>
+</html>
+```
