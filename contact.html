@@ -586,10 +586,10 @@ window.sendMessage = function() {
 
     // Save the user's message
     chatRef.collection('messages').add({
-      sender: 'bot',
-      text: botText,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(), // <--- ADDED COMMA
-      expiresAt: getExpiryTimestamp() // <--- ADDED TTL
+      sender: 'user',  // <--- CHANGED from 'bot'
+      text: text,      // <--- CHANGED from 'botText'
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      expiresAt: getExpiryTimestamp()
     }).then(function() {
       appendMessage('user', text, new Date());
       chatInput.value = '';
@@ -601,7 +601,8 @@ window.sendMessage = function() {
           chatRef.collection('messages').add({
             sender: 'bot',
             text: botText,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            expiresAt: getExpiryTimestamp() // <--- ADDED TTL
           }).then(function() {
             appendMessage('bot', botText, new Date());
             // Mark as greeted so it never fires again
