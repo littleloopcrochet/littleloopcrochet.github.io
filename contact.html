@@ -469,15 +469,15 @@
     function loadChatHistory() {
       if (!currentUser) return;
       chatWindow.innerHTML = '';
-      db.collection('chats').doc(currentUser.uid).collection('messages').orderBy('timestamp', 'asc').get()
-        .then(function(querySnapshot) {
-          querySnapshot.forEach(function(doc) {
-            const data = doc.data();
-            appendMessage(data.sender, data.text, data.timestamp.toDate());
-          });
-          chatWindow.scrollTop = chatWindow.scrollHeight;
-        })
-        .catch(function(err) { console.error("Error loading chat: ", err); });
+      // Added: Use onSnapshot() to get real-time updates
+      db.collection('chats').doc(currentUser.uid).collection('messages').orderBy('timestamp', 'asc').onSnapshot(function(querySnapshot) {
+        chatWindow.innerHTML = '';
+        querySnapshot.forEach(function(doc) {
+          const data = doc.data();
+          appendMessage(data.sender, data.text, data.timestamp.toDate());
+        });
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      });
     }
 
     function appendMessage(sender, text, date) {
