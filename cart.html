@@ -88,12 +88,33 @@
     .checkout-btn { width: 100%; padding: 15px; border: none; border-radius: 50px; background: var(--accent); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform .3s ease, background .3s ease; }
     .checkout-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
     
-    /* Empty Cart */
+    /* Empty Cart & Suggested Features */
     .empty-cart { text-align: center; padding: 60px 20px; }
     .empty-cart h2 { font-size: 2rem; margin-bottom: 20px; color: var(--text); }
     .empty-cart p { color: var(--muted); margin-bottom: 30px; }
-    .shop-btn { padding: 15px 30px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; }
+    .shop-btn { padding: 15px 30px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; display: inline-block; }
     .shop-btn:hover { background: var(--accent-hover); }
+
+    .suggested-section, .trust-section { width: 100%; margin-top: 40px; text-align: center; }
+    .suggested-title { font-size: 1.5rem; color: var(--text); margin-bottom: 20px; }
+    .suggested-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto 30px; }
+    .suggested-card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 5px 15px var(--shadow); transition: transform .3s ease; }
+    .suggested-card:hover { transform: translateY(-5px); }
+    .suggested-img { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; background: var(--pink); }
+    .green-bg { background: var(--green); }
+    .yellow-bg { background: var(--yellow); }
+    .suggested-card h4 { font-size: 1rem; margin-bottom: 5px; color: var(--text); }
+    .suggested-price { font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+    .add-suggested-btn { padding: 8px 15px; background: var(--accent); color: white; border: none; border-radius: 50px; cursor: pointer; font-family: inherit; font-size: .8rem; font-weight: 600; transition: background .3s ease; }
+    .add-suggested-btn:hover { background: var(--accent-hover); }
+
+    .trust-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; max-width: 600px; margin: 0 auto; }
+    .trust-card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid rgba(255,255,255,0.4); }
+    .trust-card span { font-size: 2rem; display: block; margin-bottom: 5px; }
+    .trust-card p { font-size: .9rem; color: var(--text-soft); font-weight: 600; }
+
+    /* Footer */
+    footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem; position: relative; z-index: 2;}
 
     /* Loader */
     body.is-loading{overflow:hidden}
@@ -116,7 +137,7 @@
     body{position:relative;isolation:isolate}
     #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block}
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))}
-    nav,.cart-page{position:relative;z-index:2}
+    nav,.cart-page,footer{position:relative;z-index:2}
 
     /* Magic Particles & Hearts */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
@@ -184,6 +205,12 @@
   <h1 class="cart-title">Your Cart</h1>
   <div id="cartContent" class="cart-container"></div>
 </div>
+
+<!-- Standard Footer -->
+<footer>
+  <p>♡ Little Loop Crochet</p>
+  <p>Made by hand · Made with love</p>
+</footer>
 
 <script>
   const firebaseConfig = {
@@ -293,11 +320,45 @@
         let total = 0;
 
         if (querySnapshot.empty) {
+          // Professional Empty Cart: Suggested items + Trust section
           cartContent.innerHTML = `
             <div class="empty-cart" style="width:100%;">
               <h2>Your cart is empty!</h2>
               <p>Looks like you haven't added anything yet.</p>
               <a href="shop.html" class="shop-btn">Continue Shopping</a>
+            </div>
+
+            <div class="suggested-section">
+              <h3 class="suggested-title">✨ You might love these</h3>
+              <div class="suggested-grid">
+                <div class="suggested-card">
+                  <div class="suggested-img">🧸</div>
+                  <h4>Cozy Teddy</h4>
+                  <p class="suggested-price">₹799</p>
+                  <button class="add-suggested-btn" onclick="quickAdd('cozy-teddy', 'Cozy Teddy', 799, '🧸')">Add to Cart</button>
+                </div>
+                <div class="suggested-card">
+                  <div class="suggested-img green-bg">🐳</div>
+                  <h4>Little Whale</h4>
+                  <p class="suggested-price">₹499</p>
+                  <button class="add-suggested-btn" onclick="quickAdd('little-whale', 'Little Whale', 499, '🐳')">Add to Cart</button>
+                </div>
+                <div class="suggested-card">
+                  <div class="suggested-img yellow-bg">🌷</div>
+                  <h4>Mini Bouquet</h4>
+                  <p class="suggested-price">₹599</p>
+                  <button class="add-suggested-btn" onclick="quickAdd('flower-bouquet', 'Mini Flower Bouquet', 599, '🌷')">Add to Cart</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="trust-section">
+              <h3 class="suggested-title">Why shop with us?</h3>
+              <div class="trust-grid">
+                <div class="trust-card"><span>🚚</span><p>Free Shipping</p></div>
+                <div class="trust-card"><span>💖</span><p>Handmade with Love</p></div>
+                <div class="trust-card"><span>🔒</span><p>Secure Checkout</p></div>
+              </div>
             </div>`;
           finishLoading();
           return;
@@ -366,6 +427,21 @@
         finishLoading();
       });
   }
+
+  window.quickAdd = function(id, name, price, image) {
+    if (!currentUser) { alert('Please sign in to add items to your cart.'); return; }
+    const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(id);
+    cartRef.get().then(function(doc) {
+      if (doc.exists) {
+        return cartRef.update({ quantity: firebase.firestore.FieldValue.increment(1) });
+      } else {
+        return cartRef.set({ id, name, price, image, quantity: 1 });
+      }
+    }).then(function() {
+      alert(name + ' added to cart!');
+      loadCart();
+    });
+  };
 
   window.changeQty = function(itemId, delta) {
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(itemId);
