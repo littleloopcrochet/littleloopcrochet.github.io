@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart — Little Loop Crochet</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{--bg:#fffdfb;--surface:#ffffff;--card:#fff9f8;--text:#000000;--text-soft:#222222;--muted:#444444;--accent:#d795a7;--accent-hover:#c98296;--pink:#f8dce4;--green:#dfeee5;--yellow:#f8edcc;--blue:#dceaf3;--nav-bg: transparent;--shadow:rgba(90,70,70,.10);--icon-glow:rgba(130,110,110,.18);}
+    body.dark{--bg:#09070d;--surface:#110d17;--card:#17111f;--text:#f7effd;--text-soft:#c8b9d1;--muted:#9989a4;--accent:#bd7cff;--accent-hover:#d19cff;--pink:#352039;--green:#1b3028;--yellow:#342b18;--blue:#20243a;--nav-bg: transparent;--shadow:rgba(0,0,0,.45);--icon-glow:rgba(174,92,255,.75);}
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:"Comfortaa",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden;}
+    
+    /* Nav */
+    nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:1000;}
+    nav a, nav .logo, .nav-links a { text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
+    body.dark nav a, body.dark nav .logo, body.dark .nav-links a { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
+    .logo{font-size:1.35rem;font-weight:700;color:var(--text);transition:transform .3s ease,color .3s ease}
+    .logo:hover{transform:translateY(-2px);color:var(--accent)}
+    .nav-right{display:flex;align-items:center;gap:28px}
+    .nav-links{display:flex;gap:30px;list-style:none;font-size:.9rem}
+    .nav-links a{display:inline-block;transition:color .3s ease,transform .3s ease}
+    .nav-links a:hover{color:var(--accent);transform:translateY(-2px)}
+    .signin-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;background:var(--accent);color:#fff;font-size:.85rem;font-weight:600;border:none;cursor:pointer;transition:background .3s ease, transform .3s ease;text-shadow:none;}
+    .signin-btn:hover{background:var(--accent-hover);transform:translateY(-3px);}
+
+    /* Cart Page Styles */
+    .cart-page { min-height: 90vh; padding: 100px 7%; max-width: 1200px; margin: 0 auto; }
+    .cart-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: var(--text); }
+    .cart-container { display: flex; gap: 30px; flex-wrap: wrap; }
+    .cart-items { flex: 2; min-width: 300px; display: flex; flex-direction: column; gap: 20px; }
+    
+    .cart-item { display: flex; align-items: center; gap: 20px; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 5px 15px var(--shadow); transition: transform .3s ease; }
+    .cart-item:hover { transform: translateY(-3px); }
+    .cart-item-img { width: 80px; height: 80px; background: var(--pink); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+    .cart-item-details { flex: 1; }
+    .cart-item-details h3 { font-size: 1.2rem; color: var(--text); margin-bottom: 5px; }
+    .cart-item-details p { font-size: .9rem; color: var(--muted); }
+    .cart-item-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+    .cart-item-price { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+    .qty-controls { display: flex; align-items: center; gap: 10px; }
+    .qty-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
+    .qty-btn:hover { background: var(--accent-hover); }
+    .qty-display { font-size: 1.1rem; font-weight: 600; min-width: 30px; text-align: center; }
+    .remove-btn { background: none; border: none; cursor: pointer; color: #ff6b6b; font-size: .9rem; font-weight: 600; }
+    .remove-btn:hover { text-decoration: underline; }
+
+    /* Summary & Checkout */
+    .cart-summary { flex: 1; min-width: 300px; background: var(--card); border-radius: 30px; padding: 30px; height: fit-content; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 20px 60px var(--shadow); }
+    .summary-title { font-size: 1.5rem; color: var(--text); margin-bottom: 20px; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; color: var(--text-soft); }
+    .summary-row.total { font-size: 1.5rem; font-weight: bold; color: var(--text); border-top: 1px solid rgba(120,100,120,.2); padding-top: 20px; margin-top: 10px; }
+    
+    .checkout-form { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: .9rem; color: var(--text-soft); }
+    .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid rgba(120,100,120,.2); border-radius: 10px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 1rem; outline: none; }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+    
+    .checkout-btn { width: 100%; padding: 15px; border: none; border-radius: 50px; background: var(--accent); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform .3s ease, background .3s ease; }
+    .checkout-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+    
+    /* Empty Cart */
+    .empty-cart { text-align: center; padding: 60px 20px; }
+    .empty-cart h2 { font-size: 2rem; margin-bottom: 20px; color: var(--text); }
+    .empty-cart p { color: var(--muted); margin-bottom: 30px; }
+    .shop-btn { padding: 15px 30px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; }
+    .shop-btn:hover { background: var(--accent-hover); }
+
+    /* Loader */
+    body.is-loading{overflow:hidden}
+    body.is-loading > *:not(#pageLoader){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
+    .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
+    .page-loader.loaded{opacity:0;visibility:hidden;pointer-events:none}
+    .loader-backdrop{position:absolute;inset:0;background:rgba(255,253,251,.58);backdrop-filter:blur(3px);transition:background .6s ease}
+    body.dark .loader-backdrop{background:rgba(7,4,11,.64)}
+    .loader-card{position:relative;width:min(390px,calc(100vw - 38px));padding:28px;border:1px solid rgba(190,150,175,.18);border-radius:30px;background:rgba(255,255,255,.88);box-shadow:0 25px 80px rgba(80,55,75,.18);backdrop-filter:blur(20px);text-align:center;animation:loaderCardFloat 4s ease-in-out infinite}
+    body.dark .loader-card{background:rgba(24,16,32,.92);border-color:rgba(190,120,255,.22);box-shadow:0 25px 90px rgba(0,0,0,.55)}
+    @keyframes loaderCardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    .loader-copy{margin-bottom:22px}.loader-title{color:var(--text);font-size:1rem;font-weight:700}.loader-subtitle{color:var(--muted);font-size:.7rem}
+    .yarn-loader{position:relative;width:100%;padding:0 7px}.yarn-track{height:18px;border-radius:20px;background:rgba(215,149,167,.17);overflow:hidden;box-shadow:inset 0 2px 6px rgba(80,50,70,.08)}
+    .yarn-progress{position:relative;height:100%;width:0;border-radius:20px;background:var(--accent);transition:width .35s cubic-bezier(.22,.61,.36,1)}
+    .yarn-ends{display:flex;justify-content:space-between;margin-top:-4px}.yarn-ends span{font-size:17px;animation:yarnBounce 1.6s ease-in-out infinite}
+    @keyframes yarnBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}}
+    .loader-percent{margin-top:13px;color:var(--accent);font-size:.68rem;font-weight:700}
+
+    @media(max-width:750px){.cart-page{padding: 60px 6%}.cart-title{font-size: 2rem}}
+  </style>
+</head>
+<body class="is-loading">
+
+<!-- Loader -->
+<div id="pageLoader" class="page-loader">
+  <div class="loader-backdrop"></div>
+  <div class="loader-card">
+    <div class="loader-copy"><span class="loader-title">Loading your cart...</span></div>
+    <div class="yarn-loader"><div class="yarn-track"><div class="yarn-progress"></div></div></div>
+    <div class="loader-percent" id="loaderPercent">0%</div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <a href="index.html" class="logo">♡ Little Loop</a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="cart.html">Cart</a></li>
+    </ul>
+    <button class="signin-btn" id="authButton" onclick="window.location.href='index.html'">
+      <span id="authButtonText">Account</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Cart Page -->
+<div class="cart-page">
+  <h1 class="cart-title">Your Cart</h1>
+  <div id="cartContent" class="cart-container"></div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCeiXIZhofwxkUrWkowZuiMSHyRcsfeHE0",
+    authDomain: "littleloopcrochet-2dcdf.firebaseapp.com",
+    projectId: "littleloopcrochet-2dcdf",
+    storageBucket: "littleloopcrochet-2dcdf.firebasestorage.app",
+    messagingSenderId: "837032344744",
+    appId: "1:837032344744:web:41f17ab83bb6071240969d"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Loader Logic
+  const pageLoader = document.getElementById('pageLoader');
+  const progressBar = document.querySelector('.yarn-progress');
+  const percentDisplay = document.getElementById('loaderPercent');
+  let progress = 0, finished = false;
+  const startTime = performance.now();
+  const MIN_LOAD_TIME = 800;
+
+  function setProgress(value) { progress = Math.max(progress, Math.min(100, value)); progressBar.style.width = progress + '%'; percentDisplay.textContent = Math.round(progress) + '%'; }
+  const ticker = setInterval(function() { if(finished) return; if(progress < 95) { setProgress(progress + Math.max(0.5, (95 - progress) * 0.04)); } }, 80);
+  function finishLoading() { if(finished) return; finished = true; const wait = Math.max(0, MIN_LOAD_TIME - (performance.now() - startTime)); setTimeout(function(){ clearInterval(ticker); setProgress(100); setTimeout(function(){ pageLoader.classList.add('loaded'); document.body.classList.remove('is-loading'); setTimeout(() => pageLoader.remove(), 750); }, 400); }, wait); }
+
+  document.fonts.ready.then(finishLoading);
+  setTimeout(finishLoading, 3000);
+
+  // Cart Logic
+  let currentUser = null;
+  
+  auth.onAuthStateChanged(function(user) {
+    currentUser = user;
+    if (user) {
+      document.getElementById('authButtonText').textContent = user.displayName || user.phoneNumber || 'Account';
+      loadCart();
+    } else {
+      document.getElementById('cartContent').innerHTML = `
+        <div class="empty-cart" style="width:100%;">
+          <h2>Please Sign In</h2>
+          <p>You need to sign in to view your cart.</p>
+          <a href="index.html" class="shop-btn">Go to Sign In</a>
+        </div>`;
+      finishLoading();
+    }
+  });
+
+  function loadCart() {
+    const cartContent = document.getElementById('cartContent');
+    cartContent.innerHTML = '';
+    
+    db.collection('users').doc(currentUser.uid).collection('cart').get()
+      .then(function(querySnapshot) {
+        let items = [];
+        let total = 0;
+
+        if (querySnapshot.empty) {
+          cartContent.innerHTML = `
+            <div class="empty-cart" style="width:100%;">
+              <h2>Your cart is empty!</h2>
+              <p>Looks like you haven't added anything yet.</p>
+              <a href="shop.html" class="shop-btn">Continue Shopping</a>
+            </div>`;
+          finishLoading();
+          return;
+        }
+
+        querySnapshot.forEach(function(doc) {
+          const item = doc.data();
+          items.push(item);
+          total += item.price * item.quantity;
+        });
+
+        // Render Items
+        let itemsHTML = '<div class="cart-items">';
+        items.forEach(function(item) {
+          itemsHTML += `
+            <div class="cart-item">
+              <div class="cart-item-img">${item.image}</div>
+              <div class="cart-item-details">
+                <h3>${item.name}</h3>
+                <p>Price: ₹${item.price}</p>
+              </div>
+              <div class="cart-item-controls">
+                <div class="cart-item-price">₹${item.price * item.quantity}</div>
+                <div class="qty-controls">
+                  <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
+                  <span class="qty-display">${item.quantity}</span>
+                  <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+                </div>
+                <button class="remove-btn" onclick="removeItem('${item.id}')">Remove</button>
+              </div>
+            </div>`;
+        });
+        itemsHTML += '</div>';
+
+        // Render Summary
+        const summaryHTML = `
+          <div class="cart-summary">
+            <h2 class="summary-title">Order Summary</h2>
+            <div class="summary-row"><span>Subtotal</span><span>₹${total}</span></div>
+            <div class="summary-row"><span>Shipping</span><span>Free</span></div>
+            <div class="summary-row total"><span>Total</span><span>₹${total}</span></div>
+            
+            <div class="checkout-form">
+              <h3>Checkout Details</h3>
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="checkoutName" placeholder="Enter your name" required>
+              </div>
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="checkoutPhone" placeholder="+91 98765 43210" required>
+              </div>
+              <div class="form-group">
+                <label>Delivery Address</label>
+                <textarea id="checkoutAddress" rows="4" placeholder="Enter your full address" required></textarea>
+              </div>
+              <button class="checkout-btn" onclick="placeOrder()">Place Order</button>
+            </div>
+          </div>`;
+
+        cartContent.innerHTML = itemsHTML + summaryHTML;
+        finishLoading();
+      })
+      .catch(function(err) {
+        console.error("Error loading cart: ", err);
+        finishLoading();
+      });
+  }
+
+  window.changeQty = function(itemId, delta) {
+    const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(itemId);
+    cartRef.get().then(function(doc) {
+      if (doc.exists) {
+        const newQty = doc.data().quantity + delta;
+        if (newQty <= 0) {
+          return cartRef.delete().then(loadCart);
+        } else {
+          return cartRef.update({ quantity: newQty }).then(loadCart);
+        }
+      }
+    });
+  };
+
+  window.removeItem = function(itemId) {
+    const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(itemId);
+    cartRef.delete().then(loadCart);
+  };
+
+  window.placeOrder = function() {
+    const name = document.getElementById('checkoutName').value;
+    const phone = document.getElementById('checkoutPhone').value;
+    const address = document.getElementById('checkoutAddress').value;
+
+    if (!name || !phone || !address) {
+      alert("Please fill in all checkout details.");
+      return;
+    }
+
+    // Get cart items and total
+    let total = 0;
+    const items = [];
+    db.collection('users').doc(currentUser.uid).collection('cart').get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          items.push(doc.data());
+          total += doc.data().price * doc.data().quantity;
+        });
+
+        return db.collection('orders').add({
+          userId: currentUser.uid,
+          userName: name,
+          phone: phone,
+          address: address,
+          items: items,
+          total: total,
+          status: 'pending',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      })
+      .then(function() {
+        // Clear the user's cart
+        const batch = db.batch();
+        return db.collection('users').doc(currentUser.uid).collection('cart').get().then(function(cartSnapshot) {
+          cartSnapshot.forEach(function(doc) {
+            batch.delete(doc.ref);
+          });
+          return batch.commit();
+        });
+      })
+      .then(function() {
+        alert('Order placed successfully! We will contact you soon.');
+        loadCart(); // Reload to empty cart
+      })
+      .catch(function(err) {
+        console.error("Error placing order: ", err);
+      });
+  };
+
+</script>
+</body>
+</html>
