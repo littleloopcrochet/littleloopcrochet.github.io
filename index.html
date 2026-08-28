@@ -291,7 +291,36 @@
     .button:hover{transform:translateY(-4px) scale(1.02);background:var(--accent-hover);box-shadow:0 12px 30px var(--shadow);}
 
     /* ---------- Hero gallery ---------- */
-    .hero-gallery{height:500px;border-radius:35px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--pink),var(--green));box-shadow:0 25px 60px var(--shadow);transition:background .5s ease,transform .5s ease,box-shadow .5s ease;cursor:pointer;perspective:2000px;}
+        .hero-gallery{height:500px;border-radius:35px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--pink),var(--green));box-shadow:0 25px 60px var(--shadow);transition:background .5s ease,transform .5s ease,box-shadow .5s ease;cursor:pointer;perspective:2000px;}
+    .hero-gallery:hover{transform:translateY(-5px);box-shadow:0 30px 70px var(--shadow);}
+
+    /* The spine is ALWAYS on the left */
+    .gallery-slide{
+        position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+        opacity:0;
+        /* Fixed, single left spine for a real book feel */
+        transform-origin: left center;
+        transform: rotateY(90deg);
+        transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.2s ease;
+        z-index:1;
+    }
+    .gallery-slide.active{
+        opacity:1;
+        transform: rotateY(0deg);
+        z-index:2;
+    }
+    /* Pressing LEFT (Prev): The previous page rolls in from the right */
+    .gallery-slide.prev-active{
+        opacity:1;
+        transform: rotateY(0deg);
+        z-index:3;
+    }
+    /* Pressing RIGHT (Next): The current page rolls out to the left */
+    .gallery-slide.next-out{
+        opacity:1;
+        transform: rotateY(-90deg);
+        z-index:3;
+    }
     .hero-gallery:hover{transform:translateY(-5px);box-shadow:0 30px 70px var(--shadow);}
 
     /* Default: Flip from Left (Going Next) */
@@ -779,7 +808,7 @@
       if (index === 0) dot.classList.add('active');
       dot.addEventListener('click', function(event) {
         event.stopPropagation();
-        // Determine if we are going backward or forward based on which dot is clicked
+        // Determine direction based on if the new dot is further right or left
         var direction = (index > currentSlide) ? 'next' : 'prev';
         showSlide(index, direction);
         restartCarousel();
@@ -790,19 +819,28 @@
 
     function showSlide(index, direction) {
       if (index === currentSlide) return;
-      
-      // Toggle the 'flip-prev' class based on direction
+
+      var oldSlide = slides[currentSlide];
+      var newSlide = slides[index];
+
+      // Reset all animations/classes for all slides
+      slides.forEach(function(s){ s.classList.remove('active', 'prev-active', 'next-out'); });
+
+      // Update dots
+      dots[currentSlide].classList.remove('active');
+      dots[index].classList.add('active');
+
       if (direction === 'prev') {
-        gallery.classList.add('flip-prev');
+        // Going Back: The NEW page rolls in from the right and sits ON TOP
+        newSlide.classList.add('prev-active');
+        oldSlide.classList.add('active'); // Keeps the current page flat underneath
       } else {
-        gallery.classList.remove('flip-prev');
+        // Going Next: The CURRENT page rolls OUT to the left, new page sits beneath
+        oldSlide.classList.add('next-out');
+        newSlide.classList.add('active');
       }
 
-      slides[currentSlide].classList.remove('active');
-      dots[currentSlide].classList.remove('active');
       currentSlide = index;
-      slides[currentSlide].classList.add('active');
-      dots[currentSlide].classList.add('active');
     }
 
     function nextSlide() { showSlide((currentSlide + 1) % slides.length, 'next'); }
