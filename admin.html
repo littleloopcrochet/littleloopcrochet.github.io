@@ -131,14 +131,11 @@
 
       querySnapshot.forEach(function(userDoc) {
         const userId = userDoc.id;
-        // Create a customer item
         const item = document.createElement('div');
         item.className = 'customer-item';
-        // For now, just show the User ID (cryptic string)
-        // If you want to show emails, we need to add email saving to contact.html
+        // Show part of the User ID for now (since we don't save emails yet)
         item.innerHTML = '<h4>User: ' + userId.substring(0, 8) + '...</h4><p>Click to view chat</p>';
         
-        // Click listener
         item.addEventListener('click', function() {
           selectCustomer(userId, item);
         });
