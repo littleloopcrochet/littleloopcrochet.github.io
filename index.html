@@ -379,6 +379,7 @@
     <div class="modal-tabs">
       <div class="modal-tab active" id="signInTab" onclick="switchTab('signin')">Sign In</div>
       <div class="modal-tab" id="signUpTab" onclick="switchTab('signup')">Sign Up</div>
+      <div class="modal-tab" id="phoneTab" onclick="switchTab('phone')">Phone</div>
     </div>
 
     <!-- Sign In Form -->
@@ -425,6 +426,25 @@
         Sign up with Google
       </button>
       <div class="modal-alt"><span>Already have an account? <a onclick="switchTab('signin')">Sign In</a></span></div>
+    </form>
+        <!-- Phone Sign In Form -->
+    <form id="phoneForm" style="display:none">
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input type="tel" id="phoneNumber" placeholder="+91 9876543210" required>
+      </div>
+      
+      <!-- This div is required for Google reCAPTCHA -->
+      <div id="recaptcha-container"></div>
+    
+      <div class="form-group" style="margin-top: 15px;">
+        <label for="otpCode">OTP Code</label>
+        <input type="text" id="otpCode" placeholder="Enter 6-digit code" required>
+      </div>
+    
+      <button type="button" class="login-submit" id="sendOtpBtn" style="margin-top: 10px;">Send Code</button>
+      <button type="button" class="login-submit" id="verifyOtpBtn" style="background: var(--green); color: var(--text);">Verify & Sign In</button>
+      <div class="modal-alt"><span>Need help? <a onclick="switchTab('signin')">Back to Email Sign In</a></span></div>
     </form>
   </div>
 </div>
@@ -881,15 +901,15 @@
     const logoutBtn = document.getElementById('logoutBtn');
 
     auth.onAuthStateChanged(function(user) {
-      currentUser = user;
-      if (user) {
-        authButtonText.textContent = user.displayName || 'Account';
-        logoutBtn.style.display = 'inline-flex';
-      } else {
-        authButtonText.textContent = 'Sign In';
-        logoutBtn.style.display = 'none';
-      }
-    });
+  currentUser = user;
+  if (user) {
+    authButtonText.textContent = user.displayName || user.phoneNumber || 'Account';
+    logoutBtn.style.display = 'inline-flex';
+  } else {
+    authButtonText.textContent = 'Sign In';
+    logoutBtn.style.display = 'none';
+  }
+});
 
     window.openAuthModal = function() {
       if (currentUser) { return; }
@@ -916,6 +936,14 @@
         modalTitle.textContent = 'Create your account';
         signUpTab.classList.add('active');
         signInTab.classList.remove('active');
+      } else if (tab === 'phone') {
+        signInForm.style.display = 'none';
+        signUpForm.style.display = 'none';
+        phoneForm.style.display = 'block';
+        modalTitle.textContent = 'Sign in with Phone';
+        phoneTab.classList.add('active');
+        signInTab.classList.remove('active');
+        signUpTab.classList.remove('active');
       }
     };
 
@@ -970,7 +998,41 @@
         .catch(function(error) { alert('Google sign-in failed: ' + error.message); })
         .finally(function() { authLoading.classList.remove('show'); });
     };
+      // Initialize reCAPTCHA verifier (Must be called once on page load)
+const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+  'size': 'normal',
+  'callback': (response) => { /* reCAPTCHA solved, allow sending */ }
+});
 
+// Send OTP
+document.getElementById('sendOtpBtn').addEventListener('click', function() {
+  const phoneNumber = document.getElementById('phoneNumber').value;
+  authLoading.classList.add('show');
+  auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
+    .then(function(confirmationResult) {
+      window.confirmationResult = confirmationResult; // SAVE globally
+      alert("OTP sent to " + phoneNumber);
+    })
+    .catch(function(error) {
+      alert("Error sending OTP: " + error.message);
+    })
+    .finally(function() { authLoading.classList.remove('show'); });
+});
+
+// Verify OTP
+  document.getElementById('verifyOtpBtn').addEventListener('click', function() {
+    const code = document.getElementById('otpCode').value;
+    authLoading.classList.add('show');
+    window.confirmationResult.confirm(code)
+      .then(function(result) {
+        alert("Login successful!");
+        closeModal(); // Close the modal
+      })
+      .catch(function(error) {
+        alert("Invalid OTP. Try again.");
+      })
+      .finally(function() { authLoading.classList.remove('show'); });
+  });
     // Forgot password
     window.forgotPassword = function() {
       const email = document.getElementById('email').value;
