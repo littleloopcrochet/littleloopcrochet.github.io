@@ -91,6 +91,13 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const RETENTION_DAYS = 90;
+
+function getExpiryTimestamp() {
+  const d = new Date();
+  d.setDate(d.getDate() + RETENTION_DAYS);
+  return firebase.firestore.Timestamp.fromDate(d);
+}
 
   let currentUser = null;
   let selectedCustomerId = null;
@@ -199,7 +206,8 @@
     db.collection('chats').doc(selectedCustomerId).collection('messages').add({
       sender: 'admin',
       text: text,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Added comma
+      expiresAt: getExpiryTimestamp() // Added TTL
     }).then(function() {
       input.value = '';
     }).catch(function(err) {
