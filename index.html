@@ -899,6 +899,8 @@
     const signUpTab = document.getElementById('signUpTab');
     const authLoading = document.getElementById('authLoading');
     const logoutBtn = document.getElementById('logoutBtn');
+    const phoneTab = document.getElementById('phoneTab');
+    const phoneForm = document.getElementById('phoneForm');
 
     auth.onAuthStateChanged(function(user) {
   currentUser = user;
@@ -927,15 +929,11 @@
       if (tab === 'signin') {
         signInForm.style.display = 'block';
         signUpForm.style.display = 'none';
+        phoneForm.style.display = 'none';
         modalTitle.textContent = 'Welcome back';
         signInTab.classList.add('active');
         signUpTab.classList.remove('active');
-      } else {
-        signInForm.style.display = 'none';
-        signUpForm.style.display = 'block';
-        modalTitle.textContent = 'Create your account';
-        signUpTab.classList.add('active');
-        signInTab.classList.remove('active');
+        phoneTab.classList.remove('active');
       } else if (tab === 'phone') {
         signInForm.style.display = 'none';
         signUpForm.style.display = 'none';
@@ -944,6 +942,14 @@
         phoneTab.classList.add('active');
         signInTab.classList.remove('active');
         signUpTab.classList.remove('active');
+      } else {
+        signInForm.style.display = 'none';
+        signUpForm.style.display = 'block';
+        phoneForm.style.display = 'none';
+        modalTitle.textContent = 'Create your account';
+        signUpTab.classList.add('active');
+        signInTab.classList.remove('active');
+        phoneTab.classList.remove('active');
       }
     };
 
