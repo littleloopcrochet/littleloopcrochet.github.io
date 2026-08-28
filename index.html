@@ -301,6 +301,58 @@
     .gallery-dots{position:absolute;bottom:24px;right:24px;z-index:10;display:flex;gap:6px;}
     .gallery-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);transition:width .3s ease;cursor:pointer;}
     .gallery-dot.active{width:20px;border-radius:20px;background:white;}
+        /* --- Aesthetic Navigation Arrows --- */
+    .gallery-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(5px);
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(90, 70, 70, 0.2);
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .gallery-nav:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-50%) scale(1.1);
+      color: var(--accent);
+      box-shadow: 0 6px 20px rgba(90, 70, 70, 0.3);
+    }
+
+    .gallery-nav.prev { left: 15px; }
+    .gallery-nav.next { right: 15px; }
+
+    body.dark .gallery-nav {
+      background: rgba(30, 25, 40, 0.6);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark .gallery-nav:hover {
+      background: rgba(40, 30, 55, 0.9);
+      color: var(--accent-hover);
+    }
+
+    @media(max-width: 750px) {
+      .gallery-nav { width: 35px; height: 35px; font-size: 1.2rem; }
+      .gallery-nav.prev { left: 8px; }
+      .gallery-nav.next { right: 8px; }
+    }
+    /* --- End Arrows --- */
 
     /* ---------- Products ---------- */
     .products-section{padding:100px 7%;background:transparent;transition:background .5s ease;}
@@ -517,6 +569,8 @@
 
     <div class="gallery-label">✨ Hover to pause</div>
     <div class="gallery-dots" id="galleryDots"></div>
+    <button class="gallery-nav prev" aria-label="Previous image">&#10094;</button>
+    <button class="gallery-nav next" aria-label="Next image">&#10095;</button>
   </div>
 </section>
 
@@ -802,6 +856,23 @@
     gallery.addEventListener('mouseenter', pauseCarousel);
     gallery.addEventListener('mouseleave', resumeCarousel);
     scheduleNextSlide();
+       // Attach click listeners to the new aesthetic arrows
+    const prevBtn = document.querySelector('.gallery-nav.prev');
+    const nextBtn = document.querySelector('.gallery-nav.next');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function() {
+        prevSlide();
+        restartCarousel();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function() {
+        nextSlide();
+        restartCarousel();
+      });
+    }
 
     // ===== Magic particles (unchanged) =====
     let particleInterval = null;
