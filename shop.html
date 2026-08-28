@@ -846,17 +846,23 @@ function createMagicParticle(element){
   particle.style.setProperty('--y3',randomNumber(-65,-30)+'px');
   particle.style.setProperty('--x4',randomNumber(-70,70)+'px');
   particle.style.setProperty('--y4',randomNumber(-85,-45)+'px');
-  particle.style.animationDuration=isNight?randomNumber(3.3,4.7)+'s':randomNumber(4.2,5.8)+'s';
+  particle.style.animationDuration=isNight?randomNumber(5.5,7.5)+'s':randomNumber(6.0,8.0)+'s';
   magicContainer.appendChild(particle);
   setTimeout(function(){particle.remove();},7000);
 }
 
-function startMagic(element){
-  if(element.classList.contains('heart-hover'))return;
-  activeMagicElement=element;
-  if(particleInterval!==null)return;
-  createMagicParticle(element);
-  particleInterval=setInterval(function(){if(activeMagicElement){createMagicParticle(activeMagicElement);}},850);
+function startMagic(element) {
+  if (element.classList.contains('heart-hover')) return;
+  activeMagicElement = element;
+  if (particleInterval !== null) return;
+  // Spawn 3 at the start
+  for (let i = 0; i < 3; i++) { createMagicParticle(element); }
+  // Spawn 3 every 300 milliseconds
+  particleInterval = setInterval(function() {
+    if (activeMagicElement) {
+      for (let i = 0; i < 3; i++) { createMagicParticle(activeMagicElement); }
+    }
+  }, 300);
 }
 
 function stopMagic(){
