@@ -393,74 +393,74 @@ body.dark .magic-hover:hover{filter:drop-shadow(0 0 7px rgba(189,124,255,.5));}
   </div>
 
   <div class="shop-grid">
-    <div class="shop-card magic-hover" data-category="plush">
+    <div class="shop-card magic-hover" data-category="plush" data-id="cozy-teddy" data-name="Cozy Teddy" data-price="799" data-image="🧸">
       <div class="shop-card-img pink-bg">🧸</div>
       <div class="shop-card-body">
         <h3>Cozy Teddy</h3>
         <p>A tiny handmade friend for your shelf or someone special.</p>
         <div class="shop-card-footer">
           <span class="shop-card-price">₹799</span>
-          <button class="add-to-cart-btn" onclick="addToCart('Cozy Teddy')">Add to Cart</button>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
         </div>
       </div>
     </div>
 
-    <div class="shop-card magic-hover" data-category="accessories">
+    <div class="shop-card magic-hover" data-category="accessories" data-id="scarlet-scarf" data-name="Scarlet Scarf" data-price="1199" data-image="🧣">
       <div class="shop-card-img green-bg">🧣</div>
       <div class="shop-card-body">
         <h3>Scarlet Scarf</h3>
         <p>Warm, soft, and beautifully hand-knitted for chilly days.</p>
         <div class="shop-card-footer">
           <span class="shop-card-price">₹1,199</span>
-          <button class="add-to-cart-btn" onclick="addToCart('Scarlet Scarf')">Add to Cart</button>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
         </div>
       </div>
     </div>
 
-    <div class="shop-card magic-hover" data-category="decor">
+    <div class="shop-card magic-hover" data-category="decor" data-id="flower-bouquet" data-name="Mini Flower Bouquet" data-price="599" data-image="🌷">
       <div class="shop-card-img yellow-bg">🌷</div>
       <div class="shop-card-body">
         <h3>Mini Flower Bouquet</h3>
         <p>Flowers that never wilt, carefully crocheted by hand.</p>
         <div class="shop-card-footer">
           <span class="shop-card-price">₹599</span>
-          <button class="add-to-cart-btn" onclick="addToCart('Mini Flower Bouquet')">Add to Cart</button>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
         </div>
       </div>
     </div>
 
-    <div class="shop-card magic-hover" data-category="plush">
+    <div class="shop-card magic-hover" data-category="plush" data-id="little-whale" data-name="Little Whale" data-price="499" data-image="🐳">
       <div class="shop-card-img blue-bg">🐳</div>
       <div class="shop-card-body">
         <h3>Little Whale</h3>
         <p>A squishy ocean friend made with soft yarn.</p>
         <div class="shop-card-footer">
           <span class="shop-card-price">₹499</span>
-          <button class="add-to-cart-btn" onclick="addToCart('Little Whale')">Add to Cart</button>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
         </div>
       </div>
     </div>
 
-    <div class="shop-card magic-hover" data-category="decor">
+    <div class="shop-card magic-hover" data-category="decor" data-id="cozy-basket" data-name="Cozy Basket" data-price="899" data-image="🧶">
       <div class="shop-card-img pink-bg">🧶</div>
       <div class="shop-card-body">
         <h3>Cozy Basket</h3>
         <p>Keep your essentials organized with this handwoven basket.</p>
         <div class="shop-card-footer">
           <span class="shop-card-price">₹899</span>
-          <button class="add-to-cart-btn" onclick="addToCart('Cozy Basket')">Add to Cart</button>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
         </div>
       </div>
     </div>
 
-    <div class="shop-card magic-hover" data-category="accessories">
+    <div class="shop-card magic-hover" data-category="accessories" data-id="sunny-pouch" data-name="Sunny Pouch" data-price="699" data-image="👜">
       <div class="shop-card-img yellow-bg">👜</div>
       <div class="shop-card-body">
         <h3>Sunny Pouch</h3>
         <p>A soft little pouch for your everyday essentials.</p>
         <div class="shop-card-footer">
           <span class="shop-card-price">₹699</span>
-          <button class="add-to-cart-btn" onclick="addToCart('Sunny Pouch')">Add to Cart</button>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">Add to Cart</button>
         </div>
       </div>
     </div>
@@ -723,9 +723,31 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       });
     };
 
-    window.addToCart = function(productName) {
-      // Simple logic for demo
-      alert(productName + ' added to cart!');
+    window.addToCart = function(btn) {
+      if (!currentUser) { alert('Please sign in to add items to your cart.'); return; }
+      
+      const card = btn.closest('.shop-card');
+      const item = {
+        id: card.dataset.id,
+        name: card.dataset.name,
+        price: parseFloat(card.dataset.price),
+        image: card.dataset.image,
+        quantity: 1
+      };
+
+      const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(item.id);
+      
+      cartRef.get().then(function(doc) {
+        if (doc.exists) {
+          return cartRef.update({ quantity: firebase.firestore.FieldValue.increment(1) });
+        } else {
+          return cartRef.set(item);
+        }
+      }).then(function() {
+        alert(item.name + ' added to cart!');
+      }).catch(function(err) {
+        console.error("Error adding to cart: ", err);
+      });
     };
 
     // ===== FULL-SITE IMMERSIVE LANDSCAPE (Complete JS) =====
