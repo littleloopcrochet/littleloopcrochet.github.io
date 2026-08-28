@@ -125,7 +125,7 @@
       customerList.innerHTML = '';
       
       if (querySnapshot.empty) {
-        customerList.innerHTML = '<p style="color:var(--muted);">No customers yet. Ask someone to try the contact page!</p>';
+        customerList.innerHTML = '<p style="color:var(--muted);">No customers yet. Make sure you sent a message from the Contact page (after the fix).</p>';
         return;
       }
 
@@ -133,7 +133,6 @@
         const userId = userDoc.id;
         const item = document.createElement('div');
         item.className = 'customer-item';
-        // Show part of the User ID for now (since we don't save emails yet)
         item.innerHTML = '<h4>User: ' + userId.substring(0, 8) + '...</h4><p>Click to view chat</p>';
         
         item.addEventListener('click', function() {
