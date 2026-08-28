@@ -489,31 +489,36 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    window.sendMessage = function() {
-      const text = chatInput.value.trim();
-      if (!text || !currentUser) return;
-      const user = currentUser;
-      db.collection('chats').doc(user.uid).collection('messages').add({
-        sender: 'user',
-        text: text,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function() {
-        appendMessage('user', text, new Date());
-        chatInput.value = '';
-        setTimeout(function() {
-          const botText = "Thanks for reaching out! Our team will get back to you soon. Meanwhile, is there anything else I can help with?";
-          db.collection('chats').doc(user.uid).collection('messages').add({
-            sender: 'bot',
-            text: botText,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          }).then(function() { appendMessage('bot', botText, new Date()); });
-        }, 1500);
-      }).catch(function(err) { console.error("Error sending message: ", err); });
-    };
+window.sendMessage = function() {
+  const text = chatInput.value.trim();
+  if (!text || !currentUser) return;
+  const user = currentUser;
 
-    chatInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
-    });
+  // NEW: create/update the parent chat doc so it shows up in admin's list
+  db.collection('chats').doc(user.uid).set({
+    lastMessage: text,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    userEmail: user.email || null,
+    userName: user.displayName || null
+  }, { merge: true });
+
+  db.collection('chats').doc(user.uid).collection('messages').add({
+    sender: 'user',
+    text: text,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function() {
+    appendMessage('user', text, new Date());
+    chatInput.value = '';
+    setTimeout(function() {
+      const botText = "Thanks for reaching out! Our team will get back to you soon. Meanwhile, is there anything else I can help with?";
+      db.collection('chats').doc(user.uid).collection('messages').add({
+        sender: 'bot',
+        text: botText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() { appendMessage('bot', botText, new Date()); });
+    }, 1500);
+  }).catch(function(err) { console.error("Error sending message: ", err); });
+};
 
     // ===== FULL-SITE IMMERSIVE LANDSCAPE =====
     (function() {
