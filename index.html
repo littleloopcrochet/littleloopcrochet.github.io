@@ -701,6 +701,7 @@
     });
 
     // ===== Hero Carousel =====
+    // ===== Hero Carousel (Professional Swipe + Keyboard) =====
     const gallery = document.getElementById('heroGallery');
     const slides = document.querySelectorAll('.gallery-slide');
     const dotsContainer = document.getElementById('galleryDots');
@@ -708,6 +709,10 @@
     let carouselTimer = null;
     let carouselPaused = false;
     const SLIDE_DURATION = 4500;
+
+    // Touch swipe variables
+    let touchStartX = 0;
+    let touchStartY = 0;
 
     slides.forEach(function(slide, index) {
       const dot = document.createElement('span');
@@ -733,6 +738,8 @@
 
     function nextSlide() { showSlide((currentSlide + 1) % slides.length); }
 
+    function prevSlide() { showSlide((currentSlide - 1 + slides.length) % slides.length); }
+
     function scheduleNextSlide() {
       if (carouselTimer !== null || carouselPaused) return;
       carouselTimer = setTimeout(function() {
@@ -753,6 +760,46 @@
       carouselPaused = false;
       scheduleNextSlide();
     }
+
+    // Professional Swipe Support
+    gallery.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+      pauseCarousel();
+    }, {passive: true});
+
+    gallery.addEventListener('touchend', function(e) {
+      const touchEndX = e.changedTouches[0].screenX;
+      const touchEndY = e.changedTouches[0].screenY;
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+
+      // Only trigger swipe if it's mainly horizontal and over 50px
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        if (deltaX < 0) {
+          nextSlide(); // Swipe left
+        } else {
+          prevSlide(); // Swipe right
+        }
+        restartCarousel();
+      } else {
+        resumeCarousel();
+      }
+    }, {passive: true});
+
+    // Add professional left/right arrow key support for desktop
+    document.addEventListener('keydown', function(e) {
+      if (gallery.matches(':hover') || carouselPaused) {
+        if (e.key === 'ArrowRight') {
+          nextSlide();
+          restartCarousel();
+        } else if (e.key === 'ArrowLeft') {
+          prevSlide();
+          restartCarousel();
+        }
+      }
+    });
+
     gallery.addEventListener('mouseenter', pauseCarousel);
     gallery.addEventListener('mouseleave', resumeCarousel);
     scheduleNextSlide();
