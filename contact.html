@@ -493,31 +493,48 @@ window.sendMessage = function() {
   const text = chatInput.value.trim();
   if (!text || !currentUser) return;
   const user = currentUser;
+  const chatRef = db.collection('chats').doc(user.uid);
 
-  // NEW: create/update the parent chat doc so it shows up in admin's list
-  db.collection('chats').doc(user.uid).set({
-    lastMessage: text,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    userEmail: user.email || null,
-    userName: user.displayName || null
-  }, { merge: true });
+  // Check whether this user has already gotten the welcome bot reply
+  chatRef.get().then(function(chatDoc) {
+    const alreadyGreeted = chatDoc.exists && chatDoc.data().botGreeted === true;
 
-  db.collection('chats').doc(user.uid).collection('messages').add({
-    sender: 'user',
-    text: text,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function() {
-    appendMessage('user', text, new Date());
-    chatInput.value = '';
-    setTimeout(function() {
-      const botText = "Thanks for reaching out! Our team will get back to you soon. Meanwhile, is there anything else I can help with?";
-      db.collection('chats').doc(user.uid).collection('messages').add({
-        sender: 'bot',
-        text: botText,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function() { appendMessage('bot', botText, new Date()); });
-    }, 1500);
-  }).catch(function(err) { console.error("Error sending message: ", err); });
+    // Update/create the parent chat doc (for admin list + real-time updates)
+    chatRef.set({
+      lastMessage: text,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      userEmail: user.email || null,
+      userName: user.displayName || null
+    }, { merge: true });
+
+    // Save the user's message
+    chatRef.collection('messages').add({
+      sender: 'user',
+      text: text,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function() {
+      appendMessage('user', text, new Date());
+      chatInput.value = '';
+
+      // Only send the bot's auto-reply the FIRST time
+      if (!alreadyGreeted) {
+        setTimeout(function() {
+          const botText = "Thanks for reaching out! Our team will get back to you soon. Meanwhile, is there anything else I can help with?";
+          chatRef.collection('messages').add({
+            sender: 'bot',
+            text: botText,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(function() {
+            appendMessage('bot', botText, new Date());
+            // Mark as greeted so it never fires again
+            chatRef.set({ botGreeted: true }, { merge: true });
+          });
+        }, 1500);
+      }
+    });
+  }).catch(function(err) {
+    console.error("Error sending message: ", err);
+  });
 };
 
     // ===== FULL-SITE IMMERSIVE LANDSCAPE =====
