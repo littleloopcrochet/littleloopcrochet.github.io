@@ -293,8 +293,14 @@
     /* ---------- Hero gallery ---------- */
     .hero-gallery{height:500px;border-radius:35px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--pink),var(--green));box-shadow:0 25px 60px var(--shadow);transition:background .5s ease,transform .5s ease,box-shadow .5s ease;cursor:pointer;perspective:2000px;}
     .hero-gallery:hover{transform:translateY(-5px);box-shadow:0 30px 70px var(--shadow);}
+
+    /* Default: Flip from Left (Going Next) */
     .gallery-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:perspective(2000px) rotateY(-90deg);transform-origin:left center;transition:transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease;z-index:1;}
     .gallery-slide.active{opacity:1;transform:perspective(2000px) rotateY(0deg);z-index:2;}
+
+    /* Going Previous: Flip from Right */
+    .hero-gallery.flip-prev .gallery-slide{transform:perspective(2000px) rotateY(90deg);transform-origin:right center;}
+    .hero-gallery.flip-prev .gallery-slide.active{opacity:1;transform:perspective(2000px) rotateY(0deg);z-index:2;}
     .hero-gallery::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,.12),transparent 40%);}
     .gallery-label{position:absolute;bottom:22px;left:22px;z-index:5;padding:10px 16px;border-radius:30px;background:rgba(255,255,255,.68);backdrop-filter:blur(10px);color:#5b5050;font-size:.72rem;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease;}
     .hero-gallery:hover .gallery-label{opacity:1;transform:translateY(0);}
@@ -773,15 +779,25 @@
       if (index === 0) dot.classList.add('active');
       dot.addEventListener('click', function(event) {
         event.stopPropagation();
-        showSlide(index);
+        // Determine if we are going backward or forward based on which dot is clicked
+        var direction = (index > currentSlide) ? 'next' : 'prev';
+        showSlide(index, direction);
         restartCarousel();
       });
       dotsContainer.appendChild(dot);
     });
     const dots = document.querySelectorAll('.gallery-dot');
 
-    function showSlide(index) {
+    function showSlide(index, direction) {
       if (index === currentSlide) return;
+      
+      // Toggle the 'flip-prev' class based on direction
+      if (direction === 'prev') {
+        gallery.classList.add('flip-prev');
+      } else {
+        gallery.classList.remove('flip-prev');
+      }
+
       slides[currentSlide].classList.remove('active');
       dots[currentSlide].classList.remove('active');
       currentSlide = index;
@@ -789,9 +805,8 @@
       dots[currentSlide].classList.add('active');
     }
 
-    function nextSlide() { showSlide((currentSlide + 1) % slides.length); }
-
-    function prevSlide() { showSlide((currentSlide - 1 + slides.length) % slides.length); }
+    function nextSlide() { showSlide((currentSlide + 1) % slides.length, 'next'); }
+    function prevSlide() { showSlide((currentSlide - 1 + slides.length) % slides.length, 'prev'); }
 
     function scheduleNextSlide() {
       if (carouselTimer !== null || carouselPaused) return;
