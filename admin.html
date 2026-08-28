@@ -117,7 +117,7 @@
     auth.signOut().then(function() { window.location.href = 'index.html'; });
   }
 
-  function loadCustomers() {
+  function where to change() {
     const customerList = document.getElementById('customerList');
     customerList.innerHTML = 'Loading...';
 
@@ -130,17 +130,24 @@
       }
 
       querySnapshot.forEach(function(userDoc) {
-        const userId = userDoc.id;
-        const item = document.createElement('div');
-        item.className = 'customer-item';
-        item.innerHTML = '<h4>User: ' + userId.substring(0, 8) + '...</h4><p>Click to view chat</p>';
-        
-        item.addEventListener('click', function() {
-          selectCustomer(userId, item);
-        });
+  const userId = userDoc.id;
+  const data = userDoc.data();
 
-        customerList.appendChild(item);
-      });
+  const displayName = data.userName || 'No name';
+  const displayEmail = data.userEmail || 'No email';
+
+  const item = document.createElement('div');
+  item.className = 'customer-item';
+  item.innerHTML =
+    '<h4>' + displayName + '</h4>' +
+    '<p>' + displayEmail + '</p>';
+
+  item.addEventListener('click', function() {
+    selectCustomer(userId, item);
+  });
+
+  customerList.appendChild(item);
+});
     }).catch(function(err) {
       // This will explicitly show the ERR_BLOCKED_BY_CLIENT error
       console.error("Error loading customers: ", err);
