@@ -298,6 +298,13 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const RETENTION_DAYS = 90;
+
+function getExpiryTimestamp() {
+  const d = new Date();
+  d.setDate(d.getDate() + RETENTION_DAYS);
+  return firebase.firestore.Timestamp.fromDate(d);
+}
 
   (function() {
     'use strict';
@@ -504,14 +511,16 @@ window.sendMessage = function() {
       lastMessage: text,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       userEmail: user.email || null,
+      userPhone: user.phoneNumber || null, // <--- ADDED
       userName: user.displayName || null
     }, { merge: true });
 
     // Save the user's message
     chatRef.collection('messages').add({
-      sender: 'user',
-      text: text,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      sender: 'bot',
+      text: botText,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(), // <--- ADDED COMMA
+      expiresAt: getExpiryTimestamp() // <--- ADDED TTL
     }).then(function() {
       appendMessage('user', text, new Date());
       chatInput.value = '';
