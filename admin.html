@@ -125,7 +125,7 @@
       customerList.innerHTML = '';
       
       if (querySnapshot.empty) {
-        customerList.innerHTML = '<p style="color:var(--muted);">No customers yet. Make sure you sent a message from the Contact page (after the fix).</p>';
+        customerList.innerHTML = '<p style="color:var(--muted);">No customers yet. <br><br><strong>WARNING:</strong> If you are running an AdBlocker or uBlock, it is blocking Firebase! Turn it off and refresh.</p>';
         return;
       }
 
@@ -142,8 +142,9 @@
         customerList.appendChild(item);
       });
     }).catch(function(err) {
+      // This will explicitly show the ERR_BLOCKED_BY_CLIENT error
       console.error("Error loading customers: ", err);
-      customerList.innerHTML = '<p style="color:red;">Error: ' + err.message + '</p>';
+      customerList.innerHTML = '<p style="color:red;">Error: ' + err.message + '<br><br>This is usually caused by your AdBlocker. Disable it and refresh.</p>';
     });
   }
 
