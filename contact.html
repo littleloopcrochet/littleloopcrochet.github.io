@@ -493,22 +493,30 @@
       const text = chatInput.value.trim();
       if (!text || !currentUser) return;
       const user = currentUser;
-      db.collection('chats').doc(user.uid).collection('messages').add({
-        sender: 'user',
-        text: text,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function() {
-        appendMessage('user', text, new Date());
-        chatInput.value = '';
-        setTimeout(function() {
-          const botText = "Thanks for reaching out! Our team will get back to you soon. Meanwhile, is there anything else I can help with?";
-          db.collection('chats').doc(user.uid).collection('messages').add({
-            sender: 'bot',
-            text: botText,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          }).then(function() { appendMessage('bot', botText, new Date()); });
-        }, 1500);
-      }).catch(function(err) { console.error("Error sending message: ", err); });
+      
+      // THE FIX: Explicitly create the parent document with a field so it can be listed!
+      const userChatRef = db.collection('chats').doc(user.uid);
+      userChatRef.set({ 
+        lastActive: firebase.firestore.FieldValue.serverTimestamp() 
+      }, { merge: true }).then(function() {
+        // Now add the message
+        userChatRef.collection('messages').add({
+          sender: 'user',
+          text: text,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function() {
+          appendMessage('user', text, new Date());
+          chatInput.value = '';
+          setTimeout(function() {
+            const botText = "Thanks for reaching out! Our team will get back to you soon. Meanwhile, is there anything else I can help with?";
+            userChatRef.collection('messages').add({
+              sender: 'bot',
+              text: botText,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(function() { appendMessage('bot', botText, new Date()); });
+          }, 1500);
+        }).catch(function(err) { console.error("Error sending message: ", err); });
+      }).catch(function(err) { console.error("Error creating chat doc: ", err); });
     };
 
     chatInput.addEventListener('keypress', function(e) {
