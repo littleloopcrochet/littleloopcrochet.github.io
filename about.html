@@ -448,7 +448,7 @@
         if (activeMagicElement) {
           for (let i = 0; i < 3; i++) { createMagicParticle(activeMagicElement); }
         }
-      }, 650;
+      }, 650);
     }
     function stopMagic(){activeMagicElement=null;if(particleInterval!==null){clearInterval(particleInterval);particleInterval=null;}}
     document.querySelectorAll('.magic-hover').forEach(function(element){element.addEventListener('mouseenter',function(){if(element.classList.contains('heart-hover'))return;startMagic(element);});element.addEventListener('mouseleave',stopMagic);});
