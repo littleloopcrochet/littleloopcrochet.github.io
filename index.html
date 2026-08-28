@@ -700,7 +700,6 @@
       if (window.aboutArt) window.aboutArt.updateTheme(isDark);
     });
 
-    // ===== Hero Carousel =====
     // ===== Hero Carousel (Professional Swipe + Keyboard) =====
     const gallery = document.getElementById('heroGallery');
     const slides = document.querySelectorAll('.gallery-slide');
@@ -761,7 +760,7 @@
       scheduleNextSlide();
     }
 
-    // Professional Swipe Support
+    // Professional Swipe Support (Mobile/Touch)
     gallery.addEventListener('touchstart', function(e) {
       touchStartX = e.changedTouches[0].screenX;
       touchStartY = e.changedTouches[0].screenY;
