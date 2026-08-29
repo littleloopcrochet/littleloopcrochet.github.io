@@ -162,25 +162,29 @@
     .shop-banner h1 { font-size: 3rem; margin-bottom: 15px; color: var(--text); }
     .shop-banner p { font-size: 1.2rem; color: var(--text-soft); max-width: 600px; margin: 0 auto; }
 
-    /* Flipbook container */
+    /* Flipbook container – increased height to avoid clipping */
     #flipbook-container {
       width: 100%;
       max-width: 1100px;
-      height: 600px;
+      height: 750px;  /* increased from 600px to give extra vertical space */
       margin: 0 auto;
       background: #eee;
       border-radius: 10px;
       position: relative;
-      overflow: hidden;
+      overflow: visible; /* allow GIFs to pop out */
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
     #flipbook {
       position: absolute;
-      top: 0;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%); /* center the book vertically and horizontally */
     }
-    .page { background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden; }
+    .page {
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: visible; /* don't clip the GIFs */
+    }
     
     /* Cover */
     .cover {
@@ -229,7 +233,7 @@
       justify-content: center;
       height: 100%;
       position: relative;
-      overflow: hidden;
+      overflow: visible; /* don't clip GIFs */
     }
     .doodle {
       position: absolute;
@@ -411,6 +415,7 @@
       nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
       .shop-page{padding: 60px 6%}
       .shop-banner{padding: 30px}
+      #flipbook-container { height: 600px; } /* adjust on mobile */
     }
     
     /* Magic particles (same as before) */
@@ -598,8 +603,6 @@
     function setProgress(value) { progress = Math.max(progress, Math.min(100, value)); if(progressBar) progressBar.style.width = progress+'%'; if(percentDisplay) percentDisplay.textContent = Math.round(progress)+'%'; }
     const ticker = setInterval(function() { if(finished) return; if(progress<95){ const remaining=95-progress; setProgress(progress + Math.max(0.5, remaining*0.04)); } }, 80);
     function finishLoading() { if(finished) return; finished=true; const elapsed=performance.now()-startTime; const wait=Math.max(0,MIN_LOAD_TIME-elapsed); setTimeout(function(){ clearInterval(ticker); setProgress(100); setTimeout(function(){ if(pageLoader){pageLoader.classList.add('loaded');document.body.classList.remove('is-loading');setTimeout(function(){if(pageLoader.isConnected) pageLoader.remove();},750);} },400); },wait); }
-    // Wait for flipbook to load (we'll call finishLoading after initFlipbook)
-    // We'll override finishLoading below in loadFlipbook function.
   })();
 
   // ===== Theme toggle =====
@@ -608,9 +611,6 @@
   const savedTheme = localStorage.getItem('theme');
   if(savedTheme==='dark'){ document.body.classList.add('dark'); icon.textContent='🌙'; }
   toggle.addEventListener('click', function(){ document.body.classList.toggle('dark'); const isDark=document.body.classList.contains('dark'); icon.textContent=isDark?'🌙':'☀️'; localStorage.setItem('theme',isDark?'dark':'light'); });
-
-  // ===== Magic particles (same as before) =====
-  // (Paste your existing magic particles code here if needed, but we can skip for simplicity)
 
   // ===== Auth Logic =====
   let currentUser = null;
@@ -656,7 +656,6 @@
       signUpTab.classList.add('active'); signInTab.classList.remove('active'); phoneTab.classList.remove('active');
     }
   };
-  // Add form submit handlers and google sign-in here (same as original)
 
   // ===== Flipbook =====
   const totalGifs = 15;
@@ -679,7 +678,7 @@
   };
   const defaultGifStyle = { top: '-150px', left: '50%', width: '80px', transform: 'translateX(-50%)' };
 
-  // Default product data (used if pages.json not found)
+  // Default product data
   const defaultPages = [
     { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend for your shelf or someone special.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
     { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, and beautifully hand-knitted for chilly days.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -703,13 +702,13 @@
       pagesData = defaultPages;
     }
     initFlipbook(pagesData);
-    // Call finishLoading after flipbook init
+    // Hide loader after flipbook is ready
     setTimeout(function() {
-      if (typeof finishLoading === 'function') finishLoading();
-      else {
-        // fallback: manually hide loader
-        const pageLoader = document.getElementById('pageLoader');
-        if (pageLoader) { pageLoader.classList.add('loaded'); document.body.classList.remove('is-loading'); setTimeout(function(){ if(pageLoader.isConnected) pageLoader.remove(); }, 750); }
+      const pageLoader = document.getElementById('pageLoader');
+      if (pageLoader) {
+        pageLoader.classList.add('loaded');
+        document.body.classList.remove('is-loading');
+        setTimeout(function(){ if(pageLoader.isConnected) pageLoader.remove(); }, 750);
       }
     }, 500);
   }
@@ -720,15 +719,12 @@
 
     const pageElements = [];
 
-    // Front cover
     pageElements.push(createCoverPage(true, 'Our Handmade Collection'));
 
-    // Interior pages
     pages.forEach((pageInfo, idx) => {
       pageElements.push(createContentPage(pageInfo, idx));
     });
 
-    // Back cover
     pageElements.push(createCoverPage(false));
 
     pageElements.forEach(page => flipbookDiv.appendChild(page));
@@ -752,10 +748,6 @@
       paddingLeft: 0,
       paddingRight: 0
     });
-
-    const container = document.getElementById('flipbook-container');
-    container.style.height = pageHeight + 'px';
-    container.style.width = (pageWidth * 2 + 20) + 'px';
 
     flipbook.loadFromHTML(pageElements);
 
@@ -802,7 +794,6 @@
       transform: ${style.transform};
     `;
 
-    // Use emoji as fallback if image not provided
     const imgSrc = pageInfo.image || '';
 
     page.innerHTML = `
@@ -849,7 +840,7 @@
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.emoji || '', // fallback
+      image: product.emoji || '',
       quantity: 1
     };
 
