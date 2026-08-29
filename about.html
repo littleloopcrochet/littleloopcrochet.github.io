@@ -723,18 +723,18 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
 </script>
 <script>
 (function() {
-  // ===== Audio Manager with Fallback Config =====
+  // ===== Audio Manager =====
   const audioManager = {
     currentTheme: null,
     audioElements: [],
     config: null,
     started: false,
 
-    // Default fallback if JSON missing
+    // Default fallback (if JSON fails)
     defaultConfig: {
       day: { tracks: [
         { src: 's1d.mp3', volume: 0.5 },
-        { src: 's2d.mp3', volume: 0.5 }
+        { src: 's2d.mp3', volume: 0.3 }
       ]},
       night: { tracks: [
         { src: 's1n.mp3', volume: 0.5 },
@@ -743,21 +743,33 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
     },
 
     async init() {
-      try {
-        const res = await fetch('sound-config.json');
-        if (!res.ok) throw new Error('not found');
-        this.config = await res.json();
-        console.log('✅ sound-config.json loaded successfully');
-      } catch (e) {
-        console.warn('⚠️ sound-config.json not found – using fallback config.');
+      // Try to fetch from multiple paths
+      const paths = ['sound-config.json', './sound-config.json', '/sound-config.json'];
+      for (const path of paths) {
+        try {
+          const res = await fetch(path, { cache: 'no-store' });
+          if (res.ok) {
+            this.config = await res.json();
+            console.log(`✅ Loaded config from ${path}`);
+            break;
+          } else {
+            console.warn(`❌ ${path} returned status ${res.status}`);
+          }
+        } catch (e) {
+          console.warn(`❌ Failed to fetch ${path}: ${e.message}`);
+        }
+      }
+
+      // If no config loaded, use fallback
+      if (!this.config) {
+        console.warn('⚠️ Using fallback config – edit volumes below.');
         this.config = this.defaultConfig;
       }
 
-      // Determine theme from body class or localStorage
-      const isDark = document.body.classList.contains('dark');
-      this.currentTheme = isDark ? 'night' : 'day';
+      // Determine theme
+      this.currentTheme = document.body.classList.contains('dark') ? 'night' : 'day';
 
-      // Wait for first user interaction
+      // Wait for user interaction
       this.armStart();
       this.bindThemeChange();
     },
@@ -770,11 +782,11 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
         document.removeEventListener('click', startAudio);
         document.removeEventListener('keydown', startAudio);
         document.removeEventListener('touchstart', startAudio);
+        document.removeEventListener('pointerdown', startAudio);
       };
       document.addEventListener('click', startAudio);
       document.addEventListener('keydown', startAudio);
       document.addEventListener('touchstart', startAudio);
-      // Also listen for pointerdown (some browsers)
       document.addEventListener('pointerdown', startAudio);
     },
 
@@ -782,9 +794,7 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       const toggle = document.getElementById('themeToggle');
       if (!toggle) return;
       toggle.addEventListener('click', () => {
-        const isDark = document.body.classList.contains('dark');
-        const newTheme = isDark ? 'night' : 'day';
-        this.switchTheme(newTheme);
+        this.switchTheme(document.body.classList.contains('dark') ? 'night' : 'day');
       });
     },
 
@@ -792,9 +802,7 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       if (this.currentTheme === newTheme) return;
       const oldTheme = this.currentTheme;
       this.currentTheme = newTheme;
-      if (this.started) {
-        this.crossfade(oldTheme, newTheme);
-      }
+      if (this.started) this.crossfade(oldTheme, newTheme);
     },
 
     startThemeAudio(theme) {
@@ -804,9 +812,9 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
         audio.loop = true;
         audio.volume = track.volume;
         audio.play().then(() => {
-          console.log(`🎵 Playing ${track.src} at volume ${track.volume}`);
+          console.log(`🎵 Playing ${track.src} (vol ${track.volume})`);
         }).catch(err => {
-          console.warn(`🔇 Could not play ${track.src}:`, err.message);
+          console.warn(`🔇 Could not play ${track.src}: ${err.message}`);
         });
         return audio;
       });
@@ -815,29 +823,23 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
     crossfade(oldTheme, newTheme) {
       const oldTracks = this.audioElements;
       const newTracks = this.config[newTheme].tracks;
-      const fadeTime = 1.5; // seconds
+      const fadeTime = 1.5;
 
-      // Create new audio elements (volume 0, then fade in)
-      const newAudioElements = newTracks.map((track, i) => {
+      const newAudioElements = newTracks.map((track) => {
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = 0;
-        audio.play().catch(err => console.warn('🔇 Could not play new track:', err));
-        setTimeout(() => {
-          audio.volume = track.volume;
-        }, fadeTime * 1000);
+        audio.play().catch(err => console.warn('🔇 New track blocked:', err));
+        setTimeout(() => { audio.volume = track.volume; }, fadeTime * 1000);
         return audio;
       });
 
-      // Fade out old tracks
       oldTracks.forEach((audio, index) => {
         if (!audio) return;
-        const oldTrackConfig = this.config[oldTheme].tracks[index];
-        if (!oldTrackConfig) return;
-        const startVolume = oldTrackConfig.volume;
+        const oldVol = this.config[oldTheme].tracks[index]?.volume || 0;
         const steps = fadeTime * 60;
-        const step = startVolume / steps;
-        let currentVol = startVolume;
+        const step = oldVol / steps;
+        let currentVol = oldVol;
         const fadeInterval = setInterval(() => {
           if (currentVol <= 0.01) {
             clearInterval(fadeInterval);
@@ -850,7 +852,6 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
         }, 1000 / 60);
       });
 
-      // Replace audio elements
       this.audioElements = newAudioElements;
     }
   };
