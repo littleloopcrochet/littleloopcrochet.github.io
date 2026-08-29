@@ -1365,5 +1365,143 @@ document.getElementById('sendOtpBtn').addEventListener('click', function() {
 
   })();
 </script>
+<script>
+(function() {
+  // ===== Audio Manager =====
+  const audioManager = {
+    currentTheme: null,
+    audioElements: [],
+    config: null,
+    started: false,
+
+    // Default fallback (if JSON fails)
+    defaultConfig: {
+      day: { tracks: [
+        { src: 's1d.mp3', volume: 0.5 },
+        { src: 's2d.mp3', volume: 0.3 }
+      ]},
+      night: { tracks: [
+        { src: 's1n.mp3', volume: 0.5 },
+        { src: 's2n.mp3', volume: 0.5 }
+      ]}
+    },
+
+    async init() {
+      // Try to fetch from multiple paths
+      const paths = ['sound-config.json', './sound-config.json', '/sound-config.json'];
+      for (const path of paths) {
+        try {
+          const res = await fetch(path, { cache: 'no-store' });
+          if (res.ok) {
+            this.config = await res.json();
+            console.log(`✅ Loaded config from ${path}`);
+            break;
+          } else {
+            console.warn(`❌ ${path} returned status ${res.status}`);
+          }
+        } catch (e) {
+          console.warn(`❌ Failed to fetch ${path}: ${e.message}`);
+        }
+      }
+
+      // If no config loaded, use fallback
+      if (!this.config) {
+        console.warn('⚠️ Using fallback config – edit volumes below.');
+        this.config = this.defaultConfig;
+      }
+
+      // Determine theme
+      this.currentTheme = document.body.classList.contains('dark') ? 'night' : 'day';
+
+      // Wait for user interaction
+      this.armStart();
+      this.bindThemeChange();
+    },
+
+    armStart() {
+      const startAudio = () => {
+        if (this.started) return;
+        this.started = true;
+        this.startThemeAudio(this.currentTheme);
+        document.removeEventListener('click', startAudio);
+        document.removeEventListener('keydown', startAudio);
+        document.removeEventListener('touchstart', startAudio);
+        document.removeEventListener('pointerdown', startAudio);
+      };
+      document.addEventListener('click', startAudio);
+      document.addEventListener('keydown', startAudio);
+      document.addEventListener('touchstart', startAudio);
+      document.addEventListener('pointerdown', startAudio);
+    },
+
+    bindThemeChange() {
+      const toggle = document.getElementById('themeToggle');
+      if (!toggle) return;
+      toggle.addEventListener('click', () => {
+        this.switchTheme(document.body.classList.contains('dark') ? 'night' : 'day');
+      });
+    },
+
+    switchTheme(newTheme) {
+      if (this.currentTheme === newTheme) return;
+      const oldTheme = this.currentTheme;
+      this.currentTheme = newTheme;
+      if (this.started) this.crossfade(oldTheme, newTheme);
+    },
+
+    startThemeAudio(theme) {
+      const tracks = this.config[theme].tracks;
+      this.audioElements = tracks.map((track, i) => {
+        const audio = new Audio(track.src);
+        audio.loop = true;
+        audio.volume = track.volume;
+        audio.play().then(() => {
+          console.log(`🎵 Playing ${track.src} (vol ${track.volume})`);
+        }).catch(err => {
+          console.warn(`🔇 Could not play ${track.src}: ${err.message}`);
+        });
+        return audio;
+      });
+    },
+
+    crossfade(oldTheme, newTheme) {
+      const oldTracks = this.audioElements;
+      const newTracks = this.config[newTheme].tracks;
+      const fadeTime = 1.5;
+
+      const newAudioElements = newTracks.map((track) => {
+        const audio = new Audio(track.src);
+        audio.loop = true;
+        audio.volume = 0;
+        audio.play().catch(err => console.warn('🔇 New track blocked:', err));
+        setTimeout(() => { audio.volume = track.volume; }, fadeTime * 1000);
+        return audio;
+      });
+
+      oldTracks.forEach((audio, index) => {
+        if (!audio) return;
+        const oldVol = this.config[oldTheme].tracks[index]?.volume || 0;
+        const steps = fadeTime * 60;
+        const step = oldVol / steps;
+        let currentVol = oldVol;
+        const fadeInterval = setInterval(() => {
+          if (currentVol <= 0.01) {
+            clearInterval(fadeInterval);
+            audio.pause();
+            audio.src = '';
+          } else {
+            currentVol -= step;
+            audio.volume = currentVol;
+          }
+        }, 1000 / 60);
+      });
+
+      this.audioElements = newAudioElements;
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => audioManager.init());
+})();
+</script>
 </body>
 </html>
