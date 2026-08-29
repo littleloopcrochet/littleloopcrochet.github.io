@@ -2,13 +2,13 @@
   "day": {
     "tracks": [
       { "src": "s1d.mp3", "volume": 0.5 },
-      { "src": "s2d.mp3", "volume": 0.5 },
+      { "src": "s2d.mp3", "volume": 0.25 }
     ]
   },
   "night": {
     "tracks": [
       { "src": "s1n.mp3", "volume": 0.5 },
-      { "src": "s2n.mp3", "volume": 0.5 },
+      { "src": "s2n.mp3", "volume": 0.5 }
     ]
   }
 }
