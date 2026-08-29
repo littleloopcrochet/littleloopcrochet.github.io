@@ -1,0 +1,21 @@
+{
+  "title": "Our Handmade Collection",
+  "pages": [
+    {
+      "image": "a.jpg",
+      "name": "Cozy Teddy",
+      "description": "A tiny handmade friend for your shelf or someone special.",
+      "price": 799,
+      "id": "cozy-teddy",
+      "emoji": "🧸"
+    },
+    {
+      "image": "b.jpg",
+      "name": "Scarlet Scarf",
+      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "price": 1199,
+      "id": "scarlet-scarf",
+      "emoji": "🧣"
+    }
+  ]
+}
