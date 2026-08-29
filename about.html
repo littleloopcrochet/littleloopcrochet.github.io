@@ -721,5 +721,117 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
 
   })();
 </script>
+<script>
+(function() {
+  // ===== Sound Manager =====
+  const audioManager = {
+    currentTheme: null,
+    audioElements: [],
+    config: null,
+    started: false,
+
+    async init() {
+      try {
+        const res = await fetch('sound-config.json');
+        if (!res.ok) throw new Error('config not found');
+        this.config = await res.json();
+      } catch (e) {
+        console.warn('No sound config found – music disabled.');
+        return;
+      }
+      
+      // Determine initial theme
+      const isDark = localStorage.getItem('theme') === 'dark';
+      this.setTheme(isDark ? 'night' : 'day');
+      this.bindThemeChange();
+      this.bindUserInteraction();
+    },
+
+    bindThemeChange() {
+      const toggle = document.getElementById('themeToggle');
+      if (!toggle) return;
+      toggle.addEventListener('click', () => {
+        const isDark = document.body.classList.contains('dark');
+        this.setTheme(isDark ? 'night' : 'day');
+      });
+    },
+
+    bindUserInteraction() {
+      // Start audio on first user interaction (autoplay policies)
+      const startOnce = () => {
+        if (this.started) return;
+        this.started = true;
+        this.playCurrentTheme();
+        document.removeEventListener('click', startOnce);
+        document.removeEventListener('keydown', startOnce);
+        document.removeEventListener('touchstart', startOnce);
+      };
+      document.addEventListener('click', startOnce);
+      document.addEventListener('keydown', startOnce);
+      document.addEventListener('touchstart', startOnce);
+    },
+
+    setTheme(theme) {
+      if (this.currentTheme === theme) return;
+      this.currentTheme = theme;
+      const tracks = this.config[theme].tracks;
+      
+      // Crossfade: stop old, start new
+      this.crossfadeTo(tracks);
+    },
+
+    crossfadeTo(newTracks) {
+      const oldElements = this.audioElements.slice();
+      const fadeDuration = 1.5; // seconds
+
+      // Create new audio elements
+      const newElements = newTracks.map((track, i) => {
+        const audio = new Audio(track.src);
+        audio.loop = true;
+        audio.volume = 0;
+        audio.play().catch(e => console.warn('Audio play blocked:', e));
+        // Fade in
+        setTimeout(() => {
+          audio.volume = track.volume;
+        }, fadeDuration * 1000);
+        return audio;
+      });
+
+      // Fade out old elements
+      oldElements.forEach((audio, index) => {
+        if (!audio) return;
+        const originalVolume = this.config[this.currentTheme === 'day' ? 'night' : 'day'].tracks[index]?.volume || 0;
+        const step = originalVolume / (fadeDuration * 60);
+        const fadeTimer = setInterval(() => {
+          if (audio.volume <= 0.01) {
+            clearInterval(fadeTimer);
+            audio.pause();
+            audio.src = '';
+          } else {
+            audio.volume -= step;
+          }
+        }, 1000/60);
+      });
+
+      this.audioElements = newElements;
+    },
+
+    playCurrentTheme() {
+      if (!this.config) return;
+      const tracks = this.config[this.currentTheme].tracks;
+      this.audioElements = tracks.map((track, i) => {
+        const audio = new Audio(track.src);
+        audio.loop = true;
+        audio.volume = track.volume;
+        audio.play().catch(e => console.warn('Audio play blocked:', e));
+        return audio;
+      });
+    }
+  };
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => audioManager.init());
+})();
+</script>
 </body>
 </html>
