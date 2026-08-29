@@ -7,18 +7,21 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet" />
   
+  <!-- Page Flip Library -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/css/page-flip.min.css" />
   <script src="https://unpkg.com/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+  <!-- Lottie for loader -->
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 
   <style>
-    /* ===== Common Styles (Same as Main Page) ===== */
+    /* ===== Common Styles ===== */
     :root{
       --bg: transparent;
       --surface:#ffffff;
@@ -101,7 +104,7 @@
     .theme-toggle{width:46px;height:46px;border:1px solid rgba(120,100,120,.12);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem;position:relative;z-index:5;transition:transform .4s ease,background .5s ease,color .5s ease,box-shadow .5s ease}
     .theme-toggle:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 0 20px var(--icon-glow)}
 
-    /* Updated Modal */
+    /* Modal */
     .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
     .modal.show { display: flex; align-items: center; justify-content: center; }
     .modal-content { background-color: var(--surface); padding: 40px; border-radius: 30px; width: 90%; max-width: 400px; box-shadow: 0 25px 80px rgba(0,0,0,0.3); position: relative; animation: modalSlideIn .3s ease; border: 1px solid rgba(255,255,255,0.2); }
@@ -179,7 +182,7 @@
     .shop-banner h1 { font-size: 3rem; margin-bottom: 15px; color: var(--text); }
     .shop-banner p { font-size: 1.2rem; color: var(--text-soft); max-width: 600px; margin: 0 auto; }
 
-    /* Flipbook container – no hover effect here; we'll apply via JS */
+    /* Flipbook container */
     #flipbook-container {
       width: 100%;
       max-width: 1040px;
@@ -242,7 +245,7 @@
     }
     .tap-to-open:hover { opacity: 1; transform: scale(1.1); }
 
-    /* Diary page design – themed */
+    /* Diary page design */
     .diary-page {
       background: var(--page-bg);
       background-image: repeating-linear-gradient(transparent, transparent 27px, var(--page-line) 28px);
@@ -413,7 +416,45 @@
     .diary-text::before { transform: rotate(-15deg); }
     .diary-text::after { transform: rotate(15deg); }
 
-    /* Add to Cart button on page */
+    /* Party Popper Icon */
+    .party-popper {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 26px;
+      z-index: 30;
+      pointer-events: none;
+      animation: partyWiggle 2s ease-in-out infinite;
+    }
+    @keyframes partyWiggle {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(10deg) translateY(-3px); }
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 50;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      animation: confettiFall 2.5s ease-in forwards;
+    }
+    @keyframes confettiFall {
+      0% { top: 10%; opacity: 1; transform: rotate(0deg); }
+      100% { top: 95%; opacity: 0; transform: rotate(360deg); }
+    }
+
+    /* Add to Cart button */
     .add-to-cart-page-btn {
       background: var(--accent);
       color: white;
@@ -426,42 +467,53 @@
       margin-top: 10px;
       transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
+      user-select: none;
     }
     .add-to-cart-page-btn:hover {
       background: var(--accent-hover);
       transform: translateY(-2px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 15px var(--glow-color);
     }
-
-    /* Counter for cart item */
-    .cart-counter {
+    .add-to-cart-page-btn.cart-counter {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      background: var(--accent);
-      color: white;
-      border-radius: 50px;
-      padding: 5px 10px;
-      margin-top: 10px;
+      gap: 6px;
     }
-    .cart-counter button {
+    .add-to-cart-page-btn.cart-counter button {
       background: rgba(255,255,255,0.2);
-      color: white;
       border: none;
+      color: white;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       font-size: 14px;
       cursor: pointer;
-      transition: background 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 0;
+      transition: background 0.2s ease;
     }
-    .cart-counter button:hover { background: rgba(255,255,255,0.4); }
-    .cart-counter span { font-weight: bold; min-width: 20px; text-align: center; }
+    .add-to-cart-page-btn.cart-counter button:hover {
+      background: rgba(255,255,255,0.4);
+    }
+    .add-to-cart-page-btn.cart-counter span {
+      min-width: 16px;
+      text-align: center;
+      font-weight: bold;
+    }
 
-    /* Magic particles (same as before) */
+    /* Footer */
+    footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
+
+    @media(max-width:750px){
+      nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
+      .shop-page{padding: 60px 6%}
+      .shop-banner{padding: 30px}
+      #flipbook-container { height: 600px; max-width: 600px; }
+    }
+    
+    /* Magic particles */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
     .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s cubic-bezier(.25,.65,.35,1) forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
     .butterfly .body{position:absolute;left:50%;top:50%;width:3px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#7d6877;z-index:3;}
@@ -476,23 +528,13 @@
     body.dark .magic-hover:hover{filter:drop-shadow(0 0 7px rgba(189,124,255,.5));}
     .heart-bubble{position:fixed;pointer-events:none;z-index:10000;font-size:13px;opacity:0;animation:heartBubble 1.25s cubic-bezier(.2,.7,.3,1) forwards;}
     @keyframes heartBubble{0%{opacity:0;transform:translate(0,5px) scale(.25) rotate(-12deg)}15%{opacity:1;transform:translate(0,0) scale(.85) rotate(5deg)}45%{transform:translate(var(--heart-x),-24px) scale(1) rotate(-8deg)}75%{opacity:.85;transform:translate(calc(var(--heart-x) * .7),-45px) scale(.85) rotate(9deg)}100%{opacity:0;transform:translate(calc(var(--heart-x) * 1.4),-70px) scale(.05) rotate(-15deg)}}
-
-    /* Footer */
-    footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
-
-    @media(max-width:750px){
-      nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
-      .shop-page{padding: 60px 6%}
-      .shop-banner{padding: 30px}
-      #flipbook-container { height: 600px; max-width: 600px; }
-    }
   </style>
 </head>
 
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
 
-<!-- Modal and Loader (same as before) -->
+<!-- Modal -->
 <div id="loginModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
@@ -562,6 +604,7 @@
   </div>
 </div>
 
+<!-- Loader -->
 <div id="pageLoader" class="page-loader" role="status" aria-label="Loading Little Loop">
   <div class="loader-backdrop"></div>
   <div class="loader-card">
@@ -599,14 +642,13 @@
   </div>
 </nav>
 
-<!-- ===== SHOP CONTENT (Flipbook Catalog) ===== -->
+<!-- SHOP CONTENT -->
 <section class="shop-page">
   <div class="shop-banner">
     <h1>Our Handmade Collection</h1>
     <p>Browse through our catalog – click on the pages to explore, and add to cart directly from each page.</p>
   </div>
 
-  <!-- Flipbook Container -->
   <div id="flipbook-container">
     <div id="flipbook"></div>
   </div>
@@ -632,7 +674,7 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // ===== Loader (will be completed after flipbook loads) =====
+  // ===== Loader =====
   (function() {
     const pageLoader = document.getElementById('pageLoader');
     const progressBar = document.querySelector('.yarn-progress');
@@ -666,12 +708,10 @@
     if (user) {
       authButtonText.textContent = user.displayName || user.phoneNumber || 'Account';
       logoutBtn.style.display = 'inline-flex';
-      // Load cart data to update buttons
       loadCartData();
     } else {
       authButtonText.textContent = 'Sign In';
       logoutBtn.style.display = 'none';
-      // Reset all cart buttons to "Add to Cart"
       resetCartButtons();
     }
   });
@@ -707,7 +747,7 @@
     }
   };
 
-  // ===== Cart Data Loading and Button Updates =====
+  // ===== Cart Logic =====
   function loadCartData() {
     if (!currentUser) return;
     db.collection('users').doc(currentUser.uid).collection('cart').get().then(function(snapshot) {
@@ -715,7 +755,6 @@
       snapshot.forEach(function(doc) {
         cartMap[doc.id] = doc.data().quantity || 1;
       });
-      // Update all buttons
       document.querySelectorAll('.add-to-cart-page-btn').forEach(function(btn) {
         const productId = btn.getAttribute('data-product-id');
         if (cartMap[productId]) {
@@ -737,18 +776,17 @@
 
   function updateButtonToCounter(btn, quantity) {
     const productId = btn.getAttribute('data-product-id');
-    btn.innerHTML = `<button class="cart-minus" onclick="decreaseCart('${productId}')">−</button><span>${quantity}</span><button class="cart-plus" onclick="increaseCart('${productId}')">+</button>`;
+    btn.innerHTML = `<button class="cart-minus" onclick="decreaseCart('${productId}', event)">−</button><span>${quantity}</span><button class="cart-plus" onclick="increaseCart('${productId}', event)">+</button>`;
     btn.classList.add('cart-counter');
     btn.style.display = 'inline-flex';
     btn.dataset.quantity = quantity;
   }
 
-  // ===== Cart Actions =====
-  window.addToCartFromPage = function(productId) {
+  window.addToCartFromPage = function(productId, event) {
+    if (event) event.stopPropagation();
     if (!currentUser) { alert('Please sign in to add items to your cart.'); return; }
     const product = pagesData.find(p => p.id === productId);
     if (!product) return;
-
     const item = {
       id: product.id,
       name: product.name,
@@ -756,9 +794,7 @@
       image: product.emoji || '',
       quantity: 1
     };
-
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(item.id);
-    
     cartRef.get().then(function(doc) {
       if (doc.exists) {
         return cartRef.update({ quantity: firebase.firestore.FieldValue.increment(1) });
@@ -766,20 +802,20 @@
         return cartRef.set(item);
       }
     }).then(function() {
-      // Update button to counter
       const btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
       if (btn) {
         const newQty = (btn.dataset.quantity ? parseInt(btn.dataset.quantity) : 0) + 1;
         updateButtonToCounter(btn, newQty);
       }
-      // Celebration particles
-      celebrate(btn);
+      const page = btn.closest('.diary-page');
+      if (page) launchConfetti(page);
     }).catch(function(err) {
       console.error("Error adding to cart: ", err);
     });
   };
 
-  window.increaseCart = function(productId) {
+  window.increaseCart = function(productId, event) {
+    if (event) event.stopPropagation();
     if (!currentUser) return;
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId);
     cartRef.update({ quantity: firebase.firestore.FieldValue.increment(1) }).then(function() {
@@ -788,13 +824,13 @@
         const newQty = (btn.dataset.quantity ? parseInt(btn.dataset.quantity) : 0) + 1;
         updateButtonToCounter(btn, newQty);
       }
-      // Celebrate
-      const btnEl = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
-      celebrate(btnEl);
+      const page = btn.closest('.diary-page');
+      if (page) launchConfetti(page);
     }).catch(function(err) { console.error(err); });
   };
 
-  window.decreaseCart = function(productId) {
+  window.decreaseCart = function(productId, event) {
+    if (event) event.stopPropagation();
     if (!currentUser) return;
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId);
     cartRef.get().then(function(doc) {
@@ -821,35 +857,32 @@
     }).catch(function(err) { console.error(err); });
   };
 
-  // ===== Celebration particles =====
-  function celebrate(element) {
-    if (!element) return;
-    const rect = element.getBoundingClientRect();
-    const x = rect.left + rect.width/2;
-    const y = rect.top + rect.height/2;
-    for (let i = 0; i < 12; i++) {
-      const particle = document.createElement('span');
-      particle.className = document.body.classList.contains('dark') ? 'firefly' : 'butterfly';
-      if (!document.body.classList.contains('dark')) {
-        particle.innerHTML = '<span class="wing left"></span><span class="body"></span><span class="wing right"></span>';
-      }
-      particle.style.left = x + 'px';
-      particle.style.top = y + 'px';
-      particle.style.setProperty('--x1', (Math.random()*50-25)+'px');
-      particle.style.setProperty('--y1', (Math.random()*-30-10)+'px');
-      particle.style.setProperty('--x2', (Math.random()*80-40)+'px');
-      particle.style.setProperty('--y2', (Math.random()*-60-20)+'px');
-      particle.style.setProperty('--x3', (Math.random()*100-50)+'px');
-      particle.style.setProperty('--y3', (Math.random()*-80-30)+'px');
-      particle.style.setProperty('--x4', (Math.random()*120-60)+'px');
-      particle.style.setProperty('--y4', (Math.random()*-100-40)+'px');
-      particle.style.animationDuration = (2.5 + Math.random()*2) + 's';
-      document.body.appendChild(particle);
-      setTimeout(() => particle.remove(), 4500);
+  // ===== Confetti Launch =====
+  function launchConfetti(pageElement) {
+    let container = pageElement.querySelector('.confetti-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'confetti-container';
+      pageElement.appendChild(container);
     }
+    container.innerHTML = '';
+    const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4'];
+    for (let i = 0; i < 30; i++) {
+      const confetti = document.createElement('span');
+      confetti.className = 'confetti-piece';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.left = (10 + Math.random() * 80) + '%';
+      confetti.style.width = (6 + Math.random() * 6) + 'px';
+      confetti.style.height = (6 + Math.random() * 6) + 'px';
+      confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+      confetti.style.animationDelay = (Math.random() * 0.3) + 's';
+      container.appendChild(confetti);
+    }
+    setTimeout(() => { container.remove(); }, 4000);
   }
 
-  // ===== Flipbook =====
+  // ===== Flipbook Setup =====
   const totalGifs = 15;
   const gifStyles = {
     1: { top: '-95px', left: '20%', width: '80px', transform: 'translateX(-50%)' },
@@ -933,13 +966,14 @@
 
     flipbook.loadFromHTML(pageElements);
 
-    // Flipbook is ready – call finishLoading
+    // Restrict hover to book area
+    setupHoverRestriction();
+    // Load cart data if user is logged in
+    if (currentUser) loadCartData();
+    // Finish loading screen
     if (typeof window.finishLoading === 'function') {
       window.finishLoading();
     }
-
-    // Add hover restriction logic
-    setupHoverRestriction();
   }
 
   function createCoverPage(isFront, title) {
@@ -982,6 +1016,8 @@
 
     page.innerHTML = `
       <div class="diary-page">
+        <span class="party-popper">🎉</span>
+        <div class="confetti-container" style="display:none;"></div>
         <span class="doodle doodle-1">✧</span>
         <span class="doodle doodle-2">♡</span>
         <span class="doodle doodle-3">★</span>
@@ -1008,7 +1044,7 @@
           <p>${pageInfo.description || ''}</p>
           <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent); margin: 10px 0 5px;">₹${pageInfo.price || ''}</p>
         </div>
-        <button class="add-to-cart-page-btn magic-hover" data-product-id="${pageInfo.id}" onclick="addToCartFromPage('${pageInfo.id}')">Add to Cart</button>
+        <button class="add-to-cart-page-btn magic-hover" data-product-id="${pageInfo.id}" onclick="addToCartFromPage('${pageInfo.id}', event)">Add to Cart</button>
       </div>
     `;
     return page;
@@ -1020,16 +1056,11 @@
     container.addEventListener('mousemove', function(e) {
       const rect = container.getBoundingClientRect();
       const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      // Check if we are over the actual book area.
-      // When closed (page 0), only the right half is book; when open, both halves.
       const page = flipbook ? flipbook.getCurrentPageIndex() : 0;
       let isOverBook = false;
       if (page === 0) {
-        // closed: book is on the right half (center to right)
         if (x > rect.width / 2) isOverBook = true;
       } else {
-        // open: book spans the whole width (approx)
         isOverBook = true;
       }
       if (isOverBook) {
@@ -1049,10 +1080,8 @@
 
   window.addEventListener('DOMContentLoaded', loadFlipbook);
 
-  // ===== Magic Particles & Canvas (Original complete code, included for completeness) =====
-  // (Since the user said preserve everything, I'll include the full canvas and particle code as before.)
+  // ===== Magic Particles & Canvas =====
   (function() {
-    // Magic particles
     let particleInterval = null, activeMagicElement = null;
     const magicContainer = document.createElement('div');
     magicContainer.className = 'magic-particles';
@@ -1080,8 +1109,10 @@
     }
     function startMagic(element) { if (element.classList.contains('heart-hover')) return; activeMagicElement = element; if (particleInterval !== null) return; for (let i = 0; i < 3; i++) { createMagicParticle(element); } particleInterval = setInterval(function() { if (activeMagicElement) { for (let i = 0; i < 3; i++) { createMagicParticle(activeMagicElement); } } }, 650); }
     function stopMagic() { activeMagicElement = null; if (particleInterval !== null) { clearInterval(particleInterval); particleInterval = null; } }
-    // Attach to all .magic-hover elements
-    document.querySelectorAll('.magic-hover').forEach(function(element) { element.addEventListener('mouseenter', function() { if (element.classList.contains('heart-hover')) return; startMagic(element); }); element.addEventListener('mouseleave', stopMagic); });
+
+    // Expose for event delegation
+    window.startMagic = startMagic;
+    window.stopMagic = stopMagic;
 
     // Hearts
     function getHeartColour(text) { if (text.includes('🤍')) return '🤍'; if (text.includes('🖤')) return '🖤'; if (text.includes('💜')) return '💜'; if (text.includes('❤️') || text.includes('♥')) return '♥'; return '♥'; }
@@ -1090,9 +1121,11 @@
     function createHeartBubble(element) { if (!element || !element.isConnected) return; const rect = element.getBoundingClientRect(); const heart = document.createElement('span'); heart.className = 'heart-bubble'; heart.textContent = getHeartColour(element.textContent); heart.style.setProperty('--heart-x', Math.floor(Math.random() * 40 - 20) + 'px'); heart.style.fontSize = (10 + Math.random() * 8) + 'px'; heart.style.left = (rect.left + rect.width / 2 + randomNumber(-5, 5)) + 'px'; heart.style.top = (rect.top + rect.height / 2) + 'px'; document.body.appendChild(heart); setTimeout(function() { heart.remove(); }, 1400); }
     function startHeartMagic(element) { stopMagic(); activeHeartElement = element; if (heartInterval !== null) return; createHeartBubble(element); heartInterval = setInterval(function() { if (activeHeartElement) { createHeartBubble(activeHeartElement); } }, 420); }
     function stopHeartMagic() { activeHeartElement = null; if (heartInterval !== null) { clearInterval(heartInterval); heartInterval = null; } }
-    document.querySelectorAll('.heart-hover').forEach(function(heart) { heart.addEventListener('mouseenter', function() { startHeartMagic(heart); }); heart.addEventListener('mouseleave', stopHeartMagic); });
 
-    // Canvas background (full code as before)
+    window.startHeartMagic = startHeartMagic;
+    window.stopHeartMagic = stopHeartMagic;
+
+    // Canvas
     const canvas = document.getElementById('aboutCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d', { alpha: true });
@@ -1121,56 +1154,35 @@
     resize(); draw();
   })();
 
-  // We need to ensure magic particles are attached to new elements after flipbook creation.
-  // The above particle code runs once, but new elements (photo-frame, etc.) are created later.
-  // So we need to re-attach after flipbook is loaded.
-  function attachMagicToDynamicElements() {
-    // Add magic-hover to already existing elements (they already have class from createContentPage)
-    // But we also need to attach the event listeners. The initial code attaches to .magic-hover at startup.
-    // Since these elements are created after, we need to re-attach.
-    // We'll just call the setup again after flipbook init.
-    // But the initial function already has listeners; we can just add new listeners for new elements.
-    // Since the particle code is inside an IIFE, we can't easily access it.
-    // Instead, we'll add a mutation observer or re-run the setup.
-    // Simpler: we can re-query .magic-hover and attach listeners, but the original code already did that once.
-    // We'll add a function to attach to new elements: we'll store the functions globally? 
-    // Actually the original code attaches to all .magic-hover elements at page load. Since new elements are added later, they won't have listeners.
-    // We'll fix by moving the particle attachment inside a function that can be called after flipbook init.
-    // I'll restructure: move the magic particle setup into a function and call it after flipbook load.
-    // However, to keep the code simple, I'll just add a small event delegation for magic-hover using event listeners on document.
-    // That's easier.
-    // But given the length, I'll leave as is for now and note that it may not work on dynamic elements.
-    // The user specifically said "the fly effect should be present on all of the above" – so we need to ensure it works.
-    // I'll implement event delegation for mouseover/mouseout for .magic-hover and .heart-hover.
-
-    // Actually, better to add a global event listener for mouseenter on document to detect .magic-hover.
-    // We'll add that in the script after the canvas code.
-  }
-
-  // Add event delegation for magic-hover
+  // ===== Event Delegation for Magic Particles (for dynamically created elements) =====
   document.addEventListener('mouseover', function(e) {
     const elem = e.target.closest('.magic-hover');
     if (elem && !elem._magicActive) {
       elem._magicActive = true;
-      startMagic(elem);
+      if (window.startMagic) window.startMagic(elem);
     }
   });
   document.addEventListener('mouseout', function(e) {
     const elem = e.target.closest('.magic-hover');
     if (elem && elem._magicActive) {
       elem._magicActive = false;
-      stopMagic();
+      if (window.stopMagic) window.stopMagic();
     }
   });
-
-  // But we need startMagic/stopMagic to be accessible. They are inside the IIFE. We need to expose them.
-  // Let's modify: we'll store them globally.
-  // I'll refactor: move startMagic/stopMagic to window.
-  // In the IIFE, we'll set window.startMagic = startMagic; window.stopMagic = stopMagic;
-  // And also for heart-hover, expose startHeartMagic/stopHeartMagic.
-
-  // To make it work, I'll rewrite the IIFE with global exposure.
-  // Let's do that in the final code. I'll update the script accordingly.
+  document.addEventListener('mouseover', function(e) {
+    const elem = e.target.closest('.heart-hover');
+    if (elem && !elem._heartActive) {
+      elem._heartActive = true;
+      if (window.startHeartMagic) window.startHeartMagic(elem);
+    }
+  });
+  document.addEventListener('mouseout', function(e) {
+    const elem = e.target.closest('.heart-hover');
+    if (elem && elem._heartActive) {
+      elem._heartActive = false;
+      if (window.stopHeartMagic) window.stopHeartMagic();
+    }
+  });
 </script>
 </body>
 </html>
