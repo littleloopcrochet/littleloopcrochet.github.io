@@ -162,28 +162,26 @@
     .shop-banner h1 { font-size: 3rem; margin-bottom: 15px; color: var(--text); }
     .shop-banner p { font-size: 1.2rem; color: var(--text-soft); max-width: 600px; margin: 0 auto; }
 
-    /* Flipbook container – increased height to avoid clipping */
+    /* Flipbook container – now transparent, larger pages */
     #flipbook-container {
       width: 100%;
-      max-width: 1100px;
-      height: 750px;  /* increased from 600px to give extra vertical space */
+      max-width: 1040px; /* 2 pages (500px each) + 40px gap */
+      height: 720px;     /* match page height */
       margin: 0 auto;
-      background: #eee;
-      border-radius: 10px;
+      background: transparent; /* show the background canvas */
       position: relative;
       overflow: visible; /* allow GIFs to pop out */
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
     #flipbook {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%); /* center the book vertically and horizontally */
+      transform: translate(-50%, -50%);
     }
     .page {
       background: white;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      overflow: visible; /* don't clip the GIFs */
+      overflow: visible;
     }
     
     /* Cover */
@@ -233,7 +231,7 @@
       justify-content: center;
       height: 100%;
       position: relative;
-      overflow: visible; /* don't clip GIFs */
+      overflow: visible;
     }
     .doodle {
       position: absolute;
@@ -391,22 +389,8 @@
     }
     .add-to-cart-page-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
 
-    /* Navigation buttons */
-    #nav-buttons {
-      text-align: center;
-      margin-top: 20px;
-    }
-    #nav-buttons button {
-      background: #19A975;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin: 0 5px;
-      font-size: 14px;
-    }
-    #nav-buttons button:hover { background: #0f7a55; }
+    /* Navigation buttons – REMOVED */
+    /* #nav-buttons ... */
 
     /* Footer */
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
@@ -415,7 +399,7 @@
       nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
       .shop-page{padding: 60px 6%}
       .shop-banner{padding: 30px}
-      #flipbook-container { height: 600px; } /* adjust on mobile */
+      #flipbook-container { height: 600px; max-width: 600px; } /* adjust for mobile */
     }
     
     /* Magic particles (same as before) */
@@ -558,12 +542,6 @@
     <div id="flipbook"></div>
   </div>
 
-  <!-- Navigation -->
-  <div id="nav-buttons">
-    <button onclick="flipPrev()">⬅ Prev</button>
-    <button onclick="flipNext()">Next ➡</button>
-  </div>
-
   <div id="status"></div>
 </section>
 
@@ -587,7 +565,7 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // ===== Loader =====
+  // ===== Loader (same as before, but will finish after flipbook) =====
   (function() {
     'use strict';
     const pageLoader = document.getElementById('pageLoader');
@@ -603,6 +581,7 @@
     function setProgress(value) { progress = Math.max(progress, Math.min(100, value)); if(progressBar) progressBar.style.width = progress+'%'; if(percentDisplay) percentDisplay.textContent = Math.round(progress)+'%'; }
     const ticker = setInterval(function() { if(finished) return; if(progress<95){ const remaining=95-progress; setProgress(progress + Math.max(0.5, remaining*0.04)); } }, 80);
     function finishLoading() { if(finished) return; finished=true; const elapsed=performance.now()-startTime; const wait=Math.max(0,MIN_LOAD_TIME-elapsed); setTimeout(function(){ clearInterval(ticker); setProgress(100); setTimeout(function(){ if(pageLoader){pageLoader.classList.add('loaded');document.body.classList.remove('is-loading');setTimeout(function(){if(pageLoader.isConnected) pageLoader.remove();},750);} },400); },wait); }
+    // We'll call finishLoading from loadFlipbook
   })();
 
   // ===== Theme toggle =====
@@ -612,7 +591,7 @@
   if(savedTheme==='dark'){ document.body.classList.add('dark'); icon.textContent='🌙'; }
   toggle.addEventListener('click', function(){ document.body.classList.toggle('dark'); const isDark=document.body.classList.contains('dark'); icon.textContent=isDark?'🌙':'☀️'; localStorage.setItem('theme',isDark?'dark':'light'); });
 
-  // ===== Auth Logic =====
+  // ===== Auth Logic (same as before) =====
   let currentUser = null;
   auth.onAuthStateChanged(function(user) {
     currentUser = user;
@@ -731,8 +710,9 @@
 
     if (flipbook) flipbook.destroy();
 
-    const pageWidth = 450;
-    const pageHeight = 600;
+    // Larger pages to fill the container
+    const pageWidth = 500;  // increased from 450
+    const pageHeight = 700; // increased from 600
     flipbook = new St.PageFlip(flipbookDiv, {
       width: pageWidth,
       height: pageHeight,
@@ -861,12 +841,6 @@
 
   // ===== Navigation =====
   window.openBook = function() {
-    if (flipbook) flipbook.flipNext();
-  };
-  window.flipPrev = function() {
-    if (flipbook) flipbook.flipPrev();
-  };
-  window.flipNext = function() {
     if (flipbook) flipbook.flipNext();
   };
 
