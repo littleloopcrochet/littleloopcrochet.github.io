@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    /* ===== All existing styles ===== */
+    /* ===== All existing styles (except gallery modifications) ===== */
     :root{
       --bg:#fffdfb;
       --surface:#ffffff;
@@ -58,7 +58,6 @@
     html{scroll-behavior:smooth}
     body{
       font-family:"Comfortaa",sans-serif;
-      /* FIX: Set to transparent so canvas landscape shows! */
       background:transparent;
       color:var(--text);
       line-height:1.6;
@@ -97,7 +96,6 @@
     }
     .nav-links a:hover{color:var(--accent);transform:translateY(-2px)}
 
-    /* Home Icon Style */
     .home-icon {
       display: flex;
       align-items: center;
@@ -107,7 +105,6 @@
     }
     .home-icon:hover { color: var(--accent); transform: translateY(-2px); }
 
-    /* Sign In Button */
     .signin-btn{
       display:flex;
       align-items:center;
@@ -130,7 +127,6 @@
       box-shadow:0 12px 25px rgba(215,149,167,.4);
     }
 
-    /* Login Modal (Modified for Firebase Auth) */
     .modal {
       display: none;
       position: fixed;
@@ -280,7 +276,7 @@
     .theme-icon{display:inline-block;transition:transform .6s ease;}
     body.dark .theme-icon{transform:rotate(180deg) scale(1.05);}
 
-    /* ---------- Hero ---------- */
+    /* ---------- Hero (updated gallery) ---------- */
     .hero{min-height:88vh;padding:70px 7%;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:70px;}
     .hero-text{animation:heroFloat 5s ease-in-out infinite;}
     @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -290,138 +286,90 @@
     .button{display:inline-block;background:var(--accent);color:white;padding:14px 25px;border-radius:50px;font-size:.9rem;font-weight:600;transition:transform .3s ease,background .3s ease,box-shadow .3s ease;}
     .button:hover{transform:translateY(-4px) scale(1.02);background:var(--accent-hover);box-shadow:0 12px 30px var(--shadow);}
 
-    /* ---------- Hero gallery ---------- */
+    /* ---------- Hero gallery (simplified) ---------- */
     .hero-gallery{
         height:500px;border-radius:35px;position:relative;overflow:hidden;
-        background:#e8dcc8; /* Old paper base */
+        background:#e8dcc8;
         box-shadow:0 25px 60px var(--shadow);
         transition:transform .5s ease, box-shadow .5s ease;
-        cursor:pointer;perspective:2000px;
+        cursor:pointer;
     }
     .hero-gallery:hover{transform:translateY(-5px);box-shadow:0 30px 70px var(--shadow);}
 
-    /* Diary Spine (Left Side) */
-    .hero-gallery::before{
-        content:"";position:absolute;top:0;left:0;bottom:0;width:55px;
-        background:repeating-linear-gradient(90deg, #b59e85, #d3c3ae 4px, #b59e85 8px);
-        z-index:15; border-right:2px dashed rgba(0,0,0,0.15);
-        box-shadow: inset -6px 0 12px rgba(0,0,0,0.2);
-    }
-
-    /* Stacked Page Edges (Right Side) */
-    .hero-gallery::after{
-        content:"";position:absolute;top:8px;right:-10px;bottom:-8px;left:60px;
-        border-radius:0 20px 20px 0;
-        background:rgba(255,250,240,0.3);
-        z-index:-1; /* Pushed behind */
-        box-shadow: 4px 4px 0 #f5efe5, 8px 8px 0 #eadfce, 12px 12px 0 #d8ccb8;
-    }
-
-    /* Aged paper & stitched text effect on images */
     .gallery-slide{
         position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
         opacity:0;
-        transform-origin:left center;
-        transform:rotateY(90deg);
-        transition:transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.2s ease;
+        transition:opacity 0.8s ease;
         z-index:1;
-        filter:sepia(0.25) saturate(0.9); /* Diaries look aged */
-        border-left: 3px dashed rgba(255,255,255,0.5); /* Stitching */
     }
     .gallery-slide.active{
-        opacity:1;transform:rotateY(0deg);z-index:2;
-    }
-    /* Pressing LEFT (Prev): The previous page rolls in from the right */
-    .gallery-slide.prev-active{
-        opacity:1;transform:rotateY(0deg);z-index:3;
-    }
-    /* Pressing RIGHT (Next): The current page rolls out to the left */
-    .gallery-slide.next-out{
-        opacity:1;transform:rotateY(-90deg);z-index:3;
+        opacity:1;z-index:2;
     }
 
-    /* Realistic Ribbon Bookmark */
-    .diary-ribbon {
-        position:absolute;top:0;right:50px;
-        width:22px;height:110px;
-        background:var(--accent); /* Uses your theme color */
-        border-bottom: 2px solid rgba(0,0,0,0.1);
-        clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
-        z-index:20;
-        transform-origin: top center;
-        transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    /* Swing when flipping forward */
-    .hero-gallery.flip-next .diary-ribbon { transform: rotate(-40deg) translateX(-5px); }
-    /* Swing when flipping backward */
-    .hero-gallery.flip-prev .diary-ribbon { transform: rotate(40deg) translateX(5px); }
-    .hero-gallery:hover{transform:translateY(-5px);box-shadow:0 30px 70px var(--shadow);}
-
-    /* Default: Flip from Left (Going Next) */
-    .gallery-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:perspective(2000px) rotateY(-90deg);transform-origin:left center;transition:transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease;z-index:1;}
-    .gallery-slide.active{opacity:1;transform:perspective(2000px) rotateY(0deg);z-index:2;}
-
-    /* Going Previous: Flip from Right */
-    .hero-gallery.flip-prev .gallery-slide{transform:perspective(2000px) rotateY(90deg);transform-origin:right center;}
-    .hero-gallery.flip-prev .gallery-slide.active{opacity:1;transform:perspective(2000px) rotateY(0deg);z-index:2;}
-    .hero-gallery::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,.12),transparent 40%);}
-    .gallery-label{position:absolute;bottom:22px;left:22px;z-index:5;padding:10px 16px;border-radius:30px;background:rgba(255,255,255,.68);backdrop-filter:blur(10px);color:#5b5050;font-size:.72rem;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease;}
-    .hero-gallery:hover .gallery-label{opacity:1;transform:translateY(0);}
-    .gallery-dots{position:absolute;bottom:24px;right:24px;z-index:10;display:flex;gap:6px;}
-    .gallery-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);transition:width .3s ease;cursor:pointer;}
-    .gallery-dot.active{width:20px;border-radius:20px;background:white;}
-        /* --- Aesthetic Navigation Arrows --- */
+    /* Navigation Arrows */
     .gallery-nav {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 10;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(5px);
-      border: none;
-      outline: none;
-      cursor: pointer;
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #555;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(90, 70, 70, 0.2);
-      transition: all 0.3s ease;
-      user-select: none;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(5px);
+        border: none;
+        outline: none;
+        cursor: pointer;
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(90, 70, 70, 0.2);
+        transition: all 0.3s ease;
+        user-select: none;
     }
 
     .gallery-nav:hover {
-      background: rgba(255, 255, 255, 0.95);
-      transform: translateY(-50%) scale(1.1);
-      color: var(--accent);
-      box-shadow: 0 6px 20px rgba(90, 70, 70, 0.3);
+        background: rgba(255, 255, 255, 0.95);
+        transform: translateY(-50%) scale(1.1);
+        color: var(--accent);
+        box-shadow: 0 6px 20px rgba(90, 70, 70, 0.3);
     }
 
     .gallery-nav.prev { left: 15px; }
     .gallery-nav.next { right: 15px; }
 
     body.dark .gallery-nav {
-      background: rgba(30, 25, 40, 0.6);
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        background: rgba(30, 25, 40, 0.6);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
     body.dark .gallery-nav:hover {
-      background: rgba(40, 30, 55, 0.9);
-      color: var(--accent-hover);
+        background: rgba(40, 30, 55, 0.9);
+        color: var(--accent-hover);
+    }
+
+    /* Dots */
+    .gallery-dots{
+        position:absolute;bottom:24px;right:24px;z-index:10;display:flex;gap:6px;
+    }
+    .gallery-dot{
+        width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);transition:width .3s ease;cursor:pointer;
+    }
+    .gallery-dot.active{
+        width:20px;border-radius:20px;background:white;
     }
 
     @media(max-width: 750px) {
-      .gallery-nav { width: 35px; height: 35px; font-size: 1.2rem; }
-      .gallery-nav.prev { left: 8px; }
-      .gallery-nav.next { right: 8px; }
+        .gallery-nav { width: 35px; height: 35px; font-size: 1.2rem; }
+        .gallery-nav.prev { left: 8px; }
+        .gallery-nav.next { right: 8px; }
+        .hero-gallery{height:380px;}
     }
-    /* --- End Arrows --- */
+    /* ---------- End Hero Gallery ---------- */
 
     /* ---------- Products ---------- */
     .products-section{padding:100px 7%;background:transparent;transition:background .5s ease;}
@@ -490,7 +438,7 @@
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
 
-<!-- Login Modal (Modified: Added Tabs for Sign In/Up & Google) -->
+<!-- Login Modal (same as before) -->
 <div id="loginModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
@@ -503,7 +451,6 @@
       <div class="modal-tab" id="phoneTab" onclick="switchTab('phone')">Phone</div>
     </div>
 
-    <!-- Sign In Form -->
     <form id="signInForm">
       <div class="form-group">
         <label for="email">Email</label>
@@ -524,7 +471,6 @@
       <div class="modal-alt"><span>Don't have an account? <a onclick="switchTab('signup')">Sign Up</a></span></div>
     </form>
 
-    <!-- Sign Up Form -->
     <form id="signUpForm" style="display:none">
       <div class="form-group">
         <label for="name">Name</label>
@@ -554,15 +500,11 @@
         <label for="phoneNumber">Phone Number</label>
         <input type="tel" id="phoneNumber" placeholder="+91 9876543210" required>
       </div>
-      
-      <!-- This div is required for Google reCAPTCHA -->
       <div id="recaptcha-container"></div>
-    
       <div class="form-group" style="margin-top: 15px;">
         <label for="otpCode">OTP Code</label>
         <input type="text" id="otpCode" placeholder="Enter 6-digit code" required>
       </div>
-    
       <button type="button" class="login-submit" id="sendOtpBtn" style="margin-top: 10px;">Send Code</button>
       <button type="button" class="login-submit" id="verifyOtpBtn" style="background: var(--green); color: var(--text);">Verify & Sign In</button>
       <div class="modal-alt"><span>Need help? <a onclick="switchTab('signin')">Back to Email Sign In</a></span></div>
@@ -590,7 +532,7 @@
   </div>
 </div>
 
-<!-- Navigation (Updated with Home icon) -->
+<!-- Navigation -->
 <nav>
   <a href="index.html" class="logo magic-hover">♡ Little Loop</a>
   <div class="nav-right">
@@ -602,13 +544,11 @@
       <li><a href="contact.html" class="magic-hover">Contact</a></li>
     </ul>
     
-    <!-- Auth Button -->
     <button class="signin-btn" id="authButton" onclick="openAuthModal()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       <span id="authButtonText">Sign In</span>
     </button>
 
-    <!-- Separate Logout Button -->
     <button id="logoutBtn" class="logout-btn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text);" onclick="logout()" title="Logout">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
     </button>
@@ -627,8 +567,9 @@
     <a href="shop.html" class="button magic-hover">Explore the collection →</a>
   </div>
 
+  <!-- Simplified Gallery -->
   <div class="hero-gallery magic-hover" id="heroGallery">
-    <img class="gallery-slide" src="Sunshine bloom charm.jpg" alt="Crochet handmade creation">
+    <img class="gallery-slide active" src="Sunshine bloom charm.jpg" alt="Crochet handmade creation">
     <img class="gallery-slide" src="Spider-gwen mini doll.jpeg" alt="Soft crochet yarn">
     <img class="gallery-slide" src="Pink piggy plushie.jpg" alt="Cute crochet product">
     <img class="gallery-slide" src="Pink jellyfish charm.jpg" alt="Cute crochet product">
@@ -637,9 +578,7 @@
     <img class="gallery-slide" src="White flower bracelet.jpg" alt="Cute crochet product">
     <img class="gallery-slide" src="Pink turtle plushie.jpg" alt="Cute crochet product">
 
-    <div class="gallery-label">✨ Hover to pause</div>
     <div class="gallery-dots" id="galleryDots"></div>
-    <div class="diary-ribbon"></div>
     <button class="gallery-nav prev" aria-label="Previous image">&#10094;</button>
     <button class="gallery-nav next" aria-label="Next image">&#10095;</button>
   </div>
@@ -821,11 +760,10 @@
       const isDark = document.body.classList.contains('dark');
       icon.textContent = isDark ? '🌙' : '☀️';
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      // Redraw background art on theme change
       if (window.aboutArt) window.aboutArt.updateTheme(isDark);
     });
 
-    // ===== Hero Carousel (Professional Swipe + Keyboard) =====
+    // ===== Hero Carousel (SIMPLIFIED CROSSFADE) =====
     const gallery = document.getElementById('heroGallery');
     const slides = document.querySelectorAll('.gallery-slide');
     const dotsContainer = document.getElementById('galleryDots');
@@ -834,56 +772,33 @@
     let carouselPaused = false;
     const SLIDE_DURATION = 4500;
 
-    // Touch swipe variables
-    let touchStartX = 0;
-    let touchStartY = 0;
-
+    // Create dots
     slides.forEach(function(slide, index) {
       const dot = document.createElement('span');
       dot.classList.add('gallery-dot');
       if (index === 0) dot.classList.add('active');
       dot.addEventListener('click', function(event) {
         event.stopPropagation();
-        // Determine direction based on if the new dot is further right or left
-        var direction = (index > currentSlide) ? 'next' : 'prev';
-        showSlide(index, direction);
+        showSlide(index);
         restartCarousel();
       });
       dotsContainer.appendChild(dot);
     });
     const dots = document.querySelectorAll('.gallery-dot');
 
-    function showSlide(index, direction) {
+    function showSlide(index) {
       if (index === currentSlide) return;
-
-      var oldSlide = slides[currentSlide];
-      var newSlide = slides[index];
-
-      // Reset all animations/classes
-      slides.forEach(function(s){ s.classList.remove('active', 'prev-active', 'next-out'); });
+      // Remove active from old slide and dot
+      slides[currentSlide].classList.remove('active');
       dots[currentSlide].classList.remove('active');
+      // Add active to new
+      slides[index].classList.add('active');
       dots[index].classList.add('active');
-
-      // Reset ribbon swing
-      gallery.classList.remove('flip-next', 'flip-prev');
-
-      if (direction === 'prev') {
-        // Going Back: New page rolls IN from right, ribbon swings right
-        gallery.classList.add('flip-prev');
-        newSlide.classList.add('prev-active');
-        oldSlide.classList.add('active');
-      } else {
-        // Going Next: Current page rolls OUT to left, ribbon swings left
-        gallery.classList.add('flip-next');
-        oldSlide.classList.add('next-out');
-        newSlide.classList.add('active');
-      }
-
       currentSlide = index;
     }
 
-    function nextSlide() { showSlide((currentSlide + 1) % slides.length, 'next'); }
-    function prevSlide() { showSlide((currentSlide - 1 + slides.length) % slides.length, 'prev'); }
+    function nextSlide() { showSlide((currentSlide + 1) % slides.length); }
+    function prevSlide() { showSlide((currentSlide - 1 + slides.length) % slides.length); }
 
     function scheduleNextSlide() {
       if (carouselTimer !== null || carouselPaused) return;
@@ -906,49 +821,7 @@
       scheduleNextSlide();
     }
 
-    // Professional Swipe Support (Mobile/Touch)
-    gallery.addEventListener('touchstart', function(e) {
-      touchStartX = e.changedTouches[0].screenX;
-      touchStartY = e.changedTouches[0].screenY;
-      pauseCarousel();
-    }, {passive: true});
-
-    gallery.addEventListener('touchend', function(e) {
-      const touchEndX = e.changedTouches[0].screenX;
-      const touchEndY = e.changedTouches[0].screenY;
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = touchEndY - touchStartY;
-
-      // Only trigger swipe if it's mainly horizontal and over 50px
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-        if (deltaX < 0) {
-          nextSlide(); // Swipe left
-        } else {
-          prevSlide(); // Swipe right
-        }
-        restartCarousel();
-      } else {
-        resumeCarousel();
-      }
-    }, {passive: true});
-
-    // Add professional left/right arrow key support for desktop
-    document.addEventListener('keydown', function(e) {
-      if (gallery.matches(':hover') || carouselPaused) {
-        if (e.key === 'ArrowRight') {
-          nextSlide();
-          restartCarousel();
-        } else if (e.key === 'ArrowLeft') {
-          prevSlide();
-          restartCarousel();
-        }
-      }
-    });
-
-    gallery.addEventListener('mouseenter', pauseCarousel);
-    gallery.addEventListener('mouseleave', resumeCarousel);
-    scheduleNextSlide();
-       // Attach click listeners to the new aesthetic arrows
+    // Attach arrow buttons
     const prevBtn = document.querySelector('.gallery-nav.prev');
     const nextBtn = document.querySelector('.gallery-nav.next');
 
@@ -965,6 +838,11 @@
         restartCarousel();
       });
     }
+
+    // Hover to pause
+    gallery.addEventListener('mouseenter', pauseCarousel);
+    gallery.addEventListener('mouseleave', resumeCarousel);
+    scheduleNextSlide();
 
     // ===== Magic particles (unchanged) =====
     let particleInterval = null;
@@ -1014,9 +892,7 @@
       if (element.classList.contains('heart-hover')) return;
       activeMagicElement = element;
       if (particleInterval !== null) return;
-      // Spawn 3 at the start
       for (let i = 0; i < 3; i++) { createMagicParticle(element); }
-      // Spawn 3 every 300 milliseconds
       particleInterval = setInterval(function() {
         if (activeMagicElement) {
           for (let i = 0; i < 3; i++) { createMagicParticle(activeMagicElement); }
@@ -1117,15 +993,15 @@
     const phoneForm = document.getElementById('phoneForm');
 
     auth.onAuthStateChanged(function(user) {
-  currentUser = user;
-  if (user) {
-    authButtonText.textContent = user.displayName || user.phoneNumber || 'Account';
-    logoutBtn.style.display = 'inline-flex';
-  } else {
-    authButtonText.textContent = 'Sign In';
-    logoutBtn.style.display = 'none';
-  }
-});
+      currentUser = user;
+      if (user) {
+        authButtonText.textContent = user.displayName || user.phoneNumber || 'Account';
+        logoutBtn.style.display = 'inline-flex';
+      } else {
+        authButtonText.textContent = 'Sign In';
+        logoutBtn.style.display = 'none';
+      }
+    });
 
     window.openAuthModal = function() {
       if (currentUser) { return; }
@@ -1167,7 +1043,6 @@
       }
     };
 
-    // Sign In
     signInForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const email = document.getElementById('email').value;
@@ -1186,7 +1061,6 @@
         .finally(function() { authLoading.classList.remove('show'); });
     });
 
-    // Sign Up
     signUpForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value;
@@ -1209,7 +1083,6 @@
         .finally(function() { authLoading.classList.remove('show'); });
     });
 
-    // Google Sign-In
     window.googleSignIn = function() {
       var provider = new firebase.auth.GoogleAuthProvider();
       authLoading.classList.add('show');
@@ -1218,42 +1091,40 @@
         .catch(function(error) { alert('Google sign-in failed: ' + error.message); })
         .finally(function() { authLoading.classList.remove('show'); });
     };
-      // Initialize reCAPTCHA verifier (Must be called once on page load)
-const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-  'size': 'normal',
-  'callback': (response) => { /* reCAPTCHA solved, allow sending */ }
-});
 
-// Send OTP
-document.getElementById('sendOtpBtn').addEventListener('click', function() {
-  const phoneNumber = document.getElementById('phoneNumber').value;
-  authLoading.classList.add('show');
-  auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
-    .then(function(confirmationResult) {
-      window.confirmationResult = confirmationResult; // SAVE globally
-      alert("OTP sent to " + phoneNumber);
-    })
-    .catch(function(error) {
-      alert("Error sending OTP: " + error.message);
-    })
-    .finally(function() { authLoading.classList.remove('show'); });
-});
+    const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'normal',
+      'callback': (response) => { /* reCAPTCHA solved, allow sending */ }
+    });
 
-// Verify OTP
-  document.getElementById('verifyOtpBtn').addEventListener('click', function() {
-    const code = document.getElementById('otpCode').value;
-    authLoading.classList.add('show');
-    window.confirmationResult.confirm(code)
-      .then(function(result) {
-        alert("Login successful!");
-        closeModal(); // Close the modal
-      })
-      .catch(function(error) {
-        alert("Invalid OTP. Try again.");
-      })
-      .finally(function() { authLoading.classList.remove('show'); });
-  });
-    // Forgot password
+    document.getElementById('sendOtpBtn').addEventListener('click', function() {
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      authLoading.classList.add('show');
+      auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
+        .then(function(confirmationResult) {
+          window.confirmationResult = confirmationResult;
+          alert("OTP sent to " + phoneNumber);
+        })
+        .catch(function(error) {
+          alert("Error sending OTP: " + error.message);
+        })
+        .finally(function() { authLoading.classList.remove('show'); });
+    });
+
+    document.getElementById('verifyOtpBtn').addEventListener('click', function() {
+      const code = document.getElementById('otpCode').value;
+      authLoading.classList.add('show');
+      window.confirmationResult.confirm(code)
+        .then(function(result) {
+          alert("Login successful!");
+          closeModal();
+        })
+        .catch(function(error) {
+          alert("Invalid OTP. Try again.");
+        })
+        .finally(function() { authLoading.classList.remove('show'); });
+    });
+
     window.forgotPassword = function() {
       const email = document.getElementById('email').value;
       if (!email) { setError('emailError', 'Please enter your email first.'); return; }
@@ -1262,10 +1133,8 @@ document.getElementById('sendOtpBtn').addEventListener('click', function() {
         .catch(function(error) { setError('emailError', 'Could not send reset email. Check email.'); });
     };
 
-    // Close modal
     window.closeModal = function() { loginModal.classList.remove('show'); clearErrors(); };
 
-    // Error helpers
     function setError(id, msg) { document.getElementById(id).textContent = msg; }
     function clearErrors() { ['emailError', 'passwordError', 'nameError', 'signupEmailError', 'signupPasswordError'].forEach(function(id) { document.getElementById(id).textContent = ''; }); }
 
