@@ -2,51 +2,113 @@
   "title": "Our First Collection",
   "pages": [
     {
-      "image": "a.jpg",
-      "name": "Cozy Teddy",
-      "description": "A tiny handmade friend for your shelf or someone special.",
+      "image": "Sunshine bloom charm.jpg",
+      "name": "Sunshine bloom charm",
+      "description": "A cheerful sunflower with an adorable little bee and leaf, handcrafted with care. Perfect to hang on your bag, keys, or anywhere that needs a little happy touch.",
       "price": 799,
-      "id": "cozy-teddy",
+      "id": "Sunshine bloom charm",
       "emoji": "🧸"
     },
     {
-      "image": "b.jpg",
-      "name": "Scarlet Scarf",
-      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "image": "Pink jellyfish charm.jpg",
+      "name": "Pink jellyfish charm",
+      "description": "A cute handmade crochet jellyfish  finished with playful curly tentacles. Perfect for nurseries, room décor, car hangings, or as a sweet handmade gift.",
       "price": 1199,
-      "id": "scarlet-scarf",
+      "id": "Pink jellyfish charm",
       "emoji": "🧣"
     },
     {
-      "image": "c.jpg",
-      "name": "Scarlet Scarf",
-      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "image": "Pink Piggy Plushie.jpg",
+      "name": "Pink Piggy Plushie",
+      "description": "A cute handmade crochet piggy plushie in soft pink with adorable little ears, snout, and tiny legs. Perfect as a playful décor piece, collectible, or a sweet handmade gift for kids and plushie lovers.",
       "price": 1199,
-      "id": "scarlet-scarf",
+      "id": "Pink Piggy Plushie",
       "emoji": "🧣"
     },
     {
-      "image": "d.jpg",
-      "name": "Scarlet Scarf",
-      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "image": "Lily bag charm.jpg",
+      "name": "Lily bag charm",
+      "description": "Handmade crochet calla lily charm, perfect for adding a cute floral touch to your bags and pouches.",
       "price": 1199,
-      "id": "scarlet-scarf",
+      "id": "Lily bag charm",
       "emoji": "🧣"
     },
     {
-      "image": "e.jpg",
-      "name": "Scarlet Scarf",
-      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "image": "Spider-gwen mini doll.jpg",
+      "name": "Spider-gwen mini doll",
+      "description": "A cute handmade crochet Spider-Man-inspired mini doll, crafted with vibrant pink, black, white, and blue details. Perfect as a collectible, bag charm, desk décor, or a fun little gift for superhero lovers.",
       "price": 1199,
-      "id": "scarlet-scarf",
+      "id": "Spider-gwen mini doll",
       "emoji": "🧣"
     },
     {
-      "image": "f.jpg",
-      "name": "Scarlet Scarf",
-      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "image": "Blue turtle plushie.jpg",
+      "name": "Blue turtle plushie",
+      "description": "Cute blue turtle. Ready to be yours as a pet",
       "price": 1199,
-      "id": "scarlet-scarf",
+      "id": "Blue turtle plushie",
+      "emoji": "🧣"
+    }
+    {
+      "image": "White Flower Bracelet.jpg",
+      "name": "White Flower Bracelet",
+      "description": "A delicate handmade crochet bracelet featuring soft white flowers and fresh green leaf details. Perfect for adding a cute, elegant touch to everyday outfits or gifting someone special.",
+      "price": 1199,
+      "id": "White Flower Bracelet",
+      "emoji": "🧣"
+    }{
+      "image": "Sunflower with butterfly charm.jpg",
+      "name": "Sunflower with butterfly charm",
+      "description": "A charming handmade crochet hanging featuring a bright sunflower with a delicate butterfly detail. Perfect for adding a cozy, cheerful touch to your room, car, or gifting collection.",
+      "price": 1199,
+      "id": "Sunflower with butterfly charm",
+      "emoji": "🧣"
+    }{
+      "image": "Blue flower mini pouch charm.jpg",
+      "name": "Blue flower mini pouch charm",
+      "description": "A lovely handmade crochet mini pouch with a vibrant blue flower design and convenient hanging loop. Perfect for storing EarPods, coins, or small essentials while doubling as a cute bag charm.",
+      "price": 1199,
+      "id": "Blue flower mini pouch charm",
+      "emoji": "🧣"
+    }
+    {
+      "image": "Blue Evil Eye charm.jpg",
+      "name": "Blue Evil Eye charm",
+      "description": "A beautiful handmade crochet evil eye hanging in vibrant blue, white, and turquoise with a playful tassel finish. Perfect for adding a stylish touch to your home décor, car, or as a thoughtful handmade gift",
+      "price": 1199,
+      "id": "Blue Evil Eye charm",
+      "emoji": "🧣"
+    }
+    {
+      "image": "Sunflower pouch.jpg",
+      "name": "Sunflower pouch",
+      "description": "A vibrant handmade crochet pouch in rich purple, beautifully decorated with a bright sunflower design.",
+      "price": 1199,
+      "id": "Sunflower pouch",
+      "emoji": "🧣"
+    }
+    {
+      "image": "Yellow flower bracelet.jpg",
+      "name": "Yellow flower bracelet",
+      "description": "A delicate handmade crochet bracelet featuring soft yellow flowers and fresh green leaf details. Perfect for adding a cute, elegant touch to everyday outfits or gifting someone special.",
+      "price": 1199,
+      "id": "Yellow flower bracelet",
+      "emoji": "🧣"
+    }
+    {
+      "image": "Pink turtle plushie.jpg",
+      "name": "Pink turtle plushie",
+      "description": "Cute pink turtle. Ready to be yours as a pet",
+      "price": 1199,
+      "id": "Pink turtle plushie",
+      "emoji": "🧣"
+    }
+    {
+      "image": "Blue daisy mini pouch charm.jpg",
+      "name": "Blue daisy mini pouch charm",
+      "description": "A cute handmade crochet mini pouch featuring a pretty blue and white daisy design. Perfect for carrying EarPods, coins, tiny essentials, or simply adding a charming touch to your bag.",
+      "price": 1199,
+      "id": "Blue daisy mini pouch charm",
       "emoji": "🧣"
     }
   ]
