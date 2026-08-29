@@ -16,6 +16,38 @@
       "price": 1199,
       "id": "scarlet-scarf",
       "emoji": "🧣"
+    },
+    {
+      "image": "c.jpg",
+      "name": "Scarlet Scarf",
+      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "price": 1199,
+      "id": "scarlet-scarf",
+      "emoji": "🧣"
+    },
+    {
+      "image": "d.jpg",
+      "name": "Scarlet Scarf",
+      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "price": 1199,
+      "id": "scarlet-scarf",
+      "emoji": "🧣"
+    },
+    {
+      "image": "e.jpg",
+      "name": "Scarlet Scarf",
+      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "price": 1199,
+      "id": "scarlet-scarf",
+      "emoji": "🧣"
+    },
+    {
+      "image": "f.jpg",
+      "name": "Scarlet Scarf",
+      "description": "Warm, soft, and beautifully hand-knitted for chilly days.",
+      "price": 1199,
+      "id": "scarlet-scarf",
+      "emoji": "🧣"
     }
   ]
 }
