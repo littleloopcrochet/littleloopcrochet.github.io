@@ -723,28 +723,41 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
 </script>
 <script>
 (function() {
-  // ===== Sound Manager =====
+  // ===== Audio Manager with Fallback Config =====
   const audioManager = {
     currentTheme: null,
     audioElements: [],
     config: null,
     started: false,
 
+    // Default fallback if JSON missing
+    defaultConfig: {
+      day: { tracks: [
+        { src: 's1d.mp3', volume: 0.5 },
+        { src: 's2d.mp3', volume: 0.5 }
+      ]},
+      night: { tracks: [
+        { src: 's1n.mp3', volume: 0.5 },
+        { src: 's2n.mp3', volume: 0.5 }
+      ]}
+    },
+
     async init() {
       try {
         const res = await fetch('sound-config.json');
-        if (!res.ok) throw new Error('Config not found');
+        if (!res.ok) throw new Error('not found');
         this.config = await res.json();
+        console.log('✅ sound-config.json loaded successfully');
       } catch (e) {
-        console.warn('Sound disabled – sound-config.json not found or inaccessible.');
-        return;
+        console.warn('⚠️ sound-config.json not found – using fallback config.');
+        this.config = this.defaultConfig;
       }
 
-      // Determine initial theme from localStorage or body class
+      // Determine theme from body class or localStorage
       const isDark = document.body.classList.contains('dark');
       this.currentTheme = isDark ? 'night' : 'day';
-      
-      // Don't play yet – wait for user interaction
+
+      // Wait for first user interaction
       this.armStart();
       this.bindThemeChange();
     },
@@ -754,7 +767,6 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
         if (this.started) return;
         this.started = true;
         this.startThemeAudio(this.currentTheme);
-        // Remove listeners after first interaction
         document.removeEventListener('click', startAudio);
         document.removeEventListener('keydown', startAudio);
         document.removeEventListener('touchstart', startAudio);
@@ -762,6 +774,8 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       document.addEventListener('click', startAudio);
       document.addEventListener('keydown', startAudio);
       document.addEventListener('touchstart', startAudio);
+      // Also listen for pointerdown (some browsers)
+      document.addEventListener('pointerdown', startAudio);
     },
 
     bindThemeChange() {
@@ -778,8 +792,6 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       if (this.currentTheme === newTheme) return;
       const oldTheme = this.currentTheme;
       this.currentTheme = newTheme;
-      
-      // Crossfade only if audio already started
       if (this.started) {
         this.crossfade(oldTheme, newTheme);
       }
@@ -791,8 +803,11 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = track.volume;
-        // Start playing; may be blocked if not allowed
-        audio.play().catch(err => console.warn('Audio play blocked:', err));
+        audio.play().then(() => {
+          console.log(`🎵 Playing ${track.src} at volume ${track.volume}`);
+        }).catch(err => {
+          console.warn(`🔇 Could not play ${track.src}:`, err.message);
+        });
         return audio;
       });
     },
@@ -802,13 +817,12 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       const newTracks = this.config[newTheme].tracks;
       const fadeTime = 1.5; // seconds
 
-      // Create new audio elements
+      // Create new audio elements (volume 0, then fade in)
       const newAudioElements = newTracks.map((track, i) => {
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = 0;
-        audio.play().catch(err => console.warn('Audio play blocked:', err));
-        // Fade in new track
+        audio.play().catch(err => console.warn('🔇 Could not play new track:', err));
         setTimeout(() => {
           audio.volume = track.volume;
         }, fadeTime * 1000);
