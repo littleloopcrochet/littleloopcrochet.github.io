@@ -756,7 +756,7 @@ function loadCartData() {
       cartMap[doc.id] = doc.data().quantity || 1;
     });
     document.querySelectorAll('.add-to-cart-page-btn').forEach(function(btn) {
-      const productId = btn.getAttribute('data-product-id');
+      const productId = btn.dataset.productId;
       if (cartMap[productId]) {
         updateButtonToCounter(btn, cartMap[productId]);
       }
@@ -776,35 +776,32 @@ function resetCartButtons() {
 }
 
 function updateButtonToCounter(btn, quantity) {
-  const productId = btn.getAttribute('data-product-id');
+  const productId = btn.dataset.productId;
   btn.innerHTML = `<button class="cart-minus" onclick="decreaseCart('${productId}', event)">−</button><span>${quantity}</span><button class="cart-plus" onclick="increaseCart('${productId}', event)">+</button>`;
   btn.classList.add('cart-counter');
   btn.style.display = 'inline-flex';
   btn.dataset.quantity = quantity;
-  btn.dataset.processing = 'false'; // reset flag
+  btn.dataset.processing = 'false';
 }
 
-window.addToCartFromPage = function(productId, event) {
+window.addToCartFromPage = function(btn, event) {
   if (event) event.stopPropagation();
   if (!currentUser) { alert('Please sign in to add items to your cart.'); return; }
-  const product = pagesData.find(p => p.id === productId);
-  if (!product) return;
-  const btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
-  if (btn && btn.dataset.processing === 'true') return; // ignore while processing
-  
-  if (btn) btn.dataset.processing = 'true';
-  
+  const productId = btn.dataset.productId;
+  if (!productId) return;
+  if (btn.dataset.processing === 'true') return;
+  btn.dataset.processing = 'true';
+
   const item = {
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    image: product.emoji || '',
+    id: productId,
+    name: btn.dataset.name,
+    price: parseFloat(btn.dataset.price),
+    image: btn.dataset.emoji || '',
     quantity: 1
   };
-  
-  const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(item.id);
-  
-  // Use transaction to ensure atomicity
+
+  const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId);
+
   db.runTransaction(function(transaction) {
     return transaction.get(cartRef).then(function(doc) {
       if (doc.exists) {
@@ -817,14 +814,12 @@ window.addToCartFromPage = function(productId, event) {
       }
     });
   }).then(function(newQty) {
-    if (btn) {
-      updateButtonToCounter(btn, newQty);
-    }
+    updateButtonToCounter(btn, newQty);
     const page = btn.closest('.diary-page');
     if (page) launchConfetti(page);
   }).catch(function(err) {
     console.error("Error adding to cart: ", err);
-    if (btn) btn.dataset.processing = 'false';
+    btn.dataset.processing = 'false';
   });
 };
 
@@ -834,9 +829,9 @@ window.increaseCart = function(productId, event) {
   const btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
   if (btn && btn.dataset.processing === 'true') return;
   if (btn) btn.dataset.processing = 'true';
-  
+
   const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId);
-  
+
   db.runTransaction(function(transaction) {
     return transaction.get(cartRef).then(function(doc) {
       if (!doc.exists) return;
@@ -861,9 +856,9 @@ window.decreaseCart = function(productId, event) {
   const btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
   if (btn && btn.dataset.processing === 'true') return;
   if (btn) btn.dataset.processing = 'true';
-  
+
   const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId);
-  
+
   db.runTransaction(function(transaction) {
     return transaction.get(cartRef).then(function(doc) {
       if (!doc.exists) return 0;
@@ -894,17 +889,19 @@ window.decreaseCart = function(productId, event) {
   });
 };
 
-// ===== Confetti Launch (DOUBLED) =====
 function launchConfetti(pageElement) {
-  let container = pageElement.querySelector('.confetti-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.className = 'confetti-container';
-    pageElement.appendChild(container);
-  }
-  container.innerHTML = '';
+  // Remove any existing confetti container on this page
+  const existing = pageElement.querySelector('.confetti-container');
+  if (existing) existing.remove();
+
+  // Create a new container
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  pageElement.appendChild(container);
+
   const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4'];
-  const pieces = 60; // doubled from 30
+  const pieces = 180; // triple the original 60
+
   for (let i = 0; i < pieces; i++) {
     const confetti = document.createElement('span');
     confetti.className = 'confetti-piece';
@@ -917,7 +914,11 @@ function launchConfetti(pageElement) {
     confetti.style.animationDelay = (Math.random() * 0.5) + 's';
     container.appendChild(confetti);
   }
-  setTimeout(() => { container.remove(); }, 4000);
+
+  // Remove container after a longer delay (enough for the longest animation)
+  setTimeout(() => {
+    if (container.parentNode) container.remove();
+  }, 5000);
 }
 
   // ===== Flipbook Setup =====
@@ -1082,7 +1083,12 @@ function launchConfetti(pageElement) {
           <p>${pageInfo.description || ''}</p>
           <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent); margin: 10px 0 5px;">₹${pageInfo.price || ''}</p>
         </div>
-        <button class="add-to-cart-page-btn magic-hover" data-product-id="${pageInfo.id}" onclick="addToCartFromPage('${pageInfo.id}', event)">Add to Cart</button>
+        <button class="add-to-cart-page-btn magic-hover" 
+        data-product-id="${pageInfo.id}" 
+        data-name="${pageInfo.name}" 
+        data-price="${pageInfo.price}" 
+        data-emoji="${pageInfo.emoji || ''}" 
+        onclick="addToCartFromPage(this, event)">Add to Cart</button>
       </div>
     `;
     return page;
