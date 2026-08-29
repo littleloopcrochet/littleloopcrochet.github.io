@@ -48,7 +48,7 @@
       "price": 1199,
       "id": "Blue turtle plushie",
       "emoji": "🧣"
-    }
+    },
     {
       "image": "White Flower Bracelet.jpg",
       "name": "White Flower Bracelet",
@@ -56,21 +56,23 @@
       "price": 1199,
       "id": "White Flower Bracelet",
       "emoji": "🧣"
-    }{
+    },
+    {
       "image": "Sunflower with butterfly charm.jpg",
       "name": "Sunflower with butterfly charm",
       "description": "A charming handmade crochet hanging featuring a bright sunflower with a delicate butterfly detail. Perfect for adding a cozy, cheerful touch to your room, car, or gifting collection.",
       "price": 1199,
       "id": "Sunflower with butterfly charm",
       "emoji": "🧣"
-    }{
+    },
+    {
       "image": "Blue flower mini pouch charm.jpg",
       "name": "Blue flower mini pouch charm",
       "description": "A lovely handmade crochet mini pouch with a vibrant blue flower design and convenient hanging loop. Perfect for storing EarPods, coins, or small essentials while doubling as a cute bag charm.",
       "price": 1199,
       "id": "Blue flower mini pouch charm",
       "emoji": "🧣"
-    }
+    },
     {
       "image": "Blue Evil Eye charm.jpg",
       "name": "Blue Evil Eye charm",
@@ -78,7 +80,7 @@
       "price": 1199,
       "id": "Blue Evil Eye charm",
       "emoji": "🧣"
-    }
+    },
     {
       "image": "Sunflower pouch.jpg",
       "name": "Sunflower pouch",
@@ -86,7 +88,7 @@
       "price": 1199,
       "id": "Sunflower pouch",
       "emoji": "🧣"
-    }
+    },
     {
       "image": "Yellow flower bracelet.jpg",
       "name": "Yellow flower bracelet",
@@ -94,7 +96,7 @@
       "price": 1199,
       "id": "Yellow flower bracelet",
       "emoji": "🧣"
-    }
+    },
     {
       "image": "Pink turtle plushie.jpg",
       "name": "Pink turtle plushie",
@@ -102,7 +104,7 @@
       "price": 1199,
       "id": "Pink turtle plushie",
       "emoji": "🧣"
-    }
+    },
     {
       "image": "Blue daisy mini pouch charm.jpg",
       "name": "Blue daisy mini pouch charm",
@@ -110,7 +112,7 @@
       "price": 1199,
       "id": "Blue daisy mini pouch charm",
       "emoji": "🧣"
-    }
+    },
     {
       "image": "Blue jellyfish charm.jpg",
       "name": "Blue jellyfish charm",
