@@ -733,18 +733,35 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
     async init() {
       try {
         const res = await fetch('sound-config.json');
-        if (!res.ok) throw new Error('config not found');
+        if (!res.ok) throw new Error('Config not found');
         this.config = await res.json();
       } catch (e) {
-        console.warn('No sound config found – music disabled.');
+        console.warn('Sound disabled – sound-config.json not found or inaccessible.');
         return;
       }
+
+      // Determine initial theme from localStorage or body class
+      const isDark = document.body.classList.contains('dark');
+      this.currentTheme = isDark ? 'night' : 'day';
       
-      // Determine initial theme
-      const isDark = localStorage.getItem('theme') === 'dark';
-      this.setTheme(isDark ? 'night' : 'day');
+      // Don't play yet – wait for user interaction
+      this.armStart();
       this.bindThemeChange();
-      this.bindUserInteraction();
+    },
+
+    armStart() {
+      const startAudio = () => {
+        if (this.started) return;
+        this.started = true;
+        this.startThemeAudio(this.currentTheme);
+        // Remove listeners after first interaction
+        document.removeEventListener('click', startAudio);
+        document.removeEventListener('keydown', startAudio);
+        document.removeEventListener('touchstart', startAudio);
+      };
+      document.addEventListener('click', startAudio);
+      document.addEventListener('keydown', startAudio);
+      document.addEventListener('touchstart', startAudio);
     },
 
     bindThemeChange() {
@@ -752,84 +769,78 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       if (!toggle) return;
       toggle.addEventListener('click', () => {
         const isDark = document.body.classList.contains('dark');
-        this.setTheme(isDark ? 'night' : 'day');
+        const newTheme = isDark ? 'night' : 'day';
+        this.switchTheme(newTheme);
       });
     },
 
-    bindUserInteraction() {
-      // Start audio on first user interaction (autoplay policies)
-      const startOnce = () => {
-        if (this.started) return;
-        this.started = true;
-        this.playCurrentTheme();
-        document.removeEventListener('click', startOnce);
-        document.removeEventListener('keydown', startOnce);
-        document.removeEventListener('touchstart', startOnce);
-      };
-      document.addEventListener('click', startOnce);
-      document.addEventListener('keydown', startOnce);
-      document.addEventListener('touchstart', startOnce);
-    },
-
-    setTheme(theme) {
-      if (this.currentTheme === theme) return;
-      this.currentTheme = theme;
-      const tracks = this.config[theme].tracks;
+    switchTheme(newTheme) {
+      if (this.currentTheme === newTheme) return;
+      const oldTheme = this.currentTheme;
+      this.currentTheme = newTheme;
       
-      // Crossfade: stop old, start new
-      this.crossfadeTo(tracks);
+      // Crossfade only if audio already started
+      if (this.started) {
+        this.crossfade(oldTheme, newTheme);
+      }
     },
 
-    crossfadeTo(newTracks) {
-      const oldElements = this.audioElements.slice();
-      const fadeDuration = 1.5; // seconds
-
-      // Create new audio elements
-      const newElements = newTracks.map((track, i) => {
-        const audio = new Audio(track.src);
-        audio.loop = true;
-        audio.volume = 0;
-        audio.play().catch(e => console.warn('Audio play blocked:', e));
-        // Fade in
-        setTimeout(() => {
-          audio.volume = track.volume;
-        }, fadeDuration * 1000);
-        return audio;
-      });
-
-      // Fade out old elements
-      oldElements.forEach((audio, index) => {
-        if (!audio) return;
-        const originalVolume = this.config[this.currentTheme === 'day' ? 'night' : 'day'].tracks[index]?.volume || 0;
-        const step = originalVolume / (fadeDuration * 60);
-        const fadeTimer = setInterval(() => {
-          if (audio.volume <= 0.01) {
-            clearInterval(fadeTimer);
-            audio.pause();
-            audio.src = '';
-          } else {
-            audio.volume -= step;
-          }
-        }, 1000/60);
-      });
-
-      this.audioElements = newElements;
-    },
-
-    playCurrentTheme() {
-      if (!this.config) return;
-      const tracks = this.config[this.currentTheme].tracks;
+    startThemeAudio(theme) {
+      const tracks = this.config[theme].tracks;
       this.audioElements = tracks.map((track, i) => {
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = track.volume;
-        audio.play().catch(e => console.warn('Audio play blocked:', e));
+        // Start playing; may be blocked if not allowed
+        audio.play().catch(err => console.warn('Audio play blocked:', err));
         return audio;
       });
+    },
+
+    crossfade(oldTheme, newTheme) {
+      const oldTracks = this.audioElements;
+      const newTracks = this.config[newTheme].tracks;
+      const fadeTime = 1.5; // seconds
+
+      // Create new audio elements
+      const newAudioElements = newTracks.map((track, i) => {
+        const audio = new Audio(track.src);
+        audio.loop = true;
+        audio.volume = 0;
+        audio.play().catch(err => console.warn('Audio play blocked:', err));
+        // Fade in new track
+        setTimeout(() => {
+          audio.volume = track.volume;
+        }, fadeTime * 1000);
+        return audio;
+      });
+
+      // Fade out old tracks
+      oldTracks.forEach((audio, index) => {
+        if (!audio) return;
+        const oldTrackConfig = this.config[oldTheme].tracks[index];
+        if (!oldTrackConfig) return;
+        const startVolume = oldTrackConfig.volume;
+        const steps = fadeTime * 60;
+        const step = startVolume / steps;
+        let currentVol = startVolume;
+        const fadeInterval = setInterval(() => {
+          if (currentVol <= 0.01) {
+            clearInterval(fadeInterval);
+            audio.pause();
+            audio.src = '';
+          } else {
+            currentVol -= step;
+            audio.volume = currentVol;
+          }
+        }, 1000 / 60);
+      });
+
+      // Replace audio elements
+      this.audioElements = newAudioElements;
     }
   };
 
-  // Initialize when DOM is ready
   document.addEventListener('DOMContentLoaded', () => audioManager.init());
 })();
 </script>
