@@ -777,7 +777,7 @@ function resetCartButtons() {
 
 function updateButtonToCounter(btn, quantity) {
   const productId = btn.dataset.productId;
-  btn.innerHTML = `<button class="cart-minus" onclick="decreaseCart('${productId}', event)">−</button><span>${quantity}</span><button class="cart-plus" onclick="increaseCart('${productId}', event)">+</button>`;
+  btn.innerHTML = `<button class="cart-minus" onclick="handleMinus(this, event)">−</button><span>${quantity}</span><button class="cart-plus" onclick="handlePlus(this, event)">+</button>`;
   btn.classList.add('cart-counter');
   btn.style.display = 'inline-flex';
   btn.dataset.quantity = quantity;
@@ -823,10 +823,25 @@ window.addToCartFromPage = function(btn, event) {
   });
 };
 
-window.increaseCart = function(productId, event) {
+// New handlers for plus/minus that pass the button element directly
+window.handleMinus = function(clickedBtn, event) {
+  event.stopPropagation();
+  const btn = clickedBtn.closest('.add-to-cart-page-btn');
+  const productId = btn.dataset.productId;
+  decreaseCart(productId, event, btn);
+};
+
+window.handlePlus = function(clickedBtn, event) {
+  event.stopPropagation();
+  const btn = clickedBtn.closest('.add-to-cart-page-btn');
+  const productId = btn.dataset.productId;
+  increaseCart(productId, event, btn);
+};
+
+window.increaseCart = function(productId, event, btn) {
   if (event) event.stopPropagation();
   if (!currentUser) return;
-  const btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
+  if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
   if (btn && btn.dataset.processing === 'true') return;
   if (btn) btn.dataset.processing = 'true';
 
@@ -850,10 +865,10 @@ window.increaseCart = function(productId, event) {
   });
 };
 
-window.decreaseCart = function(productId, event) {
+window.decreaseCart = function(productId, event, btn) {
   if (event) event.stopPropagation();
   if (!currentUser) return;
-  const btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
+  if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`);
   if (btn && btn.dataset.processing === 'true') return;
   if (btn) btn.dataset.processing = 'true';
 
@@ -1036,63 +1051,65 @@ function launchConfetti(pageElement) {
     return page;
   }
 
-  function createContentPage(pageInfo, idx) {
-    const page = document.createElement('div');
-    page.className = 'page';
+function createContentPage(pageInfo, idx) {
+  const page = document.createElement('div');
+  page.className = 'page';
 
-    const angle = (Math.random() * 10 - 5).toFixed(1);
-    const gifNum = (idx % totalGifs) + 1;
-    const gifSrc = gifNum === 1 ? 'photo-pop.gif' : `photo-pop${gifNum}.gif`;
-    const style = gifStyles[gifNum] || defaultGifStyle;
-    const inlineStyle = `
-      top: ${style.top};
-      left: ${style.left};
-      width: ${style.width};
-      transform: ${style.transform};
-    `;
+  const angle = (Math.random() * 10 - 5).toFixed(1);
+  const gifNum = (idx % totalGifs) + 1;
+  const gifSrc = gifNum === 1 ? 'photo-pop.gif' : `photo-pop${gifNum}.gif`;
+  const style = gifStyles[gifNum] || defaultGifStyle;
+  const inlineStyle = `
+    top: ${style.top};
+    left: ${style.left};
+    width: ${style.width};
+    transform: ${style.transform};
+  `;
 
-    const imgSrc = pageInfo.image || '';
+  const imgSrc = pageInfo.image || '';
+  // Ensure unique product ID
+  const productId = pageInfo.id || `item-${idx}`; // fallback
 
-    page.innerHTML = `
-      <div class="diary-page">
-        <span class="party-popper">🎉</span>
-        <div class="confetti-container" style="display:none;"></div>
-        <span class="doodle doodle-1">✧</span>
-        <span class="doodle doodle-2">♡</span>
-        <span class="doodle doodle-3">★</span>
-        <span class="doodle doodle-4">✦</span>
-        <span class="doodle doodle-5">✿</span>
-        <span class="doodle doodle-6">❀</span>
-        <span class="doodle doodle-7">✩</span>
-        <span class="doodle doodle-8">❁</span>
-        <span class="deco yarn">🧶</span>
-        <span class="deco star">⭐</span>
-        <span class="deco cat">🐱</span>
+  page.innerHTML = `
+    <div class="diary-page">
+      <span class="party-popper">🎉</span>
+      <div class="confetti-container" style="display:none;"></div>
+      <span class="doodle doodle-1">✧</span>
+      <span class="doodle doodle-2">♡</span>
+      <span class="doodle doodle-3">★</span>
+      <span class="doodle doodle-4">✦</span>
+      <span class="doodle doodle-5">✿</span>
+      <span class="doodle doodle-6">❀</span>
+      <span class="doodle doodle-7">✩</span>
+      <span class="doodle doodle-8">❁</span>
+      <span class="deco yarn">🧶</span>
+      <span class="deco star">⭐</span>
+      <span class="deco cat">🐱</span>
 
-        <div class="diary-photo-container" style="transform: rotate(${angle}deg);">
-          <div class="photo-frame magic-hover">
-            ${imgSrc ? `<img src="${imgSrc}" alt="${pageInfo.name}">` : `<div style="font-size:4rem;">${pageInfo.emoji || '🧸'}</div>`}
-          </div>
-          <img src="${gifSrc}" class="photo-pop" style="${inlineStyle}" alt="decorative animation">
-          <div class="tape-strip"></div>
-          <div class="name-sticker magic-hover">
-            <h3>${pageInfo.name || 'Untitled'}</h3>
-          </div>
+      <div class="diary-photo-container" style="transform: rotate(${angle}deg);">
+        <div class="photo-frame magic-hover">
+          ${imgSrc ? `<img src="${imgSrc}" alt="${pageInfo.name}">` : `<div style="font-size:4rem;">${pageInfo.emoji || '🧸'}</div>`}
         </div>
-        <div class="diary-text magic-hover">
-          <p>${pageInfo.description || ''}</p>
-          <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent); margin: 10px 0 5px;">₹${pageInfo.price || ''}</p>
+        <img src="${gifSrc}" class="photo-pop" style="${inlineStyle}" alt="decorative animation">
+        <div class="tape-strip"></div>
+        <div class="name-sticker magic-hover">
+          <h3>${pageInfo.name || 'Untitled'}</h3>
         </div>
-        <button class="add-to-cart-page-btn magic-hover" 
-        data-product-id="${pageInfo.id}" 
-        data-name="${pageInfo.name}" 
-        data-price="${pageInfo.price}" 
-        data-emoji="${pageInfo.emoji || ''}" 
-        onclick="addToCartFromPage(this, event)">Add to Cart</button>
       </div>
-    `;
-    return page;
-  }
+      <div class="diary-text magic-hover">
+        <p>${pageInfo.description || ''}</p>
+        <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent); margin: 10px 0 5px;">₹${pageInfo.price || ''}</p>
+      </div>
+      <button class="add-to-cart-page-btn magic-hover" 
+              data-product-id="${productId}" 
+              data-name="${pageInfo.name || ''}" 
+              data-price="${pageInfo.price || 0}" 
+              data-emoji="${pageInfo.emoji || ''}" 
+              onclick="addToCartFromPage(this, event)">Add to Cart</button>
+    </div>
+  `;
+  return page;
+}
 
   // ===== Hover Restriction for Book =====
   function setupHoverRestriction() {
