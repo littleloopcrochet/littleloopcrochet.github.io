@@ -80,9 +80,9 @@
     .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; color: var(--text-soft); }
     .summary-row.total { font-size: 1.5rem; font-weight: bold; color: var(--text); border-top: 1px solid rgba(120,100,120,.2); padding-top: 20px; margin-top: 10px; }
     
-    /* Continue Shopping button */
-    .continue-shopping { display: inline-block; margin-top: 20px; padding: 12px 25px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; text-align: center; width: 100%; box-sizing: border-box; }
-    .continue-shopping:hover { background: var(--accent-hover); }
+    /* Continue Shopping button (now below Place Order) */
+    .continue-shopping { display: inline-block; margin-top: 10px; padding: 12px 25px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease, transform .3s ease, box-shadow .3s ease; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer; }
+    .continue-shopping:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 15px var(--glow-color); }
     
     .checkout-form { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
     .form-group { display: flex; flex-direction: column; gap: 5px; }
@@ -90,8 +90,8 @@
     .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid rgba(120,100,120,.2); border-radius: 10px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 1rem; outline: none; }
     .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
     
-    .checkout-btn { width: 100%; padding: 15px; border: none; border-radius: 50px; background: var(--accent); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform .3s ease, background .3s ease; }
-    .checkout-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+    .checkout-btn { width: 100%; padding: 15px; border: none; border-radius: 50px; background: var(--accent); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform .3s ease, background .3s ease, box-shadow .3s ease; }
+    .checkout-btn:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 15px var(--glow-color); }
     
     /* Empty Cart */
     .empty-cart { text-align: center; padding: 60px 20px; }
@@ -384,7 +384,6 @@
         let total = 0;
 
         if (querySnapshot.empty) {
-          // Simplified empty cart (no suggested/trust sections)
           cartContent.innerHTML = `
             <div class="empty-cart" style="width:100%;">
               <h2>Your cart is empty!</h2>
@@ -428,7 +427,7 @@
         });
         itemsHTML += '</div>';
 
-        // Render Summary (including continue shopping button and confetti container)
+        // Render Summary (Continue Shopping now below Place Order)
         const summaryHTML = `
           <div class="cart-summary" id="cartSummary">
             <div class="confetti-container" id="cartConfetti" style="display:none;"></div>
@@ -436,8 +435,6 @@
             <div class="summary-row"><span>Subtotal</span><span>₹${total}</span></div>
             <div class="summary-row"><span>Shipping</span><span>Free</span></div>
             <div class="summary-row total"><span>Total</span><span>₹${total}</span></div>
-            
-            <a href="shop.html" class="continue-shopping">Continue Shopping</a>
             
             <div class="checkout-form">
               <h3>Checkout Details</h3>
@@ -453,7 +450,12 @@
                 <label>Delivery Address</label>
                 <textarea id="checkoutAddress" rows="4" placeholder="Enter your full address" required></textarea>
               </div>
-              <button class="checkout-btn" onclick="placeOrder()">Place Order</button>
+              
+              <!-- Place Order button with magic-hover -->
+              <button class="checkout-btn magic-hover" onclick="placeOrder()">Place Order</button>
+              
+              <!-- Continue Shopping below Place Order, with magic-hover -->
+              <a href="shop.html" class="continue-shopping magic-hover">Continue Shopping</a>
             </div>
           </div>`;
 
@@ -490,7 +492,6 @@
           return cartRef.delete().then(loadCart);
         } else {
           return cartRef.update({ quantity: newQty }).then(function() {
-            // If increment, launch confetti from summary
             if (delta > 0) {
               launchConfetti();
             }
@@ -559,7 +560,6 @@
     const container = document.getElementById('cartConfetti');
     if (!container) return;
     container.style.display = 'block';
-    // Clear previous confetti
     container.innerHTML = '';
     
     const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4'];
@@ -576,7 +576,6 @@
       confetti.style.animationDelay = (Math.random() * 0.5) + 's';
       container.appendChild(confetti);
     }
-    // Remove after animation
     setTimeout(() => {
       container.innerHTML = '';
       container.style.display = 'none';
