@@ -15,7 +15,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    /* ===== All existing styles (except gallery modifications) ===== */
     :root{
       --bg:#fffdfb;
       --surface:#ffffff;
@@ -66,7 +65,6 @@
     }
     a{color:inherit;text-decoration:none}
 
-    /* ---------- Navigation ---------- */
     nav{
       width:100%;
       padding:22px 7%;
@@ -90,10 +88,7 @@
     .logo:hover{transform:translateY(-2px);color:var(--accent)}
     .nav-right{display:flex;align-items:center;gap:28px}
     .nav-links{display:flex;gap:30px;list-style:none;font-size:.9rem}
-    .nav-links a{
-      display:inline-block;
-      transition:color .3s ease,transform .3s ease;
-    }
+    .nav-links a{display:inline-block;transition:color .3s ease,transform .3s ease;}
     .nav-links a:hover{color:var(--accent);transform:translateY(-2px)}
 
     .home-icon {
@@ -225,7 +220,6 @@
     .auth-loading.show { display: flex; }
     .auth-loading span { font-size: 1rem; color: var(--accent); font-weight: 600; }
 
-    /* ---------- Loading screen ---------- */
     body.is-loading{overflow:hidden}
     body.is-loading > *:not(#pageLoader){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
@@ -251,7 +245,6 @@
     .loader-percent{margin-top:13px;color:var(--accent);font-size:.68rem;font-weight:700}
     @media(max-width:450px){.loader-card{padding:24px 21px}.loader-cat,#loaderCat{width:115px;height:90px}}
 
-    /* ---------- Magic particles ---------- */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
     .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s cubic-bezier(.25,.65,.35,1) forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
     .butterfly .body{position:absolute;left:50%;top:50%;width:3px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#7d6877;z-index:3;}
@@ -267,7 +260,6 @@
     .heart-bubble{position:fixed;pointer-events:none;z-index:10000;font-size:13px;opacity:0;animation:heartBubble 1.25s cubic-bezier(.2,.7,.3,1) forwards;}
     @keyframes heartBubble{0%{opacity:0;transform:translate(0,5px) scale(.25) rotate(-12deg)}15%{opacity:1;transform:translate(0,0) scale(.85) rotate(5deg)}45%{transform:translate(var(--heart-x),-24px) scale(1) rotate(-8deg)}75%{opacity:.85;transform:translate(calc(var(--heart-x) * .7),-45px) scale(.85) rotate(9deg)}100%{opacity:0;transform:translate(calc(var(--heart-x) * 1.4),-70px) scale(.05) rotate(-15deg)}}
 
-    /* ---------- Theme button ---------- */
     .theme-wrapper{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;}
     body.dark .theme-wrapper::before{content:"";position:absolute;width:78px;height:78px;border-radius:50%;background:radial-gradient(circle,rgba(155,72,255,.20),transparent 70%);pointer-events:none;}
     .theme-toggle{width:46px;height:46px;border:1px solid rgba(120,100,120,.12);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem;position:relative;z-index:5;transition:transform .4s ease,background .5s ease,color .5s ease,box-shadow .5s ease;}
@@ -276,7 +268,6 @@
     .theme-icon{display:inline-block;transition:transform .6s ease;}
     body.dark .theme-icon{transform:rotate(180deg) scale(1.05);}
 
-    /* ---------- Hero (updated gallery) ---------- */
     .hero{min-height:88vh;padding:70px 7%;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:70px;}
     .hero-text{animation:heroFloat 5s ease-in-out infinite;}
     @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -286,23 +277,25 @@
     .button{display:inline-block;background:var(--accent);color:white;padding:14px 25px;border-radius:50px;font-size:.9rem;font-weight:600;transition:transform .3s ease,background .3s ease,box-shadow .3s ease;}
     .button:hover{transform:translateY(-4px) scale(1.02);background:var(--accent-hover);box-shadow:0 12px 30px var(--shadow);}
 
-    /* ---------- Hero gallery (memory constellation) ---------- */
+    /* ============ HERO GALLERY — TRANSPARENT BG ============ */
     .hero-gallery{
         height:500px;border-radius:35px;position:relative;overflow:hidden;
-        background:#e8dcc8;
+        background:transparent; /* CHANGED: no beige background */
         box-shadow:0 25px 60px var(--shadow);
         transition:transform .5s ease, box-shadow .5s ease;
         cursor:pointer;
     }
     .hero-gallery:hover{transform:translateY(-5px);box-shadow:0 30px 70px var(--shadow);}
 
-    /* Memory gallery styles (from the first file) */
+    /* ============ MEMORY CONSTELLATION ============ */
     .memory-gallery{
       position:absolute;inset:0;width:100%;height:100%;
       perspective:1200px;pointer-events:none;
     }
     .gallery-heading{
-      position:absolute;z-index:20;top:20px;left:50%;
+      position:absolute;z-index:30; /* CHANGED: higher z-index */
+      top:5px; /* CHANGED: moved up */
+      left:50%;
       transform:translateX(-50%);text-align:center;pointer-events:none;
       opacity:.9;text-shadow:0 4px 25px rgba(0,0,0,.25);
     }
@@ -314,7 +307,7 @@
       display:block;font-size:clamp(18px,2.5vw,27px);font-weight:400;letter-spacing:.02em;
     }
     .gallery-orbit{
-      position:absolute;left:50%;top:51%;width:min(630px,70vw);height:min(330px,38vw);
+      position:absolute;left:50%;top:57%;width:min(630px,70vw);height:min(330px,38vw);
       transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.12);border-radius:50%;
       box-shadow:0 0 60px rgba(255,255,255,.035),inset 0 0 50px rgba(255,255,255,.025);
       animation:orbitBreath 7s ease-in-out infinite;
@@ -328,7 +321,8 @@
     @keyframes orbitBreath{50%{transform:translate(-50%,-50%) scale(1.025);opacity:.65}}
 
     .memory-card{
-      position:absolute;left:50%;top:51%;width:170px;padding:8px 8px 30px;
+      position:absolute;left:50%;top:57%; /* CHANGED: moved down from 51% to 57% */
+      width:170px;padding:8px 8px 30px;
       background:rgba(255,251,241,.94);box-shadow:0 22px 45px rgba(0,0,0,.2),0 2px 7px rgba(0,0,0,.13);
       border-radius:2px;transform-origin:50% 75%;pointer-events:auto;cursor:pointer;
       transition:transform .75s cubic-bezier(.2,.85,.2,1),opacity .55s ease,filter .55s ease,box-shadow .55s ease;
@@ -362,7 +356,8 @@
     .card-7{transform:translate(-50%,-50%) translate(230px,48px) rotate(12deg) scale(.7);z-index:2;opacity:.68}
 
     .memory-card:hover{
-      z-index:50!important;opacity:1!important;filter:none!important;
+      z-index:80!important; /* CHANGED: above active card (was 50) */
+      opacity:1!important;filter:none!important;
       transform:translate(-50%,-50%) translateY(-28px) rotate(0deg) scale(1.08)!important;
       box-shadow:0 30px 65px rgba(0,0,0,.3),0 0 30px rgba(255,240,200,.12);
     }
@@ -372,7 +367,8 @@
     }
 
     .gallery-arrow{
-      position:absolute;z-index:70;top:52%;width:42px;height:42px;
+      position:absolute;z-index:70;top:57%; /* adjusted to match new card top */
+      width:42px;height:42px;
       border:1px solid rgba(255,255,255,.3);border-radius:50%;
       background:rgba(255,255,255,.08);color:white;backdrop-filter:blur(12px);
       font:30px Georgia,serif;line-height:34px;cursor:pointer;pointer-events:auto;
@@ -399,7 +395,7 @@
     /* mobile adjustments */
     @media(max-width:700px){
       .hero-gallery{height:420px}
-      .memory-card{width:140px}
+      .memory-card{width:140px;top:58%;}
       .photo-placeholder{height:105px}
       .card-1{transform:translate(-50%,-50%) translate(-90px,40px) rotate(-12deg) scale(.65);opacity:.65}
       .card-2{transform:translate(-50%,-50%) translate(-55px,0) rotate(-7deg) scale(.75);opacity:.8}
@@ -411,7 +407,7 @@
       .gallery-arrow{top:auto;bottom:28px}
       .gallery-arrow.prev{left:28%}
       .gallery-arrow.next{right:28%}
-      .gallery-heading{top:-10px}
+      .gallery-heading{top:-10px;}
     }
 
     /* ---------- Products ---------- */
@@ -440,16 +436,13 @@
     .product-info p{color:var(--text-soft);font-size:.85rem;margin-bottom:12px;}
     .price{color:var(--accent);font-weight:700;}
 
-    /* ---------- About ---------- */
     .about{padding:100px 7%;text-align:center;background:transparent;transition:background .5s ease;position:relative;overflow:hidden;}
     .about-content{max-width:650px;margin:auto;position:relative;z-index:2;background:transparent;border:none;padding:0;box-shadow:none;}
     .about h2{color:var(--text);}
     .about p{color:var(--text-soft);}
 
-    /* ---------- Footer ---------- */
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem;transition:background .5s ease;}
 
-    /* ---------- Canvas Background Layer ---------- */
     body{position:relative;isolation:isolate;}
     #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block;}
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05));}
@@ -475,7 +468,6 @@
       *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important;}
     }
 
-    /* Mute button */
     .mute-wrapper {
       position: relative;
       width: 44px;
@@ -512,7 +504,6 @@
       box-shadow: 0 0 12px rgba(180,100,255,.45);
     }
 
-    /* Why Choose Us */
     .why-us-section{
       padding:100px 7%;
       text-align:center;
@@ -562,7 +553,7 @@
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
 
-<!-- Login Modal (same as before) -->
+<!-- Login Modal -->
 <div id="loginModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
@@ -1403,7 +1394,6 @@
     config: null,
     started: false,
 
-    // Default fallback (if JSON fails)
     defaultConfig: {
       day: { tracks: [
         { src: 's1d.mp3', volume: 0.5 },
@@ -1416,7 +1406,6 @@
     },
 
     async init() {
-      // Try to fetch from multiple paths
       const paths = ['sound-config.json', './sound-config.json', '/sound-config.json'];
       for (const path of paths) {
         try {
@@ -1433,13 +1422,11 @@
         }
       }
 
-      // If no config loaded, use fallback
       if (!this.config) {
         console.warn('⚠️ Using fallback config – edit volumes below.');
         this.config = this.defaultConfig;
       }
 
-      // Determine theme
       this.currentTheme = document.body.classList.contains('dark') ? 'night' : 'day';
       this.setupMuteButton();
       this.loadMuteState();
@@ -1505,7 +1492,7 @@
 
     startThemeAudio(theme) {
       const tracks = this.config[theme].tracks;
-      this.audioElements = tracks.map((track, i) => {
+      this.audioElements = tracks.map((track) => {
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = track.volume;
