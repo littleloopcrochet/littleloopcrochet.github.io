@@ -493,6 +493,49 @@
       border-color: rgba(194,130,255,.45);
       box-shadow: 0 0 12px rgba(180,100,255,.45);
     }
+        /* Why Choose Us */
+    .why-us-section{
+      padding:100px 7%;
+      text-align:center;
+      background:transparent;
+      transition:background .5s ease;
+    }
+    .why-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+      gap:30px;
+      max-width:1000px;
+      margin:0 auto;
+    }
+    .why-card{
+      background:var(--card);
+      border-radius:20px;
+      padding:30px;
+      border:1px solid rgba(120,100,120,.1);
+      box-shadow:0 5px 15px var(--shadow);
+      transition:transform .4s ease, box-shadow .4s ease, background .5s ease;
+    }
+    .why-card:hover{
+      transform:translateY(-8px);
+      box-shadow:0 15px 30px var(--shadow);
+    }
+    .why-icon{
+      font-size:2.5rem;
+      margin-bottom:15px;
+    }
+    .why-card h3{
+      color:var(--text);
+      font-size:1.2rem;
+      margin-bottom:10px;
+    }
+    .why-card p{
+      color:var(--text-soft);
+      font-size:.9rem;
+      line-height:1.5;
+    }
+    @media(max-width:750px){
+      .why-us-section{padding:75px 6%;}
+    }
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 </head>
@@ -692,6 +735,34 @@
         <div class="price">₹499</div>
       </div>
     </article>
+  </div>
+</section>
+<section class="why-us-section">
+  <div class="section-heading">
+    <h2>Why Choose Us?</h2>
+    <p>Little things that make a big difference.</p>
+  </div>
+  <div class="why-grid">
+    <div class="why-card magic-hover">
+      <div class="why-icon">🧵</div>
+      <h3>Premium Yarn</h3>
+      <p>We use soft, skin-friendly yarn that lasts and feels great.</p>
+    </div>
+    <div class="why-card magic-hover">
+      <div class="why-icon">✨</div>
+      <h3>Handcrafted</h3>
+      <p>Every piece is made stitch by stitch with love and patience.</p>
+    </div>
+    <div class="why-card magic-hover">
+      <div class="why-icon">🌿</div>
+      <h3>Eco‑Conscious</h3>
+      <p>Sustainable materials and minimal waste in every creation.</p>
+    </div>
+    <div class="why-card magic-hover">
+      <div class="why-icon">💝</div>
+      <h3>Gift‑Ready</h3>
+      <p>Beautifully packaged and ready to make someone smile.</p>
+    </div>
   </div>
 </section>
 
