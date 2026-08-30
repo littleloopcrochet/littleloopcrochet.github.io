@@ -169,6 +169,42 @@
       nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
       .cart-page{padding: 60px 6%}.cart-title{font-size: 2rem}
     }
+        /* Mute button (smaller than theme button) */
+    .mute-wrapper {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mute-toggle {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(120,100,120,.12);
+      border-radius: 50%;
+      background: var(--card);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      position: relative;
+      z-index: 5;
+      transition: transform .4s ease, background .5s ease, color .5s ease, box-shadow .5s ease;
+    }
+    .mute-toggle:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 0 20px var(--icon-glow);
+    }
+    body.dark .mute-toggle {
+      border-color: rgba(194,130,255,.3);
+    }
+    body.dark .mute-toggle:hover {
+      border-color: rgba(194,130,255,.45);
+      box-shadow: 0 0 12px rgba(180,100,255,.45);
+    }
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 </head>
@@ -203,6 +239,11 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       <span id="authButtonText">Account</span>
     </button>
+    <div class="mute-wrapper magic-hover">
+      <button class="mute-toggle" id="muteToggle" aria-label="Toggle sound" title="Mute / Unmute">
+        <span class="mute-icon" id="muteIcon">🔊</span>
+      </button>
+    </div>
     
     <div class="theme-wrapper magic-hover">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme"><span class="theme-icon" id="themeIcon">☀️</span></button>
@@ -635,6 +676,7 @@
     audioElements: [],
     config: null,
     started: false,
+    muted: false,
 
     // Default fallback (if JSON fails)
     defaultConfig: {
@@ -675,7 +717,8 @@
       // Determine theme
       this.currentTheme = document.body.classList.contains('dark') ? 'night' : 'day';
 
-      // Wait for user interaction
+      this.setupMuteButton();
+      this.loadMuteState();
       this.armStart();
       this.bindThemeChange();
     },
@@ -694,6 +737,31 @@
       document.addEventListener('keydown', startAudio);
       document.addEventListener('touchstart', startAudio);
       document.addEventListener('pointerdown', startAudio);
+    },
+    setupMuteButton() {
+      const muteBtn = document.getElementById('muteToggle');
+      const muteIcon = document.getElementById('muteIcon');
+      if (!muteBtn) return;
+      muteBtn.addEventListener('click', () => {
+        this.toggleMute();
+      });
+    },
+  
+    toggleMute() {
+      this.muted = !this.muted;
+      const icon = document.getElementById('muteIcon');
+      if (icon) icon.textContent = this.muted ? '🔇' : '🔊';
+      this.audioElements.forEach(audio => {
+        audio.muted = this.muted;
+      });
+      localStorage.setItem('audioMuted', this.muted ? '1' : '0');
+    },
+  
+    loadMuteState() {
+      const saved = localStorage.getItem('audioMuted');
+      this.muted = saved === '1';
+      const icon = document.getElementById('muteIcon');
+      if (icon) icon.textContent = this.muted ? '🔇' : '🔊';
     },
 
     bindThemeChange() {
@@ -717,6 +785,7 @@
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = track.volume;
+        audio.muted = this.muted;
         audio.play().then(() => {
           console.log(`🎵 Playing ${track.src} (vol ${track.volume})`);
         }).catch(err => {
@@ -735,6 +804,7 @@
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = 0;
+        audio.muted = this.muted;
         audio.play().catch(err => console.warn('🔇 New track blocked:', err));
         setTimeout(() => { audio.volume = track.volume; }, fadeTime * 1000);
         return audio;
