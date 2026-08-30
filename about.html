@@ -190,6 +190,11 @@
     body.dark .magic-hover:hover{filter:drop-shadow(0 0 7px rgba(189,124,255,.5));}
     .heart-bubble{position:fixed;pointer-events:none;z-index:10000;font-size:13px;opacity:0;animation:heartBubble 1.25s cubic-bezier(.2,.7,.3,1) forwards;}
     @keyframes heartBubble{0%{opacity:0;transform:translate(0,5px) scale(.25) rotate(-12deg)}15%{opacity:1;transform:translate(0,0) scale(.85) rotate(5deg)}45%{transform:translate(var(--heart-x),-24px) scale(1) rotate(-8deg)}75%{opacity:.85;transform:translate(calc(var(--heart-x) * .7),-45px) scale(.85) rotate(9deg)}100%{opacity:0;transform:translate(calc(var(--heart-x) * 1.4),-70px) scale(.05) rotate(-15deg)}}
+    .mute-wrapper{position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;}
+    .mute-toggle{width:38px;height:38px;border:1px solid rgba(120,100,120,.12);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;position:relative;z-index:5;transition:transform .4s ease,background .5s ease,color .5s ease,box-shadow .5s ease;}
+    .mute-toggle:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 0 20px var(--icon-glow);}
+    body.dark .mute-toggle{border-color:rgba(194,130,255,.3);}
+    body.dark .mute-toggle:hover{border-color:rgba(194,130,255,.45);box-shadow:0 0 12px rgba(180,100,255,.45);}
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 </head>
@@ -318,6 +323,11 @@
         <line x1="21" y1="12" x2="9" y2="12"></line>
       </svg>
     </button>
+    <div class="mute-wrapper magic-hover">
+      <button class="mute-toggle" id="muteToggle" aria-label="Toggle sound" title="Mute / Unmute">
+        <span class="mute-icon" id="muteIcon">🔊</span>
+      </button>
+    </div>
 
     <div class="theme-wrapper magic-hover">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
@@ -725,6 +735,7 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
 (function() {
   // ===== Audio Manager =====
   const audioManager = {
+    muted: false,
     currentTheme: null,
     audioElements: [],
     config: null,
@@ -768,8 +779,8 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
 
       // Determine theme
       this.currentTheme = document.body.classList.contains('dark') ? 'night' : 'day';
-
-      // Wait for user interaction
+      this.setupMuteButton();
+      this.loadMuteState();
       this.armStart();
       this.bindThemeChange();
     },
@@ -788,6 +799,31 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       document.addEventListener('keydown', startAudio);
       document.addEventListener('touchstart', startAudio);
       document.addEventListener('pointerdown', startAudio);
+    },
+    setupMuteButton() {
+      const muteBtn = document.getElementById('muteToggle');
+      const muteIcon = document.getElementById('muteIcon');
+      if (!muteBtn) return;
+      muteBtn.addEventListener('click', () => {
+        this.toggleMute();
+      });
+    },
+
+    toggleMute() {
+      this.muted = !this.muted;
+      const icon = document.getElementById('muteIcon');
+      if (icon) icon.textContent = this.muted ? '🔇' : '🔊';
+      this.audioElements.forEach(audio => {
+        audio.muted = this.muted;
+      });
+      localStorage.setItem('audioMuted', this.muted ? '1' : '0');
+    },
+
+    loadMuteState() {
+      const saved = localStorage.getItem('audioMuted');
+      this.muted = saved === '1';
+      const icon = document.getElementById('muteIcon');
+      if (icon) icon.textContent = this.muted ? '🔇' : '🔊';
     },
 
     bindThemeChange() {
@@ -811,6 +847,7 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = track.volume;
+        audio.muted = this.muted;
         audio.play().then(() => {
           console.log(`🎵 Playing ${track.src} (vol ${track.volume})`);
         }).catch(err => {
@@ -829,6 +866,7 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = 0;
+        audio.muted = this.muted;
         audio.play().catch(err => console.warn('🔇 New track blocked:', err));
         setTimeout(() => { audio.volume = track.volume; }, fadeTime * 1000);
         return audio;
