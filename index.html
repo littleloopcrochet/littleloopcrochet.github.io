@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Little Loop — Handmade Crochet</title>
 
-  <!-- Added: Firebase SDK -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -286,7 +286,7 @@
     .button{display:inline-block;background:var(--accent);color:white;padding:14px 25px;border-radius:50px;font-size:.9rem;font-weight:600;transition:transform .3s ease,background .3s ease,box-shadow .3s ease;}
     .button:hover{transform:translateY(-4px) scale(1.02);background:var(--accent-hover);box-shadow:0 12px 30px var(--shadow);}
 
-    /* ---------- Hero gallery (simplified) ---------- */
+    /* ---------- Hero gallery (memory constellation) ---------- */
     .hero-gallery{
         height:500px;border-radius:35px;position:relative;overflow:hidden;
         background:#e8dcc8;
@@ -296,93 +296,123 @@
     }
     .hero-gallery:hover{transform:translateY(-5px);box-shadow:0 30px 70px var(--shadow);}
 
-    .gallery-slide{
-        position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-        opacity:0;
-        transition:opacity 0.8s ease, transform 0.8s ease;
-        z-index:1;
-        transform: scale(1);
+    /* Memory gallery styles (from the first file) */
+    .memory-gallery{
+      position:absolute;inset:0;width:100%;height:100%;
+      perspective:1200px;pointer-events:none;
     }
-    
-    /* Slow zoom effect on active slide */
-    .gallery-slide.active{
-        opacity:1;
-        z-index:2;
-        animation:slideZoom 5s ease-out forwards;
+    .gallery-heading{
+      position:absolute;z-index:20;top:20px;left:50%;
+      transform:translateX(-50%);text-align:center;pointer-events:none;
+      opacity:.9;text-shadow:0 4px 25px rgba(0,0,0,.25);
     }
-    
-    @keyframes slideZoom{
-        0% { transform: scale(1); }
-        100% { transform: scale(1.1); }
+    .gallery-heading span{
+      display:block;font-size:10px;text-transform:uppercase;letter-spacing:.34em;
+      opacity:.7;margin-bottom:7px;
     }
-    .gallery-slide.active{
-        opacity:1;z-index:2;
+    .gallery-heading strong{
+      display:block;font-size:clamp(18px,2.5vw,27px);font-weight:400;letter-spacing:.02em;
+    }
+    .gallery-orbit{
+      position:absolute;left:50%;top:51%;width:min(630px,70vw);height:min(330px,38vw);
+      transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.12);border-radius:50%;
+      box-shadow:0 0 60px rgba(255,255,255,.035),inset 0 0 50px rgba(255,255,255,.025);
+      animation:orbitBreath 7s ease-in-out infinite;
+    }
+    .gallery-orbit:before,.gallery-orbit:after{
+      content:"";position:absolute;border-radius:50%;background:#fff;
+      box-shadow:0 0 12px 4px rgba(255,240,190,.35);
+    }
+    .gallery-orbit:before{width:3px;height:3px;left:17%;top:10%}
+    .gallery-orbit:after{width:2px;height:2px;right:15%;bottom:12%}
+    @keyframes orbitBreath{50%{transform:translate(-50%,-50%) scale(1.025);opacity:.65}}
+
+    .memory-card{
+      position:absolute;left:50%;top:51%;width:170px;padding:8px 8px 30px;
+      background:rgba(255,251,241,.94);box-shadow:0 22px 45px rgba(0,0,0,.2),0 2px 7px rgba(0,0,0,.13);
+      border-radius:2px;transform-origin:50% 75%;pointer-events:auto;cursor:pointer;
+      transition:transform .75s cubic-bezier(.2,.85,.2,1),opacity .55s ease,filter .55s ease,box-shadow .55s ease;
+      will-change:transform;
+    }
+    .memory-card:before{
+      content:"";position:absolute;top:-8px;left:50%;width:64px;height:18px;
+      transform:translateX(-50%) rotate(-1deg);background:rgba(244,219,170,.65);
+      opacity:.72;filter:blur(.15px);
+    }
+    .memory-card:nth-of-type(even):before{transform:translateX(-50%) rotate(2deg)}
+    .photo-placeholder{
+      position:relative;width:100%;height:130px;background-size:cover;background-position:center;
+      overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
+    }
+    .photo-placeholder:after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(115deg,rgba(255,255,255,.17),transparent 35%,rgba(0,0,0,.12));
+    }
+    .photo-caption{
+      position:absolute;bottom:9px;left:0;right:0;text-align:center;color:#3e4147;
+      font-family:"Segoe Print","Bradley Hand",cursive;font-size:13px;transform:rotate(-1deg);
+    }
+    /* constellation positions (adapted for hero) */
+    .card-1{transform:translate(-50%,-50%) translate(-230px,45px) rotate(-11deg) scale(.7);z-index:2;opacity:.68}
+    .card-2{transform:translate(-50%,-50%) translate(-160px,-25px) rotate(-6deg) scale(.8);z-index:4;opacity:.82}
+    .card-3{transform:translate(-50%,-50%) translate(-80px,-48px) rotate(-3deg) scale(.9);z-index:6;opacity:.94}
+    .card-4{transform:translate(-50%,-50%) translate(0,-60px) rotate(1deg) scale(1);z-index:10}
+    .card-5{transform:translate(-50%,-50%) translate(80px,-42px) rotate(4deg) scale(.9);z-index:6;opacity:.94}
+    .card-6{transform:translate(-50%,-50%) translate(160px,-15px) rotate(7deg) scale(.8);z-index:4;opacity:.82}
+    .card-7{transform:translate(-50%,-50%) translate(230px,48px) rotate(12deg) scale(.7);z-index:2;opacity:.68}
+
+    .memory-card:hover{
+      z-index:50!important;opacity:1!important;filter:none!important;
+      transform:translate(-50%,-50%) translateY(-28px) rotate(0deg) scale(1.08)!important;
+      box-shadow:0 30px 65px rgba(0,0,0,.3),0 0 30px rgba(255,240,200,.12);
+    }
+    .memory-card.active{
+      z-index:60!important;opacity:1!important;filter:none!important;
+      transform:translate(-50%,-50%) translate(0,-60px) rotate(0deg) scale(1)!important;
     }
 
-    /* Navigation Arrows */
-    .gallery-nav {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 10;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(5px);
-        border: none;
-        outline: none;
-        cursor: pointer;
-        font-size: 1.6rem;
-        font-weight: bold;
-        color: #555;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(90, 70, 70, 0.2);
-        transition: all 0.3s ease;
-        user-select: none;
+    .gallery-arrow{
+      position:absolute;z-index:70;top:52%;width:42px;height:42px;
+      border:1px solid rgba(255,255,255,.3);border-radius:50%;
+      background:rgba(255,255,255,.08);color:white;backdrop-filter:blur(12px);
+      font:30px Georgia,serif;line-height:34px;cursor:pointer;pointer-events:auto;
+      opacity:.45;transition:.35s;display:flex;align-items:center;justify-content:center;
     }
+    .gallery-arrow:hover{opacity:1;background:rgba(255,255,255,.16);transform:scale(1.08)}
+    .gallery-arrow.prev{left:15px}
+    .gallery-arrow.next{right:15px}
 
-    .gallery-nav:hover {
-        background: rgba(255, 255, 255, 0.95);
-        transform: translateY(-50%) scale(1.1);
-        color: var(--accent);
-        box-shadow: 0 6px 20px rgba(90, 70, 70, 0.3);
-    }
-
-    .gallery-nav.prev { left: 15px; }
-    .gallery-nav.next { right: 15px; }
-
-    body.dark .gallery-nav {
-        background: rgba(30, 25, 40, 0.6);
-        color: #fff;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    }
-
-    body.dark .gallery-nav:hover {
-        background: rgba(40, 30, 55, 0.9);
-        color: var(--accent-hover);
-    }
-
-    /* Dots */
     .gallery-dots{
-        position:absolute;bottom:24px;right:24px;z-index:10;display:flex;gap:6px;
+      position:absolute;z-index:80;bottom:12px;left:50%;transform:translateX(-50%);
+      display:flex;gap:7px;pointer-events:auto;
     }
-    .gallery-dot{
-        width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);transition:width .3s ease;cursor:pointer;
+    .gallery-dots i{
+      width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35);transition:.4s;
     }
-    .gallery-dot.active{
-        width:20px;border-radius:20px;background:white;
-    }
+    .gallery-dots i.active{width:18px;border-radius:8px;background:rgba(255,255,255,.9)}
 
-    @media(max-width: 750px) {
-        .gallery-nav { width: 35px; height: 35px; font-size: 1.2rem; }
-        .gallery-nav.prev { left: 8px; }
-        .gallery-nav.next { right: 8px; }
-        .hero-gallery{height:380px;}
+    /* night mode adjustments */
+    body.dark .memory-card{background:rgba(244,242,232,.96);box-shadow:0 24px 50px rgba(0,0,0,.42),0 0 24px rgba(125,149,255,.06)}
+    body.dark .gallery-orbit{border-color:rgba(176,194,255,.13)}
+    body.dark .gallery-orbit:before,body.dark .gallery-orbit:after{box-shadow:0 0 12px 4px rgba(151,179,255,.45)}
+
+    /* mobile adjustments */
+    @media(max-width:700px){
+      .hero-gallery{height:420px}
+      .memory-card{width:140px}
+      .photo-placeholder{height:105px}
+      .card-1{transform:translate(-50%,-50%) translate(-90px,40px) rotate(-12deg) scale(.65);opacity:.65}
+      .card-2{transform:translate(-50%,-50%) translate(-55px,0) rotate(-7deg) scale(.75);opacity:.8}
+      .card-3{transform:translate(-50%,-50%) translate(-28px,-22px) rotate(-3deg) scale(.85);opacity:.9}
+      .card-4{transform:translate(-50%,-50%) translate(0,-35px) rotate(1deg) scale(.92)}
+      .card-5{transform:translate(-50%,-50%) translate(28px,-22px) rotate(4deg) scale(.85);opacity:.9}
+      .card-6{transform:translate(-50%,-50%) translate(55px,0) rotate(7deg) scale(.75);opacity:.8}
+      .card-7{transform:translate(-50%,-50%) translate(90px,40px) rotate(12deg) scale(.65);opacity:.65}
+      .gallery-arrow{top:auto;bottom:28px}
+      .gallery-arrow.prev{left:28%}
+      .gallery-arrow.next{right:28%}
+      .gallery-heading{top:-10px}
     }
-    /* ---------- End Hero Gallery ---------- */
 
     /* ---------- Products ---------- */
     .products-section{padding:100px 7%;background:transparent;transition:background .5s ease;}
@@ -444,20 +474,8 @@
     @media(prefers-reduced-motion:reduce){
       *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important;}
     }
-        /* Slow zoom effect on gallery */
-    .gallery-slide {
-      transition: opacity 0.8s ease;
-    }
-    .gallery-slide.active {
-      opacity: 1;
-      animation: slideZoom 5s ease-out forwards;
-    }
-    @keyframes slideZoom {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.1); }
-    }
-    
-    /* Mute button (smaller than theme button) */
+
+    /* Mute button */
     .mute-wrapper {
       position: relative;
       width: 44px;
@@ -493,7 +511,8 @@
       border-color: rgba(194,130,255,.45);
       box-shadow: 0 0 12px rgba(180,100,255,.45);
     }
-        /* Why Choose Us */
+
+    /* Why Choose Us */
     .why-us-section{
       padding:100px 7%;
       text-align:center;
@@ -599,7 +618,7 @@
       </button>
       <div class="modal-alt"><span>Already have an account? <a onclick="switchTab('signin')">Sign In</a></span></div>
     </form>
-        <!-- Phone Sign In Form -->
+    <!-- Phone Sign In Form -->
     <form id="phoneForm" style="display:none">
       <div class="form-group">
         <label for="phoneNumber">Phone Number</label>
@@ -648,7 +667,7 @@
       <li><a href="about.html" class="magic-hover">About</a></li>
       <li><a href="contact.html" class="magic-hover">Contact</a></li>
     </ul>
-    
+
     <button class="signin-btn" id="authButton" onclick="openAuthModal()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       <span id="authButtonText">Sign In</span>
@@ -676,20 +695,48 @@
     <a href="shop.html" class="button magic-hover">Explore the collection →</a>
   </div>
 
-  <!-- Simplified Gallery -->
-  <div class="hero-gallery magic-hover" id="heroGallery">
-    <img class="gallery-slide active" src="Sunshine bloom charm.jpg" alt="Crochet handmade creation">
-    <img class="gallery-slide" src="Spider-gwen mini doll.jpeg" alt="Soft crochet yarn">
-    <img class="gallery-slide" src="Pink piggy plushie.jpg" alt="Cute crochet product">
-    <img class="gallery-slide" src="Pink jellyfish charm.jpg" alt="Cute crochet product">
-    <img class="gallery-slide" src="Lily bag charm.jpeg" alt="Cute crochet product">
-    <img class="gallery-slide" src="Blue evil eye charm.jpg" alt="Cute crochet product">
-    <img class="gallery-slide" src="White flower bracelet.jpg" alt="Cute crochet product">
-    <img class="gallery-slide" src="Pink turtle plushie.jpg" alt="Cute crochet product">
+  <!-- Memory Constellation Gallery -->
+  <div class="hero-gallery" id="heroGallery">
+    <div class="memory-gallery" aria-label="Seven magical memories">
+      <div class="gallery-orbit"></div>
+      <div class="gallery-heading">
+        <span>little moments</span>
+        <strong>A collection of memories</strong>
+      </div>
 
-    <div class="gallery-dots" id="galleryDots"></div>
-    <button class="gallery-nav prev" aria-label="Previous image">&#10094;</button>
-    <button class="gallery-nav next" aria-label="Next image">&#10095;</button>
+      <div class="memory-card card-1">
+        <div class="photo-placeholder" style="background-image: url('Sunshine bloom charm.jpg')"></div>
+        <div class="photo-caption">Golden beginnings</div>
+      </div>
+      <div class="memory-card card-2">
+        <div class="photo-placeholder" style="background-image: url('Spider-gwen mini doll.jpeg')"></div>
+        <div class="photo-caption">A quiet afternoon</div>
+      </div>
+      <div class="memory-card card-3">
+        <div class="photo-placeholder" style="background-image: url('Pink piggy plushie.jpg')"></div>
+        <div class="photo-caption">Tiny adventures</div>
+      </div>
+      <div class="memory-card card-4">
+        <div class="photo-placeholder" style="background-image: url('Pink jellyfish charm.jpg')"></div>
+        <div class="photo-caption">A little sunshine</div>
+      </div>
+      <div class="memory-card card-5">
+        <div class="photo-placeholder" style="background-image: url('Lily bag charm.jpeg')"></div>
+        <div class="photo-caption">Under the stars</div>
+      </div>
+      <div class="memory-card card-6">
+        <div class="photo-placeholder" style="background-image: url('Blue evil eye charm.jpg')"></div>
+        <div class="photo-caption">Soft memories</div>
+      </div>
+      <div class="memory-card card-7">
+        <div class="photo-placeholder" style="background-image: url('White flower bracelet.jpg')"></div>
+        <div class="photo-caption">Forever & ever</div>
+      </div>
+
+      <button class="gallery-arrow prev" aria-label="Previous memory">‹</button>
+      <button class="gallery-arrow next" aria-label="Next memory">›</button>
+      <div class="gallery-dots" aria-hidden="true"></div>
+    </div>
   </div>
 </section>
 
@@ -737,6 +784,7 @@
     </article>
   </div>
 </section>
+
 <section class="why-us-section">
   <div class="section-heading">
     <h2>Why Choose Us?</h2>
@@ -900,97 +948,59 @@
       if (window.aboutArt) window.aboutArt.updateTheme(isDark);
     });
 
-    // ===== Hero Carousel (SIMPLIFIED CROSSFADE) =====
-    const gallery = document.getElementById('heroGallery');
-    const slides = document.querySelectorAll('.gallery-slide');
-    const dotsContainer = document.getElementById('galleryDots');
-    let currentSlide = 0;
-    let carouselTimer = null;
-    let carouselPaused = false;
-    const SLIDE_DURATION = 4500;
+    // ===== Memory Constellation (from Day & Night file) =====
+    const memoryCards = document.querySelectorAll(".memory-card");
+    const dotBox = document.querySelector(".gallery-dots");
+    const prevMemory = document.querySelector(".gallery-arrow.prev");
+    const nextMemory = document.querySelector(".gallery-arrow.next");
+    let memoryIndex = 3; // start at the center card (card-4)
 
     // Create dots
-    slides.forEach(function(slide, index) {
-      const dot = document.createElement('span');
-      dot.classList.add('gallery-dot');
-      if (index === 0) dot.classList.add('active');
-      dot.addEventListener('click', function(event) {
-        event.stopPropagation();
-        showSlide(index);
-        restartCarousel();
-      });
-      dotsContainer.appendChild(dot);
+    memoryCards.forEach(function(_, i) {
+      const dot = document.createElement("i");
+      if (i === memoryIndex) dot.classList.add("active");
+      dotBox.appendChild(dot);
+      dot.addEventListener("click", function() { focusMemory(i); });
     });
-    const dots = document.querySelectorAll('.gallery-dot');
 
-    function showSlide(index) {
-      if (index === currentSlide) return;
-      
-      const oldSlide = slides[currentSlide];
-      const newSlide = slides[index];
-    
-      // Remove active from old slide (fades out via CSS transition)
-      oldSlide.classList.remove('active');
-    
-      // Force reflow so the animation on new slide restarts from beginning
-      void oldSlide.offsetWidth;
-    
-      // Add active to new slide (fades in + zoom starts)
-      newSlide.classList.add('active');
-    
+    function focusMemory(index) {
+      memoryIndex = (index + 7) % 7;
+      const offsets = [
+        [-230, 45, -11, 0.7, 0.68, 2],
+        [-160, -25, -6, 0.8, 0.82, 4],
+        [-80, -48, -3, 0.9, 0.94, 6],
+        [0, -60, 1, 1, 1, 10],
+        [80, -42, 4, 0.9, 0.94, 6],
+        [160, -15, 7, 0.8, 0.82, 4],
+        [230, 48, 12, 0.7, 0.68, 2]
+      ];
+      memoryCards.forEach(function(card, i) {
+        const pos = (i - memoryIndex + 7) % 7;
+        const data = offsets[pos];
+        card.classList.toggle("active", pos === 3);
+        card.style.transform = `translate(-50%,-50%) translate(${data[0]}px,${data[1]}px) rotate(${data[2]}deg) scale(${data[3]})`;
+        card.style.opacity = data[4];
+        card.style.zIndex = data[5];
+      });
       // Update dots
-      dots[currentSlide].classList.remove('active');
-      dots[index].classList.add('active');
-    
-      currentSlide = index;
+      [...dotBox.children].forEach(function(d, i) { d.classList.toggle("active", i === memoryIndex); });
     }
 
-    function nextSlide() { showSlide((currentSlide + 1) % slides.length); }
-    function prevSlide() { showSlide((currentSlide - 1 + slides.length) % slides.length); }
+    prevMemory.addEventListener("click", function() { focusMemory(memoryIndex - 1); });
+    nextMemory.addEventListener("click", function() { focusMemory(memoryIndex + 1); });
 
-    function scheduleNextSlide() {
-      if (carouselTimer !== null || carouselPaused) return;
-      carouselTimer = setTimeout(function() {
-        carouselTimer = null;
-        if (!carouselPaused) { nextSlide(); scheduleNextSlide(); }
-      }, SLIDE_DURATION);
-    }
+    // Click on a card brings it to front
+    memoryCards.forEach(function(card, i) { card.addEventListener("click", function() { focusMemory(i); }); });
 
-    function pauseCarousel() {
-      carouselPaused = true;
-      if (carouselTimer !== null) { clearTimeout(carouselTimer); carouselTimer = null; }
-    }
+    // Auto‑rotate with pause on hover
+    let galleryPaused = false;
+    const galleryContainer = document.querySelector(".hero-gallery");
+    galleryContainer.addEventListener("mouseenter", function() { galleryPaused = true; });
+    galleryContainer.addEventListener("mouseleave", function() { galleryPaused = false; });
 
-    function resumeCarousel() { carouselPaused = false; scheduleNextSlide(); }
-
-    function restartCarousel() {
-      if (carouselTimer !== null) { clearTimeout(carouselTimer); carouselTimer = null; }
-      carouselPaused = false;
-      scheduleNextSlide();
-    }
-
-    // Attach arrow buttons
-    const prevBtn = document.querySelector('.gallery-nav.prev');
-    const nextBtn = document.querySelector('.gallery-nav.next');
-
-    if (prevBtn) {
-      prevBtn.addEventListener('click', function() {
-        prevSlide();
-        restartCarousel();
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function() {
-        nextSlide();
-        restartCarousel();
-      });
-    }
-
-    // Hover to pause
-    gallery.addEventListener('mouseenter', pauseCarousel);
-    gallery.addEventListener('mouseleave', resumeCarousel);
-    scheduleNextSlide();
+    setInterval(function() {
+      if (!galleryPaused && !document.hidden) focusMemory(memoryIndex + 1);
+    }, 5200);
 
     // ===== Magic particles (unchanged) =====
     let particleInterval = null;
