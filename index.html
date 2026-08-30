@@ -431,6 +431,55 @@
     @media(prefers-reduced-motion:reduce){
       *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important;}
     }
+        /* Slow zoom effect on gallery */
+    .gallery-slide {
+      transition: opacity 0.8s ease;
+    }
+    .gallery-slide.active {
+      opacity: 1;
+      animation: slideZoom 5s ease-out forwards;
+    }
+    @keyframes slideZoom {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.1); }
+    }
+    
+    /* Mute button (smaller than theme button) */
+    .mute-wrapper {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mute-toggle {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(120,100,120,.12);
+      border-radius: 50%;
+      background: var(--card);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      position: relative;
+      z-index: 5;
+      transition: transform .4s ease, background .5s ease, color .5s ease, box-shadow .5s ease;
+    }
+    .mute-toggle:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 0 20px var(--icon-glow);
+    }
+    body.dark .mute-toggle {
+      border-color: rgba(194,130,255,.3);
+    }
+    body.dark .mute-toggle:hover {
+      border-color: rgba(194,130,255,.45);
+      box-shadow: 0 0 12px rgba(180,100,255,.45);
+    }
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 </head>
@@ -552,7 +601,11 @@
     <button id="logoutBtn" class="logout-btn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text);" onclick="logout()" title="Logout">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
     </button>
-
+    <div class="mute-wrapper">
+      <button class="mute-toggle" id="muteToggle" aria-label="Toggle sound" title="Mute / Unmute">
+        <span class="mute-icon" id="muteIcon">🔊</span>
+      </button>
+    </div>
     <div class="theme-wrapper magic-hover">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme"><span class="theme-icon" id="themeIcon">☀️</span></button>
     </div>
@@ -788,12 +841,21 @@
 
     function showSlide(index) {
       if (index === currentSlide) return;
-      // Remove active from old slide and dot
-      slides[currentSlide].classList.remove('active');
+      const oldSlide = slides[currentSlide];
+      const newSlide = slides[index];
+
+      // Remove active from old slide
+      oldSlide.classList.remove('active');
+      // Force reflow to reset zoom animation on new slide
+      void oldSlide.offsetWidth;
+
+      // Add active (triggers zoom animation) to new slide
+      newSlide.classList.add('active');
+
+      // Update dots
       dots[currentSlide].classList.remove('active');
-      // Add active to new
-      slides[index].classList.add('active');
       dots[index].classList.add('active');
+
       currentSlide = index;
     }
 
@@ -1239,6 +1301,7 @@
 (function() {
   // ===== Audio Manager =====
   const audioManager = {
+    muted: false,
     currentTheme: null,
     audioElements: [],
     config: null,
@@ -1282,6 +1345,8 @@
 
       // Determine theme
       this.currentTheme = document.body.classList.contains('dark') ? 'night' : 'day';
+                // Setup mute button
+      this.setupMuteButton();
 
       // Wait for user interaction
       this.armStart();
@@ -1302,6 +1367,25 @@
       document.addEventListener('keydown', startAudio);
       document.addEventListener('touchstart', startAudio);
       document.addEventListener('pointerdown', startAudio);
+    },
+    setupMuteButton() {
+      const muteBtn = document.getElementById('muteToggle');
+      const muteIcon = document.getElementById('muteIcon');
+      if (!muteBtn) return;
+      muteBtn.addEventListener('click', () => {
+        this.toggleMute();
+      });
+    },
+
+    toggleMute() {
+      this.muted = !this.muted;
+      const icon = document.getElementById('muteIcon');
+      if (icon) {
+        icon.textContent = this.muted ? '🔇' : '🔊';
+      }
+      this.audioElements.forEach(audio => {
+        audio.muted = this.muted;
+      });
     },
 
     bindThemeChange() {
