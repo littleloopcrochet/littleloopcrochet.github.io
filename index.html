@@ -1431,10 +1431,8 @@
 
       // Determine theme
       this.currentTheme = document.body.classList.contains('dark') ? 'night' : 'day';
-                // Setup mute button
       this.setupMuteButton();
-
-      // Wait for user interaction
+      this.loadMuteState();
       this.armStart();
       this.bindThemeChange();
     },
@@ -1466,12 +1464,18 @@
     toggleMute() {
       this.muted = !this.muted;
       const icon = document.getElementById('muteIcon');
-      if (icon) {
-        icon.textContent = this.muted ? '🔇' : '🔊';
-      }
+      if (icon) icon.textContent = this.muted ? '🔇' : '🔊';
       this.audioElements.forEach(audio => {
         audio.muted = this.muted;
       });
+      localStorage.setItem('audioMuted', this.muted ? '1' : '0');
+    },
+
+    loadMuteState() {
+      const saved = localStorage.getItem('audioMuted');
+      this.muted = saved === '1';
+      const icon = document.getElementById('muteIcon');
+      if (icon) icon.textContent = this.muted ? '🔇' : '🔊';
     },
 
     bindThemeChange() {
@@ -1495,6 +1499,7 @@
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = track.volume;
+        audio.muted = this.muted;
         audio.play().then(() => {
           console.log(`🎵 Playing ${track.src} (vol ${track.volume})`);
         }).catch(err => {
@@ -1513,6 +1518,7 @@
         const audio = new Audio(track.src);
         audio.loop = true;
         audio.volume = 0;
+        audio.muted = this.muted;
         audio.play().catch(err => console.warn('🔇 New track blocked:', err));
         setTimeout(() => { audio.volume = track.volume; }, fadeTime * 1000);
         return audio;
