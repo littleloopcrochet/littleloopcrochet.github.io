@@ -10,6 +10,11 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).end();
+  }
+
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
   const body = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSignature = crypto
