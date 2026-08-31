@@ -1,4 +1,4 @@
-const Razorpay = require("razorpay");
+const https = require('https');
 
 export default async function handler(req, res) {
   // CORS Headers
@@ -6,30 +6,42 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    return res.status(405).end();
-  }
-
-  const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-  });
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).end();
 
   const { amount, currency, receipt } = req.body;
-  try {
-    const order = await razorpay.orders.create({ 
-      amount: amount * 100, 
-      currency: currency || "INR", 
-      receipt: receipt || `order_${Date.now()}` 
+
+  const postData = JSON.stringify({
+    amount: amount * 100,
+    currency: currency || "INR",
+    receipt: receipt || `order_${Date.now()}`
+  });
+
+  const options = {
+    hostname: 'api.razorpay.com',
+    port: 443,
+    path: '/v1/orders',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(postData),
+      'Authorization': 'Basic ' + Buffer.from(process.env.RAZORPAY_KEY_ID + ':' + process.env.RAZORPAY_KEY_SECRET).toString('base64')
+    }
+  };
+
+  const reqRazor = https.request(options, (resRazor) => {
+    let data = '';
+    resRazor.on('data', (chunk) => data += chunk);
+    resRazor.on('end', () => {
+      res.status(resRazor.statusCode).json(JSON.parse(data));
     });
-    res.status(200).json(order);
-  } catch (error) {
+  });
+
+  reqRazor.on('error', (error) => {
     console.error(error);
-    res.status(500).json({ error: "Order creation failed" });
-  }
+    res.status(500).json({ error: 'Order creation failed' });
+  });
+
+  reqRazor.write(postData);
+  reqRazor.end();
 }
