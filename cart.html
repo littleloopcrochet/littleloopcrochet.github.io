@@ -9,6 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+  <!-- Razorpay Checkout Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -507,7 +510,10 @@
     cartRef.delete().then(loadCart);
   };
 
-  window.placeOrder = function() {
+  // ============================================================
+  // NEW PLACE ORDER FUNCTION WITH RAZORPAY INTEGRATION
+  // ============================================================
+  window.placeOrder = async function() {
     const name = document.getElementById('checkoutName').value;
     const phone = document.getElementById('checkoutPhone').value;
     const address = document.getElementById('checkoutAddress').value;
@@ -517,43 +523,111 @@
       return;
     }
 
-    let total = 0;
-    const items = [];
-    db.collection('users').doc(currentUser.uid).collection('cart').get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          items.push(doc.data());
-          total += doc.data().price * doc.data().quantity;
-        });
+    // Disable button to prevent double clicks
+    const btn = document.querySelector('.checkout-btn');
+    btn.disabled = true;
+    btn.textContent = "Processing...";
 
-        return db.collection('orders').add({
-          userId: currentUser.uid,
-          userName: name,
-          phone: phone,
-          address: address,
-          items: items,
-          total: total,
-          status: 'pending',
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      })
-      .then(function() {
-        const batch = db.batch();
-        return db.collection('users').doc(currentUser.uid).collection('cart').get().then(function(cartSnapshot) {
-          cartSnapshot.forEach(function(doc) {
-            batch.delete(doc.ref);
-          });
-          return batch.commit();
-        });
-      })
-      .then(function() {
-        alert('Order placed successfully! We will contact you soon.');
-        loadCart();
-      })
-      .catch(function(err) {
-        console.error("Error placing order: ", err);
+    try {
+      let total = 0;
+      const items = [];
+      const cartSnapshot = await db.collection('users').doc(currentUser.uid).collection('cart').get();
+      
+      cartSnapshot.forEach(doc => {
+        const item = doc.data();
+        items.push(item);
+        total += item.price * item.quantity;
       });
+
+      if (items.length === 0) {
+        alert("Your cart is empty.");
+        btn.disabled = false;
+        btn.textContent = "Place Order";
+        return;
+      }
+
+      // 1. Create order in Firestore (status: pending)
+      const orderDoc = await db.collection('orders').add({
+        userId: currentUser.uid,
+        userName: name,
+        phone: phone,
+        address: address,
+        items: items,
+        total: total,
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // 2. Call Vercel backend to create Razorpay order
+      const orderResponse = await fetch('https://littleloopcrochet.vercel.app/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, currency: 'INR', receipt: orderDoc.id })
+      });
+      const orderData = await orderResponse.json();
+
+      if (!orderData.id) {
+        throw new Error(orderData.error || "Failed to create order");
+      }
+
+      // 3. Open Razorpay Checkout Modal
+      const options = {
+        key: 'YOUR_RAZORPAY_KEY_ID', // <-- Replace with your Razorpay Public Key
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Little Loop',
+        description: 'Order Payment',
+        order_id: orderData.id,
+        handler: async function(response) {
+          // 4. Call Vercel to verify payment
+          const verifyResponse = await fetch('https://littleloopcrochet.vercel.app/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId: orderDoc.id
+            })
+          });
+          const verifyData = await verifyResponse.json();
+
+          if (verifyData.success) {
+            // 5. Clear the cart and confirm
+            const batch = db.batch();
+            cartSnapshot.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+            alert('Payment successful! Order confirmed.');
+            loadCart();
+          } else {
+            alert('Payment verification failed. Contact support.');
+          }
+        },
+        modal: {
+          ondismiss: function() {
+            // User closed the modal without payment
+            btn.disabled = false;
+            btn.textContent = "Place Order";
+          }
+        },
+        theme: {
+          color: '#d795a7'
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Payment failed. Please try again.");
+      btn.disabled = false;
+      btn.textContent = "Place Order";
+    }
   };
+  // ============================================================
+  // END NEW PLACE ORDER FUNCTION
+  // ============================================================
 
   // ===== Confetti launch =====
   function launchConfetti() {
