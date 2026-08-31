@@ -10,6 +10,11 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).end();
+  }
+
   const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
