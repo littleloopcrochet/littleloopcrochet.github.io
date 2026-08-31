@@ -277,18 +277,18 @@
     .button{display:inline-block;background:var(--accent);color:white;padding:14px 25px;border-radius:50px;font-size:.9rem;font-weight:600;transition:transform .3s ease,background .3s ease,box-shadow .3s ease;}
     .button:hover{transform:translateY(-4px) scale(1.02);background:var(--accent-hover);box-shadow:0 12px 30px var(--shadow);}
 
-    /* ============ HERO GALLERY — WIDER + NO CLIPPING ============ */
+    /* ============ HERO GALLERY — SHIFTED LEFT ============ */
     .hero-gallery{
         height:500px;
         position:relative;
-        overflow:visible; /* CHANGED: was hidden, now visible so cards aren't clipped */
+        overflow:visible;
         background:transparent;
         box-shadow:none;
         border-radius:0;
         transition:transform .5s ease;
         cursor:pointer;
-        width:125%; /* CHANGED: wider container */
-        margin-left:-12.5%; /* CHANGED: center it */
+        width:150%; /* CHANGED: wider */
+        margin-left:-25%; /* CHANGED: shifted left */
     }
     .hero-gallery:hover{transform:translateY(-5px);}
 
@@ -405,8 +405,8 @@
     /* mobile adjustments */
     @media(max-width:700px){
       .hero-gallery{
-        width:130%;
-        margin-left:-15%;
+        width:160%;
+        margin-left:-30%;
       }
       .hero-gallery{height:420px}
       .memory-card{width:180px;top:58%;padding:8px 8px 30px;}
@@ -425,32 +425,7 @@
       .gallery-heading{top:-10px;}
     }
 
-    /* ---------- Products ---------- */
-    .products-section{padding:100px 7%;background:transparent;transition:background .5s ease;}
-    .section-heading{text-align:center;margin-bottom:55px;}
-    .section-heading h2{font-size:2.2rem;color:var(--text);margin-bottom:10px;}
-    .section-heading p{color:var(--muted);font-size:.95rem;}
-    .product-grid{max-width:1000px;margin:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:35px;}
-    .product-card{background:var(--card);border-radius:25px;overflow:hidden;border:1px solid rgba(120,100,120,.08);transition:transform .4s ease,box-shadow .4s ease,background .5s ease;}
-    .product-card:hover{transform:translateY(-9px);box-shadow:0 20px 45px var(--shadow);}
-    .product-image{height:280px;display:flex;align-items:center;justify-content:center;font-size:4rem;transition:background .5s ease;}
-    .product-card:nth-child(1) .product-image{animation:productFloat1 4.2s ease-in-out infinite;}
-    .product-card:nth-child(2) .product-image{animation:productFloat2 4.8s ease-in-out infinite;}
-    .product-card:nth-child(3) .product-image{animation:productFloat3 4.5s ease-in-out infinite;}
-    .product-card:nth-child(4) .product-image{animation:productFloat4 5.1s ease-in-out infinite;}
-    @keyframes productFloat1{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px) rotate(-1deg);}}
-    @keyframes productFloat2{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px) rotate(1deg);}}
-    @keyframes productFloat3{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px) rotate(-1deg);}}
-    @keyframes productFloat4{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px) rotate(1deg);}}
-    .pink{background:var(--pink);}
-    .green{background:var(--green);}
-    .yellow{background:var(--yellow);}
-    .blue{background:var(--blue);}
-    .product-info{padding:22px;}
-    .product-info h3{color:var(--text);margin-bottom:5px;font-size:1.05rem;}
-    .product-info p{color:var(--text-soft);font-size:.85rem;margin-bottom:12px;}
-    .price{color:var(--accent);font-weight:700;}
-
+    /* ---------- About ---------- */
     .about{padding:100px 7%;text-align:center;background:transparent;transition:background .5s ease;position:relative;overflow:hidden;}
     .about-content{max-width:650px;margin:auto;position:relative;z-index:2;background:transparent;border:none;padding:0;box-shadow:none;}
     .about h2{color:var(--text);}
@@ -461,7 +436,7 @@
     body{position:relative;isolation:isolate;}
     #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block;}
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05));}
-    nav,.hero,.products-section,.about,footer{position:relative;z-index:2;}
+    nav,.hero,.about,footer{position:relative;z-index:2;}
 
     @media(max-width:750px){
       nav{padding:20px 6%;}
@@ -470,8 +445,7 @@
       .hero{grid-template-columns:1fr;padding:60px 6%;gap:45px;text-align:center;}
       .hero p{margin-left:auto;margin-right:auto;}
       .hero-gallery{height:380px;}
-      .product-grid{grid-template-columns:1fr;}
-      .products-section,.about{padding:75px 6%;}
+      .about{padding:75px 6%;}
     }
     @media(max-width:450px){
       .nav-links{gap:10px;}
@@ -746,50 +720,7 @@
   </div>
 </section>
 
-<section class="products-section" id="shop">
-  <div class="section-heading">
-    <h2>Made with love ♡</h2>
-    <p>A few of our favorite little creations.</p>
-  </div>
-
-  <div class="product-grid">
-    <article class="product-card magic-hover">
-      <div class="product-image pink magic-hover">🧸</div>
-      <div class="product-info">
-        <h3>Cozy Teddy</h3>
-        <p>A tiny handmade friend for your shelf or someone special.</p>
-        <div class="price">₹799</div>
-      </div>
-    </article>
-
-    <article class="product-card magic-hover">
-      <div class="product-image green magic-hover">🌷</div>
-      <div class="product-info">
-        <h3>Mini Flower Bouquet</h3>
-        <p>Flowers that never wilt, carefully crocheted by hand.</p>
-        <div class="price">₹599</div>
-      </div>
-    </article>
-
-    <article class="product-card magic-hover">
-      <div class="product-image yellow magic-hover">☀️</div>
-      <div class="product-info">
-        <h3>Sunny Pouch</h3>
-        <p>A soft little pouch for your everyday essentials.</p>
-        <div class="price">₹699</div>
-      </div>
-    </article>
-
-    <article class="product-card magic-hover">
-      <div class="product-image blue magic-hover">🐳</div>
-      <div class="product-info">
-        <h3>Little Whale</h3>
-        <p>A squishy ocean friend made with soft yarn.</p>
-        <div class="price">₹499</div>
-      </div>
-    </article>
-  </div>
-</section>
+<!-- Products section removed -->
 
 <section class="why-us-section">
   <div class="section-heading">
