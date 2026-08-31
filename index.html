@@ -277,21 +277,22 @@
     .button{display:inline-block;background:var(--accent);color:white;padding:14px 25px;border-radius:50px;font-size:.9rem;font-weight:600;transition:transform .3s ease,background .3s ease,box-shadow .3s ease;}
     .button:hover{transform:translateY(-4px) scale(1.02);background:var(--accent-hover);box-shadow:0 12px 30px var(--shadow);}
 
-    /* ============ HERO GALLERY — COMPLETELY TRANSPARENT ============ */
+    /* ============ HERO GALLERY — TRANSPARENT, NO CLIPPING ============ */
     .hero-gallery{
-        height:500px;position:relative;overflow:hidden;
+        height:500px;position:relative;
         background:transparent;
-        box-shadow:none; /* removed */
-        border-radius:0; /* removed */
+        box-shadow:none;
+        border-radius:0;
         transition:transform .5s ease;
         cursor:pointer;
+        overflow:visible; /* FIX: allow cards to extend beyond */
     }
     .hero-gallery:hover{transform:translateY(-5px);}
 
-    /* ============ MEMORY CONSTELLATION (LARGER CARDS) ============ */
     .memory-gallery{
       position:absolute;inset:0;width:100%;height:100%;
       perspective:1200px;pointer-events:none;
+      overflow:visible; /* FIX: no clipping */
     }
     .gallery-heading{
       position:absolute;z-index:30;
@@ -322,7 +323,7 @@
 
     .memory-card{
       position:absolute;left:50%;top:57%;
-      width:255px; /* 1.5x larger */
+      width:255px; /* 1.5x */
       padding:12px 12px 40px;
       background:rgba(255,251,241,.94);
       box-shadow:0 22px 45px rgba(0,0,0,.2),0 2px 7px rgba(0,0,0,.13);
@@ -352,14 +353,14 @@
       position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#3e4147;
       font-family:"Segoe Print","Bradley Hand",cursive;font-size:16px;transform:rotate(-1deg);
     }
-    /* constellation positions (adjusted for larger cards) */
-    .card-1{transform:translate(-50%,-50%) translate(-345px,67px) rotate(-11deg) scale(.7);z-index:2;opacity:.68}
-    .card-2{transform:translate(-50%,-50%) translate(-240px,-37px) rotate(-6deg) scale(.8);z-index:4;opacity:.82}
-    .card-3{transform:translate(-50%,-50%) translate(-120px,-72px) rotate(-3deg) scale(.9);z-index:6;opacity:.94}
-    .card-4{transform:translate(-50%,-50%) translate(0,-90px) rotate(1deg) scale(1);z-index:10}
-    .card-5{transform:translate(-50%,-50%) translate(120px,-63px) rotate(4deg) scale(.9);z-index:6;opacity:.94}
-    .card-6{transform:translate(-50%,-50%) translate(240px,-22px) rotate(7deg) scale(.8);z-index:4;opacity:.82}
-    .card-7{transform:translate(-50%,-50%) translate(345px,72px) rotate(12deg) scale(.7);z-index:2;opacity:.68}
+    /* constellation positions (adjusted to reduce clipping) */
+    .card-1{transform:translate(-50%,-50%) translate(-280px,60px) rotate(-11deg) scale(.7);z-index:2;opacity:.68}
+    .card-2{transform:translate(-50%,-50%) translate(-190px,-30px) rotate(-6deg) scale(.8);z-index:4;opacity:.82}
+    .card-3{transform:translate(-50%,-50%) translate(-95px,-60px) rotate(-3deg) scale(.9);z-index:6;opacity:.94}
+    .card-4{transform:translate(-50%,-50%) translate(0,-80px) rotate(1deg) scale(1);z-index:10}
+    .card-5{transform:translate(-50%,-50%) translate(95px,-55px) rotate(4deg) scale(.9);z-index:6;opacity:.94}
+    .card-6{transform:translate(-50%,-50%) translate(190px,-20px) rotate(7deg) scale(.8);z-index:4;opacity:.82}
+    .card-7{transform:translate(-50%,-50%) translate(280px,60px) rotate(12deg) scale(.7);z-index:2;opacity:.68}
 
     .memory-card:hover{
       z-index:80!important;
@@ -369,7 +370,7 @@
     }
     .memory-card.active{
       z-index:60!important;opacity:1!important;filter:none!important;
-      transform:translate(-50%,-50%) translate(0,-90px) rotate(0deg) scale(1)!important;
+      transform:translate(-50%,-50%) translate(0,-80px) rotate(0deg) scale(1)!important;
     }
 
     .gallery-arrow{
@@ -454,6 +455,88 @@
     #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block;}
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05));}
     nav,.hero,.products-section,.about,footer{position:relative;z-index:2;}
+
+    /* ============ DAY/NIGHT SKY OVERLAY ============ */
+    .daynight-bg{
+      position:fixed;
+      inset:0;
+      z-index:-1; /* above canvas, below content */
+      pointer-events:none;
+      transition:background .8s ease;
+    }
+    .daynight-bg .sky-gradient{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg,#8fd4f2 0%,#c4eaf4 36%,#f8dfc7 67%,#b9d5bd 100%);
+    }
+    body.dark .daynight-bg .sky-gradient{
+      background:linear-gradient(180deg,#070918 0%,#111a34 38%,#282443 70%,#39253f 100%);
+    }
+    .daynight-bg .celestial{
+      position:absolute;
+      width:110px;height:110px;
+      top:12%;right:12%;
+      border-radius:50%;
+      background:#fff5bf;
+      box-shadow:0 0 35px #fff2a6,0 0 90px rgba(255,236,151,.55);
+      transition:all .8s ease;
+      animation:celestialFloat 7s ease-in-out infinite;
+    }
+    body.dark .daynight-bg .celestial{
+      left:12%;right:auto;
+      background:#eef1ff;
+      box-shadow:0 0 30px rgba(219,228,255,.9);
+    }
+    @keyframes celestialFloat{50%{transform:translateY(9px)}}
+
+    .daynight-bg .cloud{
+      position:absolute;
+      width:220px;height:55px;
+      border-radius:100px;
+      background:rgba(255,255,255,.52);
+      filter:blur(1px);
+      opacity:.65;
+      animation:cloudDrift 38s linear infinite;
+    }
+    .daynight-bg .cloud:before,.daynight-bg .cloud:after{
+      content:"";position:absolute;border-radius:50%;background:inherit;
+    }
+    .daynight-bg .cloud:before{width:95px;height:95px;left:28px;bottom:0}
+    .daynight-bg .cloud:after{width:75px;height:75px;right:35px;bottom:0}
+    .daynight-bg .c1{top:18%;left:-250px;animation-duration:55s}
+    .daynight-bg .c2{top:29%;left:15%;transform:scale(.65);animation-duration:70s;animation-delay:-25s}
+    .daynight-bg .c3{top:13%;left:52%;transform:scale(.45);animation-duration:80s;animation-delay:-48s}
+    @keyframes cloudDrift{to{transform:translateX(calc(100vw + 500px))}}
+    body.dark .daynight-bg .cloud{background:rgba(103,115,170,.12);opacity:.28}
+
+    .daynight-bg .stars,.daynight-bg .meteors{
+      position:absolute;inset:0;opacity:0;transition:opacity .8s ease;
+    }
+    body.dark .daynight-bg .stars,body.dark .daynight-bg .meteors{opacity:1}
+    .daynight-bg .star{
+      position:absolute;width:2px;height:2px;border-radius:50%;
+      background:white;box-shadow:0 0 7px white;
+      animation:twinkle var(--d) ease-in-out infinite alternate;
+    }
+    @keyframes twinkle{to{opacity:.15;transform:scale(.45)}}
+    .daynight-bg .meteor{
+      position:absolute;width:150px;height:2px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),white);
+      border-radius:100%;
+      transform:rotate(-35deg);
+      filter:drop-shadow(0 0 5px white);
+      animation:meteor var(--speed) linear infinite;
+      animation-delay:var(--delay);
+      left:var(--x);top:var(--y);
+    }
+    .daynight-bg .meteor:after{
+      content:"";position:absolute;right:0;top:-2px;width:7px;height:7px;
+      border-radius:50%;background:#fff;box-shadow:0 0 12px 4px #dce7ff;
+    }
+    @keyframes meteor{
+      0%{opacity:0;transform:translate(0,0) rotate(-35deg)}
+      8%{opacity:1}
+      35%,100%{opacity:0;transform:translate(-55vw,38vh) rotate(-35deg)}
+    }
 
     @media(max-width:750px){
       nav{padding:20px 6%;}
@@ -559,6 +642,17 @@
 
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
+
+<!-- DAY/NIGHT SKY OVERLAY -->
+<div class="daynight-bg" id="daynightBg">
+  <div class="sky-gradient"></div>
+  <div class="celestial"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+  <div class="stars" id="bgStars"></div>
+  <div class="meteors" id="bgMeteors"></div>
+</div>
 
 <!-- Login Modal -->
 <div id="loginModal" class="modal">
@@ -946,6 +1040,35 @@
       if (window.aboutArt) window.aboutArt.updateTheme(isDark);
     });
 
+    // ===== Generate background stars and meteors =====
+    function makeBgStars() {
+      const box = document.getElementById('bgStars');
+      for (let i = 0; i < 95; i++) {
+        const s = document.createElement('i');
+        s.className = 'star';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 72 + '%';
+        s.style.setProperty('--d', (2 + Math.random() * 5) + 's');
+        s.style.animationDelay = (-Math.random() * 5) + 's';
+        s.style.opacity = .25 + Math.random() * .75;
+        box.appendChild(s);
+      }
+    }
+    function makeBgMeteors() {
+      const box = document.getElementById('bgMeteors');
+      for (let i = 0; i < 7; i++) {
+        const m = document.createElement('i');
+        m.className = 'meteor';
+        m.style.setProperty('--x', (35 + Math.random() * 75) + '%');
+        m.style.setProperty('--y', (3 + Math.random() * 45) + '%');
+        m.style.setProperty('--speed', (3.5 + Math.random() * 5) + 's');
+        m.style.setProperty('--delay', (-Math.random() * 12) + 's');
+        box.appendChild(m);
+      }
+    }
+    makeBgStars();
+    makeBgMeteors();
+
     // ===== Memory Constellation =====
     const memoryCards = document.querySelectorAll(".memory-card");
     const dotBox = document.querySelector(".gallery-dots");
@@ -963,13 +1086,13 @@
     function focusMemory(index) {
       memoryIndex = (index + 7) % 7;
       const offsets = [
-        [-345, 67, -11, 0.7, 0.68, 2],
-        [-240, -37, -6, 0.8, 0.82, 4],
-        [-120, -72, -3, 0.9, 0.94, 6],
-        [0, -90, 1, 1, 1, 10],
-        [120, -63, 4, 0.9, 0.94, 6],
-        [240, -22, 7, 0.8, 0.82, 4],
-        [345, 72, 12, 0.7, 0.68, 2]
+        [-280, 60, -11, 0.7, 0.68, 2],
+        [-190, -30, -6, 0.8, 0.82, 4],
+        [-95, -60, -3, 0.9, 0.94, 6],
+        [0, -80, 1, 1, 1, 10],
+        [95, -55, 4, 0.9, 0.94, 6],
+        [190, -20, 7, 0.8, 0.82, 4],
+        [280, 60, 12, 0.7, 0.68, 2]
       ];
       memoryCards.forEach(function(card, i) {
         const pos = (i - memoryIndex + 7) % 7;
