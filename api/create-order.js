@@ -1,7 +1,14 @@
 const Razorpay = require("razorpay");
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end();
+  // CORS Headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
   const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -9,12 +16,11 @@ export default async function handler(req, res) {
   });
 
   const { amount, currency, receipt } = req.body;
-
   try {
-    const order = await razorpay.orders.create({
-      amount: amount * 100,
-      currency: currency || "INR",
-      receipt: receipt || `order_${Date.now()}`,
+    const order = await razorpay.orders.create({ 
+      amount: amount * 100, 
+      currency: currency || "INR", 
+      receipt: receipt || `order_${Date.now()}` 
     });
     res.status(200).json(order);
   } catch (error) {
