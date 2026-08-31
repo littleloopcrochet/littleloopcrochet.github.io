@@ -603,14 +603,18 @@
           const verifyData = await verifyResponse.json();
 
           if (verifyData.success) {
-            // 5. Clear the cart and confirm
             const batch = db.batch();
             cartSnapshot.forEach(doc => batch.delete(doc.ref));
             await batch.commit();
-            alert('Payment successful! Order confirmed.');
+            
+            // Check if email was sent
+            if (verifyData.emailSent) {
+              alert('Payment successful! Confirmation email sent to ' + email + '.');
+            } else {
+              alert('Payment successful! Order confirmed. (Email could not be sent, but order is placed.)');
+            }
+            
             loadCart();
-          } else {
-            alert('Payment verification failed. Contact support.');
           }
         },
         modal: {
