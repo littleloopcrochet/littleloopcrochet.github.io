@@ -449,6 +449,11 @@
                 <label>Phone Number</label>
                 <input type="tel" id="checkoutPhone" placeholder="+91 98765 43210" required>
               </div>
+              <!-- NEW: Email Field -->
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="checkoutEmail" placeholder="you@example.com" required>
+              </div>
               <div class="form-group">
                 <label>Delivery Address</label>
                 <textarea id="checkoutAddress" rows="4" placeholder="Enter your full address" required></textarea>
@@ -511,14 +516,15 @@
   };
 
   // ============================================================
-  // NEW PLACE ORDER FUNCTION WITH RAZORPAY INTEGRATION
+  // PLACE ORDER FUNCTION WITH RAZORPAY + BREVO EMAIL
   // ============================================================
   window.placeOrder = async function() {
     const name = document.getElementById('checkoutName').value;
     const phone = document.getElementById('checkoutPhone').value;
+    const email = document.getElementById('checkoutEmail').value; // NEW
     const address = document.getElementById('checkoutAddress').value;
 
-    if (!name || !phone || !address) {
+    if (!name || !phone || !email || !address) {
       alert("Please fill in all checkout details.");
       return;
     }
@@ -551,6 +557,7 @@
         userId: currentUser.uid,
         userName: name,
         phone: phone,
+        email: email, // NEW
         address: address,
         items: items,
         total: total,
@@ -579,7 +586,7 @@
         description: 'Order Payment',
         order_id: orderData.id,
         handler: async function(response) {
-          // 4. Call Vercel to verify payment
+          // 4. Call Vercel to verify payment (and send Brevo email)
           const verifyResponse = await fetch('https://littleloopcrochet-github-io.vercel.app/api/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -587,7 +594,10 @@
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              orderId: orderDoc.id
+              orderId: orderDoc.id,
+              email: email,          // NEW
+              name: name,            // NEW
+              total: total           // NEW
             })
           });
           const verifyData = await verifyResponse.json();
@@ -626,7 +636,7 @@
     }
   };
   // ============================================================
-  // END NEW PLACE ORDER FUNCTION
+  // END PLACE ORDER FUNCTION
   // ============================================================
 
   // ===== Confetti launch =====
