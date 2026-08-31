@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   // Send email via Brevo
   if (email && process.env.BREVO_API_KEY) {
     const emailData = JSON.stringify({
-      sender: { email: "holalittleloop@gmail.com", name: "Little Loop" }, // Change to your verified sender
+      sender: { email: "holalittleloop@gmail.com", name: "Little Loop" }, 
       to: [{ email: email }],
       subject: "Order Confirmation",
       htmlContent: `<p>Hi ${name || "there"},</p><p>Thank you for your order! Your payment of ₹${total} has been received successfully.</p><p>Warm regards,<br>Little Loop</p>`
@@ -39,24 +39,30 @@ export default async function handler(req, res) {
       }
     };
 
-    const reqBrevo = https.request(options, (resBrevo) => {
-      let data = '';
-      resBrevo.on('data', (chunk) => data += chunk);
-      resBrevo.on('end', () => {
-        if (resBrevo.statusCode >= 200 && resBrevo.statusCode < 300) {
-          emailSent = true;
-        } else {
-          console.error("Brevo Error:", resBrevo.statusCode, data);
-        }
+    // Wrap in a promise to WAIT for the email to be sent
+    await new Promise((resolve) => {
+      const reqBrevo = https.request(options, (resBrevo) => {
+        let data = '';
+        resBrevo.on('data', (chunk) => data += chunk);
+        resBrevo.on('end', () => {
+          if (resBrevo.statusCode >= 200 && resBrevo.statusCode < 300) {
+            emailSent = true;
+            console.log("Brevo email sent successfully");
+          } else {
+            console.error("Brevo Error:", resBrevo.statusCode, data);
+          }
+          resolve();
+        });
       });
-    });
 
-    reqBrevo.on('error', (error) => {
-      console.error("Brevo network error:", error);
-    });
+      reqBrevo.on('error', (error) => {
+        console.error("Brevo network error:", error);
+        resolve();
+      });
 
-    reqBrevo.write(emailData);
-    reqBrevo.end();
+      reqBrevo.write(emailData);
+      reqBrevo.end();
+    });
   }
 
   res.status(200).json({ success: true, emailSent });
