@@ -98,14 +98,12 @@
     if (!currentUser) return;
     const container = document.getElementById('ordersContainer'); container.innerHTML = '';
     
-    // FIX: Removed .orderBy('createdAt', 'desc') and sort client-side to avoid Firestore Index error
     db.collection('orders').where('userId', '==', currentUser.uid).get().then(function(querySnapshot) {
       if (querySnapshot.empty) { 
         container.innerHTML = `<div class="empty-orders" style="width:100%;"><h2>No orders yet!</h2><p>Once you place an order, it will show up here.</p><a href="shop.html" class="shop-btn">Start Shopping</a></div>`; 
         finishLoading(); return; 
       }
 
-      // Convert to array and sort by date in JavaScript (Newest first)
       let orders = [];
       querySnapshot.forEach(function(doc) {
         let order = doc.data();
@@ -132,7 +130,13 @@
         if (status !== 'cancelled' && status !== 'delivered' && status !== 'refunded') {
           cancelBtn = `<button onclick="cancelOrder('${orderId}')" class="cancel-btn">Cancel</button>`;
         }
-        const cardHTML = `<div class="order-card"><div class="order-header"><h3>Order #${orderId.slice(-6).toUpperCase()}</h3><span class="order-status ${statusClass}">${status}</span><span class="order-date">${dateStr}</span></div><div class="order-items"><h4>Items</h4>${itemsHTML}</div><div class="order-summary"><div><span class="order-total-label">Total</span><div class="order-total-amount">₹${order.total || 0}</div></div><div class="order-actions"><button onclick="openTrackModal('${status}')">Track</button>${cancelBtn}<a href="shop.html">Shop</a></div></div></div>`;
+        // ** NEW: Only show Track button if status is 'shipped' **
+        let trackBtn = '';
+        if (status === 'shipped') {
+          trackBtn = `<button onclick="openTrackModal('${status}')">Track</button>`;
+        }
+        
+        const cardHTML = `<div class="order-card"><div class="order-header"><h3>Order #${orderId.slice(-6).toUpperCase()}</h3><span class="order-status ${statusClass}">${status}</span><span class="order-date">${dateStr}</span></div><div class="order-items"><h4>Items</h4>${itemsHTML}</div><div class="order-summary"><div><span class="order-total-label">Total</span><div class="order-total-amount">₹${order.total || 0}</div></div><div class="order-actions">${trackBtn}${cancelBtn}<a href="shop.html">Shop</a></div></div></div>`;
         container.innerHTML += cardHTML;
       });
       finishLoading();
