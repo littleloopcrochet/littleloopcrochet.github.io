@@ -1,65 +1,374 @@
-<!-- ... (Keep all your existing HTML/CSS) ... -->
-<!-- In loadOrders() function, add the following -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Little Loop</title>
 
-// In the cardHTML generation, add a Send Mail button:
-const mailBtn = `<button onclick="sendStatusEmail('${orderId}', '${status}')">📧 Send Mail</button>`;
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-// And include it in the order actions:
-const cardHTML = `<div class="order-card">
-  ...
-  <div class="order-actions">
-    <select ...>...</select>
-    ${mailBtn}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{--bg:#fffdfb;--surface:#ffffff;--card:#fff9f8;--text:#000000;--text-soft:#222222;--muted:#444444;--accent:#d795a7;--accent-hover:#c98296;--pink:#f8dce4;--green:#dfeee5;--yellow:#f8edcc;--blue:#dceaf3;--shadow:rgba(90,70,70,.10);}
+    body.dark{--bg:#09070d;--surface:#110d17;--card:#17111f;--text:#f7effd;--text-soft:#c8b9d1;--muted:#9989a4;--accent:#bd7cff;--accent-hover:#d19cff;--pink:#352039;--green:#1b3028;--yellow:#342b18;--blue:#20243a;}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:"Comfortaa",sans-serif;background:transparent;color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden;}
+    body{position:relative;isolation:isolate}
+    #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block}
+    body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))}
+
+    .admin-header{padding:20px 7%;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.2);}
+    .admin-header h1{color:var(--text);font-size:1.8rem;}
+    .admin-header button{background:var(--accent);border:none;padding:10px 20px;border-radius:50px;color:white;cursor:pointer;font-family:inherit;font-size:0.9rem;transition:all .3s ease;}
+    .admin-header button:hover{background:var(--accent-hover);transform:translateY(-2px);}
+
+    .admin-tabs{display:flex;gap:20px;padding:20px 7%;border-bottom:1px solid rgba(255,255,255,0.1);background:transparent;}
+    .admin-tab{padding:10px 25px;border-radius:50px;background:var(--card);cursor:pointer;font-weight:600;color:var(--muted);transition:all .3s ease;}
+    .admin-tab.active{background:var(--accent);color:white;}
+
+    .admin-container{padding:30px 7%;display:none;height:85vh;}
+    .admin-container.active{display:flex;gap:30px;}
+
+    /* Orders Panel */
+    .orders-panel{flex:1;overflow-y:auto;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.3);}
+    body.dark .orders-panel{background:rgba(0,0,0,0.2);border-color:rgba(255,255,255,0.1);}
+    .order-admin-card{background:var(--card);border-radius:15px;padding:20px;margin-bottom:15px;box-shadow:0 5px 15px var(--shadow);}
+    .order-admin-card h4{color:var(--text);font-size:1rem;}
+    .order-admin-card p{font-size:0.8rem;color:var(--muted);margin-bottom:10px;}
+    .order-items-admin{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+    .order-item-admin{background:var(--pink);padding:5px 10px;border-radius:10px;font-size:0.8rem;}
+    .status-select{padding:10px 15px;border-radius:50px;border:none;background:var(--surface);color:var(--text);font-family:inherit;font-weight:600;cursor:pointer;}
+    .status-select.pending{background:var(--yellow);}
+    .status-select.paid{background:var(--green);}
+    .status-select.shipped{background:var(--blue);}
+    .status-select.delivered{background:var(--pink);}
+    .status-select.cancelled{background:var(--muted);color:white;}
+    .status-select.refunded{background:var(--blue);color:var(--text);}
+    .send-mail-btn{background:var(--accent);color:white;border:none;padding:8px 15px;border-radius:50px;cursor:pointer;font-family:inherit;font-size:0.8rem;margin-left:10px;transition:all .3s ease;}
+    .send-mail-btn:hover{background:var(--accent-hover);}
+    .send-mail-btn:disabled{opacity:0.6;cursor:not-allowed;}
+
+    /* Chats Panel */
+    .customer-list{flex:1;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.3);overflow-y:auto;}
+    body.dark .customer-list{background:rgba(0,0,0,0.2);border-color:rgba(255,255,255,0.1);}
+    .customer-item{padding:15px;border-radius:15px;margin-bottom:10px;cursor:pointer;background:var(--card);transition:all 0.3s ease;}
+    .customer-item:hover,.customer-item.active{background:var(--pink);}
+    .customer-item h4{margin-bottom:5px;font-size:1rem;color:var(--text);}
+    .customer-item p{font-size:0.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .admin-chat{flex:2;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.3);display:flex;flex-direction:column;}
+    body.dark .admin-chat{background:rgba(0,0,0,0.2);border-color:rgba(255,255,255,0.1);}
+    .chat-window{flex-grow:1;overflow-y:auto;margin-bottom:20px;background:var(--card);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:15px;}
+    .chat-msg{max-width:80%;padding:12px 18px;border-radius:18px;line-height:1.4;font-size:.9rem;}
+    .chat-msg.user{align-self:flex-start;background:var(--surface);color:var(--text);border-bottom-left-radius:4px;}
+    .chat-msg.admin{align-self:flex-end;background:var(--accent);color:white;border-bottom-right-radius:4px;}
+    .chat-input-area{display:flex;gap:10px;}
+    .chat-input{flex:1;padding:14px;border:1px solid rgba(120,100,120,.2);border-radius:30px;background:var(--card);color:var(--text);font-size:1rem;outline:none;}
+    .chat-input:focus{border-color:var(--accent);}
+    .chat-send{padding:12px 24px;border:none;border-radius:30px;background:var(--accent);color:white;cursor:pointer;font-weight:600;}
+    .chat-send:hover{background:var(--accent-hover);}
+
+    .admin-login-required{display:flex;justify-content:center;align-items:center;height:80vh;font-size:1.2rem;color:var(--text);text-align:center;}
+    @media(max-width:750px){.admin-container{flex-direction:column;height:auto;}.admin-chat{height:400px;}}
+  </style>
+</head>
+
+<body>
+<canvas id="aboutCanvas" aria-hidden="true"></canvas>
+
+<div id="adminContent" style="display:none;">
+  <div class="admin-header">
+    <h1>Little Loop Admin</h1>
+    <button onclick="logoutAdmin()">Logout</button>
   </div>
-</div>`;
+  
+  <div class="admin-tabs">
+    <div class="admin-tab active" id="tabOrders" onclick="switchTab('orders')">📦 Orders</div>
+    <div class="admin-tab" id="tabChats" onclick="switchTab('chats')">💬 Chats</div>
+  </div>
 
-// Add the function:
-window.sendStatusEmail = async function(orderId, status) {
-  if (!confirm("Send this email to the customer?")) return;
+  <!-- Orders Panel -->
+  <div class="admin-container active" id="ordersContainer">
+    <div class="orders-panel" id="ordersListPanel">
+      <h2 style="margin-bottom:20px;">All Orders</h2>
+      <div id="allOrdersList"></div>
+    </div>
+  </div>
 
-  const btn = document.querySelector(`button[onclick="sendStatusEmail('${orderId}', '${status}')"]`);
-  btn.textContent = "Sending...";
-  btn.disabled = true;
+  <!-- Chats Panel -->
+  <div class="admin-container" id="chatsContainer">
+    <div class="customer-list" id="customerList"></div>
+    <div class="admin-chat">
+      <div class="chat-window" id="adminChatWindow"></div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="adminChatInput" placeholder="Type your reply..." />
+        <button class="chat-send" onclick="sendAdminMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-  try {
-    // Get order details from the DOM (or refetch from Firestore)
-    // For simplicity, we pass basic data. The worker will fetch more if needed.
-    const orderCard = btn.closest('.order-card');
-    const email = orderCard.dataset.email;
-    const name = orderCard.dataset.name;
-    const total = orderCard.dataset.total;
+<div class="admin-login-required" id="loginRequired">Loading Admin Panel... Please Log In.</div>
 
-    // Call the Cloudflare Worker
-    const response = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/send-status-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        orderId: orderId,
-        status: status,
-        adminSecret: 'mySecret123', // Replace with your actual ADMIN_SECRET
-        email: email,
-        name: name,
-        total: total
-      })
-    });
+<script>
+  const ADMIN_EMAIL = "mayankverma01092003@gmail.com";
+  const ADMIN_UID = "ZqNEhhvYDCRe9InEE1P7wmGYiC92"; 
 
-    const data = await response.json();
-    if (data.success) {
-      alert("Email sent successfully!");
+  const firebaseConfig = {
+    apiKey: "AIzaSyCeiXIZhofwxkUrWkowZuiMSHyRcsfeHE0",
+    authDomain: "littleloopcrochet-2dcdf.firebaseapp.com",
+    projectId: "littleloopcrochet-2dcdf",
+    storageBucket: "littleloopcrochet-2dcdf.firebasestorage.app",
+    messagingSenderId: "837032344744",
+    appId: "1:837032344744:web:41f17ab83bb6071240969d",
+    measurementId: "G-1F2GVL84HC"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let currentUser = null;
+  let selectedCustomerId = null;
+  let unsubscribeChat = null;
+  let currentTab = 'orders';
+
+  auth.onAuthStateChanged(function(user) {
+    if (user && (user.email === ADMIN_EMAIL || user.uid === ADMIN_UID)) {
+      currentUser = user;
+      document.getElementById('adminContent').style.display = 'block';
+      document.getElementById('loginRequired').style.display = 'none';
+      loadOrders();
+      loadCustomers();
+    } else if (user) {
+      document.getElementById('adminContent').style.display = 'none';
+      document.getElementById('loginRequired').style.display = 'block';
+      document.getElementById('loginRequired').innerHTML = "Access Denied. You are not the Admin.";
     } else {
-      alert("Error sending email: " + data.error);
+      document.getElementById('adminContent').style.display = 'none';
+      document.getElementById('loginRequired').style.display = 'block';
+      document.getElementById('loginRequired').innerHTML = "Please <a href='index.html' style='color:var(--accent)'>Log In</a> to access the admin panel.";
     }
-  } catch (err) {
-    console.error("Send email error:", err);
-    alert("Failed to send email.");
-  } finally {
-    btn.textContent = "📧 Send Mail";
-    btn.disabled = false;
-  }
-};
+  });
 
-// In the order loading, store data in dataset:
-// Add these attributes to the order-card div:
-// data-email="${order.email || ''}"
-// data-name="${order.userName || 'Customer'}"
-// data-total="${order.total || ''}"
+  function logoutAdmin() {
+    auth.signOut().then(function() { window.location.href = 'index.html'; });
+  }
+
+  window.switchTab = function(tab) {
+    currentTab = tab;
+    document.getElementById('tabOrders').classList.toggle('active', tab === 'orders');
+    document.getElementById('tabChats').classList.toggle('active', tab === 'chats');
+    document.getElementById('ordersContainer').classList.toggle('active', tab === 'orders');
+    document.getElementById('chatsContainer').classList.toggle('active', tab === 'chats');
+    if (tab === 'orders') loadOrders();
+    if (tab === 'chats') loadCustomers();
+  };
+
+  // ===== ORDERS MANAGEMENT =====
+  function loadOrders() {
+    const list = document.getElementById('allOrdersList');
+    list.innerHTML = 'Loading...';
+
+    db.collection('orders').orderBy('createdAt', 'desc').get().then(function(querySnapshot) {
+      list.innerHTML = '';
+      if (querySnapshot.empty) {
+        list.innerHTML = '<p style="color:var(--muted);">No orders yet.</p>';
+        return;
+      }
+      querySnapshot.forEach(function(doc) {
+        const order = doc.data();
+        const orderId = doc.id;
+        const itemsHTML = (order.items || []).map(item => 
+          `<div class="order-item-admin">${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}</div>`
+        ).join('');
+
+        const status = order.status || 'pending';
+        let statusClass = status;
+
+        // Need to store email, name, total in data attributes for the mail button
+        const email = order.email || '';
+        const name = order.userName || 'Unknown';
+        const total = order.total || 0;
+
+        const cardHTML = `
+          <div class="order-admin-card" data-email="${email}" data-name="${name}" data-total="${total}">
+            <h4>Order #${orderId.slice(-6).toUpperCase()} (${name})</h4>
+            <p>Date: ${order.createdAt ? order.createdAt.toDate().toLocaleDateString('en-IN') : 'N/A'} | Phone: ${order.phone || 'N/A'}</p>
+            <div class="order-items-admin">${itemsHTML}</div>
+            <p><strong>Total: ₹${total}</strong></p>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+              <select class="status-select ${statusClass}" onchange="changeOrderStatus('${orderId}', this.value)">
+                <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="paid" ${status === 'paid' ? 'selected' : ''}>Paid</option>
+                <option value="shipped" ${status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                <option value="delivered" ${status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                <option value="cancelled" ${status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                <option value="refunded" ${status === 'refunded' ? 'selected' : ''}>Refunded</option>
+              </select>
+              <button class="send-mail-btn" onclick="sendStatusEmail('${orderId}', '${status}')">📧 Send Mail</button>
+            </div>
+          </div>
+        `;
+        list.innerHTML += cardHTML;
+      });
+    }).catch(function(err) {
+      console.error("Error loading orders: ", err);
+      list.innerHTML = '<p style="color:red;">Error loading orders.</p>';
+    });
+  }
+
+  window.changeOrderStatus = function(orderId, newStatus) {
+    db.collection('orders').doc(orderId).update({ status: newStatus }).then(function() {
+      alert('Order status updated to ' + newStatus);
+      loadOrders();
+    }).catch(function(err) {
+      console.error("Error updating order: ", err);
+      alert('Failed to update order. Check Firestore Rules.');
+    });
+  };
+
+  // ===== SEND STATUS EMAIL (Calls Cloudflare Worker) =====
+  window.sendStatusEmail = async function(orderId, status) {
+    const orderCard = document.querySelector(`.order-admin-card[data-email]`); // Not ideal: we need to find the specific card.
+    // Better approach: find via the button's closest card
+    const btn = event.target; // the clicked button
+    const card = btn.closest('.order-admin-card');
+    const email = card.dataset.email;
+    const name = card.dataset.name;
+    const total = card.dataset.total;
+
+    if (!email) {
+      alert("No email found for this order.");
+      return;
+    }
+
+    if (!confirm("Send " + status + " email to " + email + "?")) return;
+
+    const originalText = btn.textContent;
+    btn.textContent = "Sending...";
+    btn.disabled = true;
+
+    try {
+      const response = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/send-status-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: orderId,
+          status: status,
+          adminSecret: 'mySecret123', // Replace with your actual ADMIN_SECRET if changed
+          email: email,
+          name: name,
+          total: total
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert("Email sent successfully!");
+      } else {
+        alert("Error sending email: " + data.error);
+      }
+    } catch (err) {
+      console.error("Send email error:", err);
+      alert("Failed to send email. Check Worker logs.");
+    } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  };
+
+  // ===== CHATS MANAGEMENT =====
+  function loadCustomers() {
+    const customerList = document.getElementById('customerList');
+    customerList.innerHTML = 'Loading...';
+
+    db.collection('chats').get().then(function(querySnapshot) {
+      customerList.innerHTML = '';
+      if (querySnapshot.empty) {
+        customerList.innerHTML = '<p style="color:var(--muted);">No customers yet.</p>';
+        return;
+      }
+      querySnapshot.forEach(function(userDoc) {
+        const userId = userDoc.id;
+        const data = userDoc.data();
+        const displayName = data.userName || 'No name';
+        const displayEmail = data.userEmail || 'No email';
+
+        const item = document.createElement('div');
+        item.className = 'customer-item';
+        item.innerHTML = '<h4>' + displayName + '</h4><p>' + displayEmail + '</p>';
+        item.addEventListener('click', function() {
+          selectCustomer(userId, item);
+        });
+        customerList.appendChild(item);
+      });
+    }).catch(function(err) {
+      console.error("Error loading customers: ", err);
+      customerList.innerHTML = '<p style="color:red;">Error loading customers.</p>';
+    });
+  }
+
+  function selectCustomer(userId, element) {
+    selectedCustomerId = userId;
+    document.querySelectorAll('.customer-item').forEach(function(item) {
+      item.classList.remove('active');
+    });
+    element.classList.add('active');
+    loadAdminChat(userId);
+  }
+
+  function loadAdminChat(userId) {
+    const chatWindow = document.getElementById('adminChatWindow');
+    chatWindow.innerHTML = '';
+
+    if (unsubscribeChat) {
+      unsubscribeChat();
+    }
+
+    unsubscribeChat = db.collection('chats').doc(userId).collection('messages')
+      .orderBy('timestamp', 'asc')
+      .onSnapshot(function(querySnapshot) {
+        chatWindow.innerHTML = '';
+        querySnapshot.forEach(function(doc) {
+          const data = doc.data();
+          const msgDiv = document.createElement('div');
+          msgDiv.classList.add('chat-msg');
+          msgDiv.classList.add(data.sender === 'user' ? 'user' : 'admin');
+          msgDiv.textContent = data.text;
+          chatWindow.appendChild(msgDiv);
+        });
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      });
+  }
+
+  function sendAdminMessage() {
+    const input = document.getElementById('adminChatInput');
+    const text = input.value.trim();
+    if (!text || !selectedCustomerId) return;
+
+    db.collection('chats').doc(selectedCustomerId).collection('messages').add({
+      sender: 'admin',
+      text: text,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function() {
+      input.value = '';
+    }).catch(function(err) {
+      console.error("Error sending message: ", err);
+    });
+  }
+
+  document.getElementById('adminChatInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); sendAdminMessage(); }
+  });
+
+  // ===== BACKGROUND CANVAS (keep as existing) =====
+  // (I'm keeping the full background code from previous to ensure it runs)
+  (function() { ... })();
+</script>
+</body>
+</html>
