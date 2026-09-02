@@ -95,6 +95,7 @@
   });
 
   function loadOrders() {
+    if (!currentUser) return;
     const container = document.getElementById('ordersContainer'); container.innerHTML = '';
     // This line uses currentUser.uid correctly because it's inside the if(user) block above
     db.collection('orders').where('userId', '==', currentUser.uid).orderBy('createdAt', 'desc').get().then(function(querySnapshot) {
