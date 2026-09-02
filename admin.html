@@ -48,6 +48,7 @@
     .status-select.shipped{background:var(--blue);}
     .status-select.delivered{background:var(--pink);}
     .status-select.cancelled{background:var(--muted);color:white;}
+    .status-select.refunded { background: var(--blue); color: var(--text); }
 
     /* Chats Tab */
     .customer-list{flex:1;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.3);overflow-y:auto;}
@@ -199,6 +200,7 @@
               <option value="shipped" ${status === 'shipped' ? 'selected' : ''}>Shipped</option>
               <option value="delivered" ${status === 'delivered' ? 'selected' : ''}>Delivered</option>
               <option value="cancelled" ${status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+              <option value="refunded" ${status === 'refunded' ? 'selected' : ''}>Refunded</option>
             </select>
           </div>
         `;
