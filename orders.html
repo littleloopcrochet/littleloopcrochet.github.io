@@ -291,6 +291,7 @@
   document.querySelectorAll('.heart-hover').forEach(function(heart){heart.addEventListener('mouseenter',function(){startHeartMagic(heart);});heart.addEventListener('mouseleave',stopHeartMagic);});
 
   // ===== Orders Logic =====
+  let currentUser = null;
   const authButtonText = document.getElementById('authButtonText');
 
   auth.onAuthStateChanged(function(user) {
