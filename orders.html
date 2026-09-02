@@ -88,14 +88,15 @@
   const authButtonText = document.getElementById('authButtonText');
   let currentUser = null;
 
+  // ===== TIME WINDOWS (CHANGE NUMBERS BELOW TO EDIT DURATION) =====
+  const CANCEL_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours (change 24 to your desired hours)
+  const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;    // 24 hours (change 24 to your desired hours)
+
   auth.onAuthStateChanged(function(user) {
     currentUser = user;
     if (user) { authButtonText.textContent = user.displayName || user.phoneNumber || 'Account'; loadOrders(); }
     else { authButtonText.textContent = 'Sign In'; document.getElementById('ordersContainer').innerHTML = `<div class="empty-orders" style="width:100%;"><h2>Please Sign In</h2><p>You need to sign in to view your orders.</p><a href="index.html" class="shop-btn">Go to Sign In</a></div>`; finishLoading(); }
   });
-
-  // ===== EDIT WINDOW (CHANGE THIS VALUE TO MODIFY HOW LONG CUSTOMERS CAN EDIT) =====
-  const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours (change 24 to 1 for 1 hour, 72 for 3 days, etc.)
 
   function loadOrders() {
     if (!currentUser) return;
@@ -130,9 +131,14 @@
         let itemsHTML = '';
         if (order.items && order.items.length > 0) { order.items.forEach(function(item) { const isValidImage = item.image && item.image !== '🧸'; const img = isValidImage ? `<img src="${item.image}" alt="${item.name}">` : `<span>🧸</span>`; itemsHTML += `<div class="item-row"><div class="item-img">${img}</div><div class="item-name">${item.name}</div><div class="item-qty">x ${item.quantity}</div><div class="item-price">₹${item.price * item.quantity}</div></div>`; }); } else { itemsHTML = `<div class="item-row">No items found</div>`; }
         
-        // Cancel button (not shown for cancelled, delivered, refunded)
+        // Time check for cancel and edit buttons
+        const now = new Date();
+        const createdDate = order.createdAt ? order.createdAt.toDate() : new Date();
+        const timeDiff = now - createdDate;
+
+        // Cancel button (only within CANCEL_WINDOW_MS and status not final)
         let cancelBtn = '';
-        if (status !== 'cancelled' && status !== 'delivered' && status !== 'refunded') {
+        if (timeDiff < CANCEL_WINDOW_MS && status !== 'cancelled' && status !== 'delivered' && status !== 'refunded') {
           cancelBtn = `<button onclick="cancelOrder('${orderId}')" class="cancel-btn">Cancel</button>`;
         }
 
@@ -142,13 +148,10 @@
           trackBtn = `<button onclick="openTrackModal('${status}')">Track</button>`;
         }
 
-        // Edit details button (only within time window and status not final)
+        // Edit details button (only within EDIT_WINDOW_MS and status not final)
         let editBtn = '';
-        const now = new Date();
-        const createdDate = order.createdAt ? order.createdAt.toDate() : new Date();
-        const timeDiff = now - createdDate;
         if (timeDiff < EDIT_WINDOW_MS && status !== 'cancelled' && status !== 'refunded' && status !== 'delivered') {
-          editBtn = `<button onclick="openEditModal('${orderId}')" class="edit-btn">Edit</button>`;
+          editBtn = `<button onclick="openEditModal('${orderId}')" class="edit-btn">Edit Order Details</button>`;
         }
         
         const cardHTML = `<div class="order-card"><div class="order-header"><h3>Order #${orderId.slice(-6).toUpperCase()}</h3><span class="order-status ${statusClass}">${status}</span><span class="order-date">${dateStr}</span></div><div class="order-items"><h4>Items</h4>${itemsHTML}</div><div class="order-summary"><div><span class="order-total-label">Total</span><div class="order-total-amount">₹${order.total || 0}</div></div><div class="order-actions">${trackBtn}${cancelBtn}${editBtn}<a href="shop.html">Shop</a></div></div></div>`;
@@ -162,12 +165,10 @@
   window.cancelOrder = async function(orderId) {
     if (!confirm('Are you sure you want to cancel this order?')) return;
 
-    // Update status in Firestore
     db.collection('orders').doc(orderId).update({ status: 'cancelled' }).then(async () => {
       alert('Order cancelled successfully.');
       loadOrders();
 
-      // Trigger cancellation email (calls Cloudflare Worker)
       const orderDoc = await db.collection('orders').doc(orderId).get();
       const order = orderDoc.data();
       const email = order.email || '';
@@ -192,9 +193,8 @@
     });
   };
 
-  // ===== EDIT DETAILS MODAL (Customer can update name/phone/address within time window) =====
+  // ===== EDIT DETAILS (Customer can update name/phone/address within time window) =====
   window.openEditModal = function(orderId) {
-    // Fetch current order data
     db.collection('orders').doc(orderId).get().then((doc) => {
       const order = doc.data();
       const name = prompt("Enter new name:", order.userName);
@@ -203,7 +203,6 @@
       if (phone === null) return;
       const address = prompt("Enter new address:", order.address);
 
-      // Update in Firestore
       db.collection('orders').doc(orderId).update({
         userName: name,
         phone: phone,
