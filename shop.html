@@ -838,7 +838,7 @@ window.addToCartFromPage = function(btn, event) {
     id: productId,
     name: btn.dataset.name,
     price: parseFloat(btn.dataset.price),
-    image: btn.dataset.emoji || '',
+    image: btn.dataset.image || btn.dataset.emoji || '', // Prefer real image, else emoji
     quantity: 1
   };
 
@@ -1146,6 +1146,7 @@ function createContentPage(pageInfo, idx) {
               data-product-id="${productId}" 
               data-name="${pageInfo.name || ''}" 
               data-price="${pageInfo.price || 0}" 
+              data-image="${pageInfo.image || ''}" 
               data-emoji="${pageInfo.emoji || ''}" 
               onclick="addToCartFromPage(this, event)">Add to Cart</button>
     </div>
