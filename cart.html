@@ -566,7 +566,7 @@
       });
 
       // 2. Call Vercel backend to create Razorpay order
-      const orderResponse = await fetch('https://littleloopcrochet-github-io.vercel.app/api/create-order', {
+      const orderResponse = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: total, currency: 'INR', receipt: orderDoc.id })
@@ -587,7 +587,7 @@
         order_id: orderData.id,
         handler: async function(response) {
           // 4. Call Vercel to verify payment (and send Brevo email)
-          const verifyResponse = await fetch('https://littleloopcrochet-github-io.vercel.app/api/verify-payment', {
+          const verifyResponse = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
