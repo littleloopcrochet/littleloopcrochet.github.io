@@ -18,7 +18,7 @@
     body.dark{--bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd; --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff; --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75);}
     *{margin:0;padding:0;box-sizing:border-box} html{scroll-behavior:smooth} body{font-family:"Comfortaa",sans-serif;background:transparent;color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden} a{color:inherit;text-decoration:none}
     nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:1000;transition:background .5s ease} nav a, nav .logo, .nav-links a { text-shadow: 0 1px 3px rgba(255,255,255,0.6); } body.dark nav a, body.dark nav .logo, body.dark .nav-links a { text-shadow: 0 1px 4px rgba(0,0,0,0.9); } .logo{font-size:1.35rem;font-weight:700;color:var(--text);transition:transform .3s ease,color .3s ease} .logo:hover{transform:translateY(-2px);color:var(--accent)} .nav-right{display:flex;align-items:center;gap:28px} .nav-links{display:flex;gap:30px;list-style:none;font-size:.9rem} .nav-links a{display:inline-block;transition:color .3s ease,transform .3s ease} .nav-links a:hover{color:var(--accent);transform:translateY(-2px)} .signin-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;background:var(--accent);color:#fff;font-size:.85rem;font-weight:600;border:none;cursor:pointer;transition:background .3s ease, transform .3s ease, box-shadow .3s ease;text-shadow:none;box-shadow:0 8px 20px rgba(215,149,167,.3)} .signin-btn:hover{background:var(--accent-hover);transform:translateY(-3px);box-shadow:0 12px 25px rgba(215,149,167,.4)} .theme-wrapper{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center} .theme-toggle{width:46px;height:46px;border:1px solid rgba(120,100,120,.12);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem;position:relative;z-index:5;transition:transform .4s ease,background .5s ease,color .5s ease,box-shadow .5s ease} .theme-toggle:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 0 20px var(--icon-glow)}
-    .orders-page { min-height: 90vh; padding: 100px 7%; max-width: 1100px; margin: 0 auto; } .orders-title { text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: var(--text); text-shadow: 0 1px 3px rgba(255,255,255,0.6); } body.dark .orders-title { text-shadow: 0 1px 4px rgba(0,0,0,0.9); } .orders-subtitle { text-align: center; margin-bottom: 40px; color: var(--muted); } .order-list { display: flex; flex-direction: column; gap: 20px; } .order-card { background: var(--card); border-radius: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px var(--shadow); transition: transform .3s ease, box-shadow .3s ease; } .order-card:hover { transform: translateY(-3px); box-shadow: 0 15px 40px var(--shadow); } .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(120,100,120,.15); } .order-header h3 { font-size: 1.2rem; color: var(--text); } .order-status { padding: 5px 15px; border-radius: 50px; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; } .order-status.pending { background: var(--yellow); color: #8a6d1e; } .order-status.paid { background: var(--green); color: #2d6a4f; } .order-status.shipped { background: var(--blue); color: #1e4e6a; } .order-status.delivered { background: var(--pink); color: #9d4a5f; } .order-status.cancelled { background: var(--muted); color: white; } .order-date { font-size: .85rem; color: var(--muted); } .order-items { margin-bottom: 20px; } .order-items h4 { font-size: 1rem; margin-bottom: 15px; color: var(--text-soft); } .item-row { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid rgba(120,100,120,.1); } .item-row:last-child { border-bottom: none; } .item-img { width: 50px; height: 50px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: var(--pink); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; } .item-img img { width: 100%; height: 100%; object-fit: cover; } .item-name { flex: 1; font-size: .95rem; color: var(--text); } .item-qty { font-size: .9rem; color: var(--muted); } .item-price { font-size: .95rem; font-weight: 700; color: var(--accent); } .order-summary { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(120,100,120,.15); } .order-total-label { font-size: .95rem; color: var(--muted); } .order-total-amount { font-size: 1.5rem; font-weight: 700; color: var(--text); } .order-actions { display: flex; gap: 10px; } .order-actions a, .order-actions button { padding: 8px 15px; border-radius: 50px; background: var(--accent); color: white; font-size: .85rem; font-weight: 600; border: none; cursor: pointer; transition: background .3s ease; } .order-actions a:hover, .order-actions button:hover { background: var(--accent-hover); } .order-actions .cancel-btn { background: #ff6b6b; } .order-actions .cancel-btn:hover { background: #e55353; } .empty-orders { text-align: center; padding: 80px 20px; } .empty-orders h2 { font-size: 1.8rem; margin-bottom: 15px; color: var(--text); } .empty-orders p { color: var(--muted); margin-bottom: 30px; } .shop-btn { padding: 15px 30px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; display: inline-block; } .shop-btn:hover { background: var(--accent-hover); } .order-status.refunded { background: var(--blue); color: #1e4e6a; }
+    .orders-page { min-height: 90vh; padding: 100px 7%; max-width: 1100px; margin: 0 auto; } .orders-title { text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: var(--text); text-shadow: 0 1px 3px rgba(255,255,255,0.6); } body.dark .orders-title { text-shadow: 0 1px 4px rgba(0,0,0,0.9); } .orders-subtitle { text-align: center; margin-bottom: 40px; color: var(--muted); } .order-list { display: flex; flex-direction: column; gap: 20px; } .order-card { background: var(--card); border-radius: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px var(--shadow); transition: transform .3s ease, box-shadow .3s ease; } .order-card:hover { transform: translateY(-3px); box-shadow: 0 15px 40px var(--shadow); } .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(120,100,120,.15); } .order-header h3 { font-size: 1.2rem; color: var(--text); } .order-status { padding: 5px 15px; border-radius: 50px; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; } .order-status.pending { background: var(--yellow); color: #8a6d1e; } .order-status.paid { background: var(--green); color: #2d6a4f; } .order-status.shipped { background: var(--blue); color: #1e4e6a; } .order-status.delivered { background: var(--pink); color: #9d4a5f; } .order-status.cancelled { background: var(--muted); color: white; } .order-date { font-size: .85rem; color: var(--muted); } .order-items { margin-bottom: 20px; } .order-items h4 { font-size: 1rem; margin-bottom: 15px; color: var(--text-soft); } .item-row { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid rgba(120,100,120,.1); } .item-row:last-child { border-bottom: none; } .item-img { width: 50px; height: 50px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: var(--pink); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; } .item-img img { width: 100%; height: 100%; object-fit: cover; } .item-name { flex: 1; font-size: .95rem; color: var(--text); } .item-qty { font-size: .9rem; color: var(--muted); } .item-price { font-size: .95rem; font-weight: 700; color: var(--accent); } .order-summary { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(120,100,120,.15); } .order-total-label { font-size: .95rem; color: var(--muted); } .order-total-amount { font-size: 1.5rem; font-weight: 700; color: var(--text); } .order-actions { display: flex; gap: 10px; } .order-actions a, .order-actions button { padding: 8px 15px; border-radius: 50px; background: var(--accent); color: white; font-size: .85rem; font-weight: 600; border: none; cursor: pointer; transition: background .3s ease; } .order-actions a:hover, .order-actions button:hover { background: var(--accent-hover); } .order-actions .cancel-btn { background: #ff6b6b; } .order-actions .cancel-btn:hover { background: #e55353; } .order-actions .edit-btn { background: var(--blue); color: white; } .order-actions .edit-btn:hover { background: var(--blue); opacity: 0.8; } .empty-orders { text-align: center; padding: 80px 20px; } .empty-orders h2 { font-size: 1.8rem; margin-bottom: 15px; color: var(--text); } .empty-orders p { color: var(--muted); margin-bottom: 30px; } .shop-btn { padding: 15px 30px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; display: inline-block; } .shop-btn:hover { background: var(--accent-hover); } .order-status.refunded { background: var(--blue); color: #1e4e6a; }
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center; } .modal-box { background: var(--card); padding: 30px; border-radius: 20px; max-width: 500px; width: 90%; position: relative; text-align: center; } .close-modal { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 24px; color: var(--muted); } .timeline { display: flex; justify-content: space-between; margin-top: 30px; position: relative; } .timeline::before { content: ""; position: absolute; top: 10px; left: 10%; right: 10%; height: 4px; background: var(--muted); opacity: 0.3; } .step { position: relative; z-index: 1; width: 20%; text-align: center; } .step-dot { width: 20px; height: 20px; border-radius: 50%; background: var(--muted); margin: 0 auto 10px; opacity: 0.5; } .step.active .step-dot { background: var(--accent); opacity: 1; box-shadow: 0 0 10px var(--accent); } .step-label { font-size: 0.8rem; color: var(--muted); } .step.active .step-label { color: var(--accent); font-weight: bold; }
     body.is-loading{overflow:hidden} body.is-loading > *:not(#pageLoader){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease} .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease} .page-loader.loaded{opacity:0;visibility:hidden;pointer-events:none} .loader-backdrop{position:absolute;inset:0;background:rgba(255,253,251,.58);backdrop-filter:blur(3px);transition:background .6s ease} body.dark .loader-backdrop{background:rgba(7,4,11,.64)} .loader-card{position:relative;width:min(390px,calc(100vw - 38px));padding:28px;border:1px solid rgba(190,150,175,.18);border-radius:30px;background:rgba(255,255,255,.88);box-shadow:0 25px 80px rgba(80,55,75,.18);backdrop-filter:blur(20px);text-align:center;animation:loaderCardFloat 4s ease-in-out infinite} body.dark .loader-card{background:rgba(24,16,32,.92);border-color:rgba(190,120,255,.22);box-shadow:0 25px 90px rgba(0,0,0,.55)} @keyframes loaderCardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}} .loader-copy{margin-bottom:22px}.loader-title{color:var(--text);font-size:1rem;font-weight:700}.loader-subtitle{color:var(--muted);font-size:.7rem} .yarn-loader{position:relative;width:100%;padding:0 7px}.yarn-track{height:18px;border-radius:20px;background:rgba(215,149,167,.17);overflow:hidden;box-shadow:inset 0 2px 6px rgba(80,50,70,.08)} .yarn-progress{position:relative;height:100%;width:0;border-radius:20px;background:var(--accent);transition:width .35s cubic-bezier(.22,.61,.36,1)} .yarn-ends{display:flex;justify-content:space-between;margin-top:-4px}.yarn-ends span{font-size:17px;animation:yarnBounce 1.6s ease-in-out infinite} @keyframes yarnBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}} .loader-percent{margin-top:13px;color:var(--accent);font-size:.68rem;font-weight:700}
     body{position:relative;isolation:isolate} #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block} body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))} nav,.orders-page,footer{position:relative;z-index:2}
@@ -94,6 +94,9 @@
     else { authButtonText.textContent = 'Sign In'; document.getElementById('ordersContainer').innerHTML = `<div class="empty-orders" style="width:100%;"><h2>Please Sign In</h2><p>You need to sign in to view your orders.</p><a href="index.html" class="shop-btn">Go to Sign In</a></div>`; finishLoading(); }
   });
 
+  // ===== EDIT WINDOW (CHANGE THIS VALUE TO MODIFY HOW LONG CUSTOMERS CAN EDIT) =====
+  const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours (change 24 to 1 for 1 hour, 72 for 3 days, etc.)
+
   function loadOrders() {
     if (!currentUser) return;
     const container = document.getElementById('ordersContainer'); container.innerHTML = '';
@@ -126,26 +129,93 @@
         if (status === 'paid') statusClass = 'paid'; if (status === 'shipped') statusClass = 'shipped'; if (status === 'delivered') statusClass = 'delivered'; if (status === 'cancelled') statusClass = 'cancelled'; if (status === 'refunded') statusClass = 'refunded';
         let itemsHTML = '';
         if (order.items && order.items.length > 0) { order.items.forEach(function(item) { const isValidImage = item.image && item.image !== '🧸'; const img = isValidImage ? `<img src="${item.image}" alt="${item.name}">` : `<span>🧸</span>`; itemsHTML += `<div class="item-row"><div class="item-img">${img}</div><div class="item-name">${item.name}</div><div class="item-qty">x ${item.quantity}</div><div class="item-price">₹${item.price * item.quantity}</div></div>`; }); } else { itemsHTML = `<div class="item-row">No items found</div>`; }
+        
+        // Cancel button (not shown for cancelled, delivered, refunded)
         let cancelBtn = '';
         if (status !== 'cancelled' && status !== 'delivered' && status !== 'refunded') {
           cancelBtn = `<button onclick="cancelOrder('${orderId}')" class="cancel-btn">Cancel</button>`;
         }
-        // ** NEW: Only show Track button if status is 'shipped' **
+
+        // Track button (only shown for 'shipped')
         let trackBtn = '';
         if (status === 'shipped') {
           trackBtn = `<button onclick="openTrackModal('${status}')">Track</button>`;
         }
+
+        // Edit details button (only within time window and status not final)
+        let editBtn = '';
+        const now = new Date();
+        const createdDate = order.createdAt ? order.createdAt.toDate() : new Date();
+        const timeDiff = now - createdDate;
+        if (timeDiff < EDIT_WINDOW_MS && status !== 'cancelled' && status !== 'refunded' && status !== 'delivered') {
+          editBtn = `<button onclick="openEditModal('${orderId}')" class="edit-btn">Edit</button>`;
+        }
         
-        const cardHTML = `<div class="order-card"><div class="order-header"><h3>Order #${orderId.slice(-6).toUpperCase()}</h3><span class="order-status ${statusClass}">${status}</span><span class="order-date">${dateStr}</span></div><div class="order-items"><h4>Items</h4>${itemsHTML}</div><div class="order-summary"><div><span class="order-total-label">Total</span><div class="order-total-amount">₹${order.total || 0}</div></div><div class="order-actions">${trackBtn}${cancelBtn}<a href="shop.html">Shop</a></div></div></div>`;
+        const cardHTML = `<div class="order-card"><div class="order-header"><h3>Order #${orderId.slice(-6).toUpperCase()}</h3><span class="order-status ${statusClass}">${status}</span><span class="order-date">${dateStr}</span></div><div class="order-items"><h4>Items</h4>${itemsHTML}</div><div class="order-summary"><div><span class="order-total-label">Total</span><div class="order-total-amount">₹${order.total || 0}</div></div><div class="order-actions">${trackBtn}${cancelBtn}${editBtn}<a href="shop.html">Shop</a></div></div></div>`;
         container.innerHTML += cardHTML;
       });
       finishLoading();
     }).catch(function(err) { console.error("Error loading orders: ", err); finishLoading(); });
   }
 
-  window.cancelOrder = function(orderId) {
+  // ===== CANCEL ORDER (with automatic email trigger) =====
+  window.cancelOrder = async function(orderId) {
     if (!confirm('Are you sure you want to cancel this order?')) return;
-    db.collection('orders').doc(orderId).update({ status: 'cancelled' }).then(function() { alert('Order cancelled successfully.'); loadOrders(); }).catch(function(error) { console.error("Error cancelling order: ", error); alert('Could not cancel order. Please contact support.'); });
+
+    // Update status in Firestore
+    db.collection('orders').doc(orderId).update({ status: 'cancelled' }).then(async () => {
+      alert('Order cancelled successfully.');
+      loadOrders();
+
+      // Trigger cancellation email (calls Cloudflare Worker)
+      const orderDoc = await db.collection('orders').doc(orderId).get();
+      const order = orderDoc.data();
+      const email = order.email || '';
+
+      if (email) {
+        fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/send-status-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: orderId,
+            status: 'cancelled',
+            customerUid: currentUser.uid,
+            email: email,
+            name: order.userName || 'Customer',
+            total: order.total || 0
+          })
+        }).catch(err => console.error("Auto email failed:", err));
+      }
+    }).catch(function(error) {
+      console.error("Error cancelling order: ", error);
+      alert('Could not cancel order. Please contact support.');
+    });
+  };
+
+  // ===== EDIT DETAILS MODAL (Customer can update name/phone/address within time window) =====
+  window.openEditModal = function(orderId) {
+    // Fetch current order data
+    db.collection('orders').doc(orderId).get().then((doc) => {
+      const order = doc.data();
+      const name = prompt("Enter new name:", order.userName);
+      if (name === null) return;
+      const phone = prompt("Enter new phone:", order.phone);
+      if (phone === null) return;
+      const address = prompt("Enter new address:", order.address);
+
+      // Update in Firestore
+      db.collection('orders').doc(orderId).update({
+        userName: name,
+        phone: phone,
+        address: address
+      }).then(() => {
+        alert("Order details updated!");
+        loadOrders();
+      }).catch((err) => {
+        console.error("Edit error:", err);
+        alert("Could not edit order. Please contact support.");
+      });
+    });
   };
 
   window.openTrackModal = function(status) {
