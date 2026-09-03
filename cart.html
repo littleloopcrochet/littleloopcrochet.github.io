@@ -82,24 +82,18 @@
     .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid rgba(120,100,120,.2); border-radius: 10px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 1rem; outline: none; }
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
 
-    /* Name fields - Grid layout for clean alignment */
     .name-grid { display: grid; grid-template-columns: 1fr 0.9fr 1fr; gap: 10px; }
-    .name-grid .form-group label { white-space: nowrap; font-size: .85rem; }
-
-    /* Phone field - Grid layout */
     .phone-grid { display: grid; grid-template-columns: 110px 1fr; gap: 10px; }
 
-    /* Address fields */
     .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .address-grid .full-width { grid-column: span 2; }
 
-    /* Gift fields */
     .gift-option { margin-top: 20px; border-top: 1px solid rgba(120,100,120,.15); padding-top: 20px; }
     .gift-checkbox { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
     .gift-checkbox input { width: 20px; height: 20px; }
     .gift-fields { display: none; gap: 15px; }
     .gift-fields.show { display: flex; flex-direction: column; }
-
+    
     .checkout-btn { width: 100%; padding: 15px; border: none; border-radius: 50px; background: var(--accent); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform .3s ease, background .3s ease; }
     .checkout-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
     .empty-cart { text-align: center; padding: 60px 20px; }
@@ -368,7 +362,7 @@
         });
         itemsHTML += '</div>';
 
-        // Professional Checkout Form (with fixed layout)
+        // Professional Checkout Form
         const summaryHTML = `
           <div class="cart-summary" id="cartSummary">
             <div class="confetti-container" id="cartConfetti" style="display:none;"></div>
@@ -456,9 +450,18 @@
                     <label>Recipient's Name</label>
                     <input type="text" id="checkoutRecipientName" placeholder="Recipient's name">
                   </div>
-                  <div class="form-group">
-                    <label>Recipient's Phone</label>
-                    <input type="tel" id="checkoutRecipientPhone" placeholder="10-digit number" maxlength="10" pattern="[0-9]{10}">
+                  <!-- Recipient Phone with Country Code (Grid) -->
+                  <div class="phone-grid">
+                    <div class="form-group">
+                      <label>Recipient Code</label>
+                      <select id="checkoutRecipientCode">
+                        <option value="+91" selected>+91</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Recipient Phone</label>
+                      <input type="tel" id="checkoutRecipientPhone" placeholder="10-digit number" maxlength="10" pattern="[0-9]{10}">
+                    </div>
                   </div>
                   <div class="form-group">
                     <label>Gift Message</label>
@@ -486,7 +489,6 @@
                 document.getElementById('checkoutCity').value = info.District;
                 document.getElementById('checkoutState').value = info.State;
               } else {
-                // Clear fields if pin not found
                 document.getElementById('checkoutCity').value = '';
                 document.getElementById('checkoutState').value = '';
               }
@@ -509,7 +511,7 @@
       });
   }
 
-  // ===== Cart action functions =====
+  // Cart action functions
   window.changeQty = function(itemId, delta) {
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(itemId);
     cartRef.get().then(function(doc) {
@@ -547,7 +549,7 @@
     });
   };
 
-  // ===== Place Order with new fields =====
+  // Place Order with new fields
   window.placeOrder = async function() {
     const firstName = document.getElementById('checkoutFirstName').value.trim();
     const middleName = document.getElementById('checkoutMiddleName').value.trim();
@@ -563,6 +565,7 @@
     const pincode = document.getElementById('checkoutPincode').value.trim();
     const isGift = document.getElementById('checkoutGift').checked;
     const recipientName = isGift ? document.getElementById('checkoutRecipientName').value.trim() : '';
+    const recipientCode = isGift ? document.getElementById('checkoutRecipientCode').value : '';
     const recipientPhone = isGift ? document.getElementById('checkoutRecipientPhone').value.trim() : '';
     const giftMessage = isGift ? document.getElementById('checkoutGiftMessage').value.trim() : '';
 
@@ -607,7 +610,7 @@
         status: 'pending',
         isGift,
         recipientName,
-        recipientPhone,
+        recipientCode, recipientPhone,
         giftMessage,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -647,7 +650,7 @@
               address: `${house}, ${street}, ${area}, ${city}, ${state} - ${pincode}`,
               isGift,
               recipientName,
-              recipientPhone,
+              recipientPhone: recipientCode + recipientPhone,
               giftMessage
             })
           });
