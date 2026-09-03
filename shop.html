@@ -161,7 +161,7 @@
     .loader-percent{margin-top:13px;color:var(--accent);font-size:.68rem;font-weight:700}
 
     /* Background & Z-index */
-    body{position:relative;isolation:isolate}
+    body{position:relative;isolation:isolate;width:100%;overflow-x:hidden}
     #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block}
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))}
     nav,.hero,.shop-page,footer{position:relative;z-index:2}
@@ -506,11 +506,20 @@
     /* Footer */
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
 
+    /* ===== MOBILE RESPONSIVENESS FIXES ===== */
     @media(max-width:750px){
-      nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
+      nav{padding:20px 6%}
+      .nav-right{gap:10px}
+      .nav-links{gap:10px;font-size:.75rem;flex-wrap:wrap;justify-content:center}
+      .logo{white-space:nowrap;font-size:1.1rem}
+      
       .shop-page{padding: 60px 6%}
-      .shop-banner{padding: 30px}
-      #flipbook-container { height: 600px; max-width: 600px; }
+      .shop-banner{padding: 20px; margin-bottom: 40px;}
+      .shop-banner h1{font-size: 1.8rem;}
+      .shop-banner p{font-size: 1rem;}
+
+      /* Fix flipbook for mobile */
+      #flipbook-container { height: 500px; max-width: 500px; width: 100%; margin: 0 auto; overflow: visible; }
     }
     
     /* Magic particles */
@@ -522,48 +531,7 @@
     .butterfly .wing.right{left:50%;border-radius:20% 80% 30% 70%;transform:rotate(25deg) scaleX(1);animation:flapRight .48s ease-in-out infinite alternate;}
     @keyframes flapLeft{from{transform:rotate(-25deg) scaleX(1)}to{transform:rotate(-10deg) scaleX(.48)}}
     @keyframes flapRight{from{transform:rotate(25deg) scaleX(1)}to{transform:rotate(10deg) scaleX(.48)}}
-    @keyframes butterflyDrift{0%{opacity:0;transform:translate(0,7px) rotate(-8deg) scale(.55)}10%{opacity:.18}24%{opacity:.82;transform:translate(var(--x1),var(--y1)) rotate(5deg) scale(.88)}45%{opacity:.95;transform:translate(var(--x2),var(--y2)) rotate(-5deg) scale(1)}68%{opacity:.78;transform:translate(var(--x3),var(--y3)) rotate(7deg) scale(.92)}84%{opacity:.35;transform:translate(var(--x4),var(--y4)) rotate(-4deg) scale(.72)}100%{opacity:0;transform:translate(calc(var(--x4) * 1.08),calc(var(--y4) - 8px)) rotate(2deg) scale(.5)}}
-    .firefly{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;background:#e1b8ff;box-shadow:0 0 5px #d19cff,0 0 12px #b86aff,0 0 23px rgba(168,80,255,.8);opacity:0;animation:fireflyDrift 3.8s ease-in-out forwards;}
-    @keyframes fireflyDrift{0%{opacity:0;transform:translate(0,5px) scale(.25)}12%{opacity:.18}28%{opacity:.72;transform:translate(var(--x1),var(--y1)) scale(.75)}46%{opacity:1;transform:translate(var(--x2),var(--y2)) scale(1)}62%{opacity:.72;transform:translate(var(--x3),var(--y3)) scale(.85)}82%{opacity:.35;transform:translate(var(--x4),var(--y4)) scale(.62)}100%{opacity:0;transform:translate(calc(var(--x4) * 1.05),calc(var(--y4) - 7px)) scale(.2)}}
-    body.dark .magic-hover:hover{filter:drop-shadow(0 0 7px rgba(189,124,255,.5));}
-    .heart-bubble{position:fixed;pointer-events:none;z-index:10000;font-size:13px;opacity:0;animation:heartBubble 1.25s cubic-bezier(.2,.7,.3,1) forwards;}
-    @keyframes heartBubble{0%{opacity:0;transform:translate(0,5px) scale(.25) rotate(-12deg)}15%{opacity:1;transform:translate(0,0) scale(.85) rotate(5deg)}45%{transform:translate(var(--heart-x),-24px) scale(1) rotate(-8deg)}75%{opacity:.85;transform:translate(calc(var(--heart-x) * .7),-45px) scale(.85) rotate(9deg)}100%{opacity:0;transform:translate(calc(var(--heart-x) * 1.4),-70px) scale(.05) rotate(-15deg)}}
-    /* Mute button (smaller than theme button) */
-    .mute-wrapper {
-      position: relative;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .mute-toggle {
-      width: 38px;
-      height: 38px;
-      border: 1px solid rgba(120,100,120,.12);
-      border-radius: 50%;
-      background: var(--card);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
-      position: relative;
-      z-index: 5;
-      transition: transform .4s ease, background .5s ease, color .5s ease, box-shadow .5s ease;
-    }
-    .mute-toggle:hover {
-      transform: translateY(-3px) scale(1.08);
-      box-shadow: 0 0 20px var(--icon-glow);
-    }
-    body.dark .mute-toggle {
-      border-color: rgba(194,130,255,.3);
-    }
-    body.dark .mute-toggle:hover {
-      border-color: rgba(194,130,255,.45);
-      box-shadow: 0 0 12px rgba(180,100,255,.45);
-    }
+    @keyframes butterflyDrift{0%{opacity:0;transform:translate(0,7px) rotate(-8deg) scale(.55)}10%{opacity:.18}24%{opacity:.82;transform:translate(var(--x1),var(--y1)) rotate(5deg) scale(.88)}45%{opacity:.95;transform:translate(var(--x2),var(--y2)) rotate(-5deg) scale(1)}68%{opacity:.78;transform:translate(var(--x3),var(--y3)) rotate(7deg) scale(.92)}84%{opacity:.35;transform:translate(var(--x4),var(--y4)) rotate(-4deg) scale(.72)}100%{opacity:0;transform:translate(calc(var(--x4) * 1.08),calc(var(--y4) - 8px)) rotate(2deg) scale(.5)}} .firefly{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;background:#e1b8ff;box-shadow:0 0 5px #d19cff,0 0 12px #b86aff,0 0 23px rgba(168,80,255,.8);opacity:0;animation:fireflyDrift 3.8s ease-in-out forwards;} @keyframes fireflyDrift{0%{opacity:0;transform:translate(0,5px) scale(.25)}12%{opacity:.18}28%{opacity:.72;transform:translate(var(--x1),var(--y1)) scale(.75)}46%{opacity:1;transform:translate(var(--x2),var(--y2)) scale(1)}62%{opacity:.72;transform:translate(var(--x3),var(--y3)) scale(.85)}82%{opacity:.35;transform:translate(var(--x4),var(--y4)) scale(.62)}100%{opacity:0;transform:translate(calc(var(--x4) * 1.05),calc(var(--y4) - 7px)) scale(.2)}} body.dark .magic-hover:hover{filter:drop-shadow(0 0 7px rgba(189,124,255,.5));} .heart-bubble{position:fixed;pointer-events:none;z-index:10000;font-size:13px;opacity:0;animation:heartBubble 1.25s cubic-bezier(.2,.7,.3,1) forwards;} @keyframes heartBubble{0%{opacity:0;transform:translate(0,5px) scale(.25) rotate(-12deg)}15%{opacity:1;transform:translate(0,0) scale(.85) rotate(5deg)}45%{transform:translate(var(--heart-x),-24px) scale(1) rotate(-8deg)}75%{opacity:.85;transform:translate(calc(var(--heart-x) * .7),-45px) scale(.85) rotate(9deg)}100%{opacity:0;transform:translate(calc(var(--heart-x) * 1.4),-70px) scale(.05) rotate(-15deg)}} .mute-wrapper { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; } .mute-toggle { width: 38px; height: 38px; border: 1px solid rgba(120,100,120,.12); border-radius: 50%; background: var(--card); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; position: relative; z-index: 5; transition: transform .4s ease, background .5s ease, color .5s ease, box-shadow .5s ease; } .mute-toggle:hover { transform: translateY(-3px) scale(1.08); box-shadow: 0 0 20px var(--icon-glow); } body.dark .mute-toggle { border-color: rgba(194,130,255,.3); } body.dark .mute-toggle:hover { border-color: rgba(194,130,255,.45); box-shadow: 0 0 12px rgba(180,100,255,.45); }
   </style>
 </head>
 
@@ -1042,8 +1010,14 @@ function launchConfetti(pageElement) {
 
     if (flipbook) flipbook.destroy();
 
-    const pageWidth = 500;
-    const pageHeight = 700;
+    // ===== FIXED: Responsive page sizing =====
+    let pageWidth = 500;
+    let pageHeight = 700;
+    if (window.innerWidth < 750) {
+      pageWidth = Math.min(360, window.innerWidth - 30);
+      pageHeight = Math.round(pageWidth * 1.4); // Maintain aspect ratio (700/500 = 1.4)
+    }
+
     flipbook = new St.PageFlip(flipbookDiv, {
       width: pageWidth,
       height: pageHeight,
