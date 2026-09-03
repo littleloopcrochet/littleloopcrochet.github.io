@@ -83,7 +83,10 @@
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
 
     .name-grid { display: grid; grid-template-columns: 1fr 0.9fr 1fr; gap: 10px; }
-    .phone-grid { display: grid; grid-template-columns: 110px 1fr; gap: 10px; }
+    
+    /* ===== FIXED PHONE GRID ===== */
+    .phone-grid { display: grid; grid-template-columns: 130px 1fr; gap: 10px; }
+    .phone-grid .form-group label { white-space: nowrap; font-size: .8rem; }
 
     .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .address-grid .full-width { grid-column: span 2; }
@@ -362,7 +365,6 @@
         });
         itemsHTML += '</div>';
 
-        // Professional Checkout Form
         const summaryHTML = `
           <div class="cart-summary" id="cartSummary">
             <div class="confetti-container" id="cartConfetti" style="display:none;"></div>
@@ -374,7 +376,6 @@
             <div class="checkout-form">
               <h3>Checkout Details</h3>
               
-              <!-- Name Fields (Grid) -->
               <div class="name-grid">
                 <div class="form-group">
                   <label>First Name *</label>
@@ -390,7 +391,7 @@
                 </div>
               </div>
 
-              <!-- Phone with Code (Grid) -->
+              <!-- Fixed Phone Grid with nowrap labels -->
               <div class="phone-grid">
                 <div class="form-group">
                   <label>Country Code</label>
@@ -404,13 +405,11 @@
                 </div>
               </div>
 
-              <!-- Email -->
               <div class="form-group">
                 <label>Email Address *</label>
                 <input type="email" id="checkoutEmail" placeholder="you@example.com" required>
               </div>
 
-              <!-- Address Fields -->
               <h3 style="margin-top: 10px;">Delivery Address</h3>
               <div class="form-group">
                 <label>House / Flat / Building No. *</label>
@@ -439,7 +438,6 @@
                 </div>
               </div>
 
-              <!-- Gift Option -->
               <div class="gift-option">
                 <div class="gift-checkbox">
                   <input type="checkbox" id="checkoutGift">
@@ -450,7 +448,7 @@
                     <label>Recipient's Name</label>
                     <input type="text" id="checkoutRecipientName" placeholder="Recipient's name">
                   </div>
-                  <!-- Recipient Phone with Country Code (Grid) -->
+                  <!-- Fixed Recipient Phone Grid with nowrap labels -->
                   <div class="phone-grid">
                     <div class="form-group">
                       <label>Recipient Code</label>
@@ -477,7 +475,6 @@
 
         cartContent.innerHTML = itemsHTML + summaryHTML;
 
-        // Auto-fill pincode when 6 digits entered
         document.getElementById('checkoutPincode').addEventListener('input', async function() {
           const pincode = this.value.trim();
           if (pincode.length === 6 && /^[0-9]{6}$/.test(pincode)) {
@@ -498,7 +495,6 @@
           }
         });
 
-        // Gift checkbox toggle
         document.getElementById('checkoutGift').addEventListener('change', function() {
           document.getElementById('giftFields').classList.toggle('show', this.checked);
         });
@@ -511,7 +507,6 @@
       });
   }
 
-  // Cart action functions
   window.changeQty = function(itemId, delta) {
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(itemId);
     cartRef.get().then(function(doc) {
@@ -549,7 +544,6 @@
     });
   };
 
-  // Place Order with new fields
   window.placeOrder = async function() {
     const firstName = document.getElementById('checkoutFirstName').value.trim();
     const middleName = document.getElementById('checkoutMiddleName').value.trim();
@@ -708,7 +702,6 @@
     }, 5000);
   }
 
-  // Full background animation
   (function() {
     const canvas=document.getElementById('aboutCanvas'); if(!canvas)return;
     const ctx=canvas.getContext('2d',{alpha:true});
