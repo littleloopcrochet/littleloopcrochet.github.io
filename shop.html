@@ -19,6 +19,8 @@
   <style>
     :root {
       --bg:#fffdfb; --surface:#ffffff; --card:#fff9f8; --text:#000000; --text-soft:#222222; --muted:#444444; --accent:#d795a7; --accent-hover:#c98296; --pink:#f8dce4; --green:#dfeee5; --yellow:#f8edcc; --blue:#dceaf3; --nav-bg: transparent; --shadow:rgba(90,70,70,.10); --icon-glow:rgba(130,110,110,.18); --page-bg:#fff9f0; --page-line:#e0d5c5; --frame-bg:#ffffff; --frame-border:#ddd; --text-sticker-bg:#fdf6e3; --text-sticker-border:#d4a574; --sticker-bg:#f2a6b8; --sticker-text:#ffffff; --doodle-color:#f2a6b8; --glow-color: rgba(215,149,167,0.4);
+      /* ADJUST THIS VALUE TO MOVE CONTENT DOWN (e.g. 50px or 100px) */
+      --content-padding-top: 30px; 
     }
     body.dark {
       --bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd; --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff; --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75); --page-bg:#1a1420; --page-line:#2e2438; --frame-bg:#241d2c; --frame-border:#3a2f45; --text-sticker-bg:#2e2438; --text-sticker-border:#5b4a6b; --sticker-bg:#bd7cff; --sticker-text:#ffffff; --doodle-color:#bd7cff; --glow-color: rgba(189,124,255,0.5);
@@ -128,7 +130,7 @@
     .shop-banner h1 { font-size: 3rem; margin-bottom: 15px; color: var(--text); }
     .shop-banner p { font-size: 1.2rem; color: var(--text-soft); max-width: 600px; margin: 0 auto; }
 
-    /* FIXED HEIGHTS: DESKTOP 700px, MOBILE 740px */
+    /* CONTAINER HEIGHT: DESKTOP 700px, MOBILE 740px */
     #flipbook-container {
       width: 100%;
       max-width: 1040px;
@@ -138,18 +140,18 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 700px;
+      height: 700px; 
       overflow: hidden;
       transition: transform 0.4s, box-shadow 0.4s;
     }
     @media(max-width:750px){
-      #flipbook-container { height: 740px; }
+      #flipbook-container { height: 740px; } 
     }
     #flipbook-container.book-hover {
       transform: translateY(-10px) scale(1.02);
       box-shadow: 0 20px 60px var(--shadow), 0 0 40px var(--glow-color);
     }
-    #flipbook { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transform-origin: center center; transition: transform 0.3s ease; }
+    #flipbook { position: relative; transform-origin: center center; transition: transform 0.3s ease; }
 
     .page { background: transparent; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: visible; }
     .cover { background-image: url('logo.png'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; position: relative; }
@@ -159,15 +161,18 @@
     .tap-to-open { font-family: 'Caveat', cursive; font-size: 20px; color: #f2a6b8; opacity: 0.4; margin-top: 20px; cursor: pointer; transition: opacity 0.3s, transform 0.3s; }
     .tap-to-open:hover { opacity: 1; transform: scale(1.1); }
 
+    /* FIXED: Content moved down using var(--content-padding-top) */
     .diary-page {
       background: var(--page-bg);
       background-image: repeating-linear-gradient(transparent, transparent 27px, var(--page-line) 28px);
-      padding: 30px 25px 20px;
-      box-sizing: border-box;
+      padding-top: var(--content-padding-top);
+      padding-bottom: 20px;
+      padding-left: 25px;
+      padding-right: 25px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100%;
       position: relative;
       overflow: visible;
@@ -177,10 +182,6 @@
     .doodle-2 { top: 25px; right: 25px; transform: rotate(30deg); font-size: 16px; }
     .doodle-3 { bottom: 40px; left: 15px; transform: rotate(-15deg); font-size: 18px; }
     .doodle-4 { bottom: 30px; right: 20px; transform: rotate(25deg); font-size: 14px; }
-    .doodle-5 { top: 40px; left: 45%; transform: rotate(15deg); font-size: 12px; }
-    .doodle-6 { bottom: 20px; left: 60%; transform: rotate(-30deg); font-size: 15px; }
-    .doodle-7 { top: 50%; left: 10px; transform: rotate(10deg); font-size: 18px; }
-    .doodle-8 { bottom: 50%; right: 8px; transform: rotate(-10deg); font-size: 16px; }
     .deco { position: absolute; pointer-events: none; z-index: 6; opacity: 0.8; animation: floatYarn 6s ease-in-out infinite; }
     .deco.yarn { font-size: 30px; top: 20%; left: 12%; }
     .deco.cat { font-size: 28px; bottom: 15%; left: 20%; animation-duration: 8s; }
@@ -188,14 +189,16 @@
     @keyframes floatYarn { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 25% { transform: translate(5px, -10px) rotate(10deg); } 50% { transform: translate(-5px, -5px) rotate(-10deg); } 75% { transform: translate(3px, -12px) rotate(5deg); } }
     @keyframes twinkle { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
     .photo-pop { position: absolute; pointer-events: none; z-index: 15; object-fit: contain; }
-    .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; max-width: 80%; max-height: 65%; margin-top: 15px; z-index: 10; }
-    .photo-frame { background: var(--frame-bg); padding: 8px 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid var(--frame-border); max-width: 100%; transition: transform 0.3s, box-shadow 0.3s; }
+    
+    .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; max-height: 65%; margin-top: 10px; z-index: 10; }
+    .photo-frame { background: var(--frame-bg); padding: 8px 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid var(--frame-border); width: 100%; max-width: 100%; transition: transform 0.3s, box-shadow 0.3s; }
     .photo-frame:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px var(--glow-color); }
-    .photo-frame img { width: 100%; height: auto; max-height: 320px; object-fit: cover; }
+    .photo-frame img { width: 100%; height: auto; max-height: 280px; object-fit: cover; display: block; }
+    
     .name-sticker { position: absolute; bottom: -12px; right: -12px; background: var(--sticker-bg); color: var(--sticker-text); padding: 8px 15px; border: 2px solid white; border-radius: 8px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); z-index: 10; transform: rotate(-12deg); transition: transform 0.3s, box-shadow 0.3s; }
     .name-sticker:hover { transform: rotate(-12deg) translateY(-3px) scale(1.05); box-shadow: 2px 2px 8px rgba(0,0,0,0.4), 0 0 15px var(--glow-color); }
     .name-sticker h3 { margin: 0; font-size: 15px; font-weight: bold; }
-    .diary-text { background: var(--text-sticker-bg); border: 2px solid var(--text-sticker-border); border-radius: 10px; padding: 10px 15px; font-family: 'Caveat', cursive; font-size: 18px; color: var(--text-soft); text-align: center; max-width: 85%; margin-top: 15px; transform: rotate(2deg); z-index: 10; transition: transform 0.3s, box-shadow 0.3s; }
+    .diary-text { background: var(--text-sticker-bg); border: 2px solid var(--text-sticker-border); border-radius: 10px; padding: 8px 12px; font-family: 'Caveat', cursive; font-size: 16px; color: var(--text-soft); text-align: center; max-width: 85%; margin-top: 10px; transform: rotate(2deg); z-index: 10; transition: transform 0.3s, box-shadow 0.3s; }
     .diary-text:hover { transform: rotate(2deg) translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
     .add-to-cart-page-btn { background: var(--accent); color: white; border: none; border-radius: 50px; padding: 8px 20px; font-family: inherit; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.3s, transform 0.3s; }
@@ -204,9 +207,28 @@
     .add-to-cart-page-btn.cart-counter button { background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .add-to-cart-page-btn.cart-counter span { min-width: 16px; text-align: center; font-weight: bold; }
 
-    .confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 50; }
-    .confetti-piece { position: absolute; width: 8px; height: 8px; border-radius: 2px; animation: confettiFall 2.5s ease-in forwards; }
-    @keyframes confettiFall { 0% { top: 10%; opacity: 1; transform: rotate(0deg); } 100% { top: 95%; opacity: 0; transform: rotate(360deg); } }
+    /* CONFETTI EFFECT (FULLY RESTORED) */
+    .confetti-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 50;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      animation: confettiFall 2.5s ease-in forwards;
+    }
+    @keyframes confettiFall {
+      0% { top: 10%; opacity: 1; transform: rotate(0deg); }
+      100% { top: 95%; opacity: 0; transform: rotate(360deg); }
+    }
 
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
 
@@ -218,6 +240,7 @@
       .shop-banner p{font-size: 1rem;}
     }
 
+    /* Magic particles */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
     .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
     .butterfly .body{position:absolute;left:50%;top:50%;width:3px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#7d6877;z-index:3;}
@@ -312,15 +335,7 @@
   </div>
 </div>
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCeiXIZhofwxkUrWkowZuiMSHyRcsfeHE0",
-    authDomain: "littleloopcrochet-2dcdf.firebaseapp.com",
-    projectId: "littleloopcrochet-2dcdf",
-    storageBucket: "littleloopcrochet-2dcdf.firebasestorage.app",
-    messagingSenderId: "837032344744",
-    appId: "1:837032344744:web:41f17ab83bb6071240969d",
-    measurementId: "G-1F2GVL84HC"
-  };
+  const firebaseConfig = { apiKey: "AIzaSyCeiXIZhofwxkUrWkowZuiMSHyRcsfeHE0", authDomain: "littleloopcrochet-2dcdf.firebaseapp.com", projectId: "littleloopcrochet-2dcdf", storageBucket: "littleloopcrochet-2dcdf.firebasestorage.app", messagingSenderId: "837032344744", appId: "1:837032344744:web:41f17ab83bb6071240969d", measurementId: "G-1F2GVL84HC" };
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
@@ -359,9 +374,30 @@
     window.addToCartFromPage = function(btn, event) { if (event) event.stopPropagation(); if (!currentUser) { alert('Please sign in to add items to your cart.'); return; } const productId = btn.dataset.productId; if (!productId) return; if (btn.dataset.processing === 'true') return; btn.dataset.processing = 'true'; const item = { id: productId, name: btn.dataset.name, price: parseFloat(btn.dataset.price), image: btn.dataset.image || btn.dataset.emoji || '', quantity: 1 }; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (doc.exists) { const newQty = doc.data().quantity + 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } else { transaction.set(cartRef, item); return 1; } }); }).then(function(newQty) { updateButtonToCounter(btn, newQty); const page = btn.closest('.diary-page'); if (page) launchConfetti(page); }).catch(function(err) { console.error("Error adding to cart: ", err); btn.dataset.processing = 'false'; }); };
     window.handleMinus = function(clickedBtn, event) { event.stopPropagation(); const btn = clickedBtn.closest('.add-to-cart-page-btn'); decreaseCart(btn.dataset.productId, event, btn); };
     window.handlePlus = function(clickedBtn, event) { event.stopPropagation(); const btn = clickedBtn.closest('.add-to-cart-page-btn'); increaseCart(btn.dataset.productId, event, btn); };
-    window.increaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return; const newQty = doc.data().quantity + 1; transaction.update(cartRef, { quantity: newQty }); return newQty; }); }).then(function(newQty) { if (btn) updateButtonToCounter(btn, newQty); const page = btn.closest('.diary-page'); if (page) launchConfetti(page); }).catch(function() { if (btn) btn.dataset.processing = 'false'; }); };
+    window.increaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return; const newQty = doc.data().quantity + 1; transaction.update(cartRef, { quantity: newQty }); return newQty; }); }).then(function(newQty) { if (btn) updateButtonToCounter(btn, newQty); }).catch(function() { if (btn) btn.dataset.processing = 'false'; }); };
     window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }); };
-    function launchConfetti(pageElement) { const existing = pageElement.querySelector('.confetti-container'); if (existing) existing.remove(); const container = document.createElement('div'); container.className = 'confetti-container'; pageElement.appendChild(container); const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4']; const pieces = 180; for (let i = 0; i < pieces; i++) { const confetti = document.createElement('span'); confetti.className = 'confetti-piece'; confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; confetti.style.left = (5 + Math.random() * 90) + '%'; confetti.style.width = (6 + Math.random() * 8) + 'px'; confetti.style.height = (6 + Math.random() * 8) + 'px'; confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px'; confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's'; confetti.style.animationDelay = (Math.random() * 0.5) + 's'; container.appendChild(confetti); } setTimeout(() => { if (container.parentNode) container.remove(); }, 5000); }
+    function launchConfetti(pageElement) {
+      const existing = pageElement.querySelector('.confetti-container');
+      if (existing) existing.remove();
+      const container = document.createElement('div');
+      container.className = 'confetti-container';
+      pageElement.appendChild(container);
+      const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4'];
+      const pieces = 180;
+      for (let i = 0; i < pieces; i++) {
+        const confetti = document.createElement('span');
+        confetti.className = 'confetti-piece';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = (5 + Math.random() * 90) + '%';
+        confetti.style.width = (6 + Math.random() * 8) + 'px';
+        confetti.style.height = (6 + Math.random() * 8) + 'px';
+        confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px';
+        confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+        confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+        container.appendChild(confetti);
+      }
+      setTimeout(() => { if (container.parentNode) container.remove(); }, 5000);
+    }
 
     // ===== FLIPBOOK =====
     const defaultPages = [
@@ -389,8 +425,8 @@
       const flipbookDiv = document.getElementById('flipbook');
       const container = document.getElementById('flipbook-container');
       
-      // SIZES: Desktop 500x700, Mobile 300x740
-      let pageWidth = 500; let pageHeight = 700;
+      // DESKTOP: 500x700, MOBILE: 300x740
+      let pageWidth = 500; let pageHeight = 700; 
       if (window.innerWidth <= 750) { pageWidth = 300; pageHeight = 740; }
 
       flipbookDiv.innerHTML = '';
@@ -409,35 +445,15 @@
           drawShadow: true, flippingTime: 600
         });
         flipbook.loadFromHTML(pageElements);
-        // Center the book via absolute positioning (already done in CSS)
-      } catch (e) { console.error("Flipbook failed, using Grid Fallback:", e); renderGridFallback(); }
 
-      // Add click override ONLY on mobile (width <= 750) to fix tap-flip
-      if (window.innerWidth <= 750) {
-        setupClickOverride();
-      }
+        flipbookDiv.style.width = pageWidth + 'px';
+        flipbookDiv.style.height = pageHeight + 'px';
+        
+        // Restore original native flip logic by NOT overriding clicks
+      } catch (e) { console.error("Flipbook failed, using Grid Fallback:", e); renderGridFallback(); }
 
       if (currentUser) loadCartData();
       window.finishLoading();
-    }
-
-    function setupClickOverride() {
-      const container = document.getElementById('flipbook-container');
-      container.removeEventListener('click', handleClick);
-      container.addEventListener('click', handleClick, true);
-    }
-
-    function handleClick(e) {
-      if (e.target.closest('button') || e.target.closest('a')) return;
-      const rect = document.getElementById('flipbook-container').getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const half = rect.width / 2;
-      e.stopImmediatePropagation();
-      if (x < half) {
-        if (flipbook) flipbook.flipPrev();
-      } else {
-        if (flipbook) flipbook.flipNext();
-      }
     }
 
     function renderGridFallback() { const container = document.getElementById('flipbook-container'); container.style.height = 'auto'; container.innerHTML = '<div class="grid-fallback">' + pagesData.map(p => `<div class="grid-item"><div class="grid-img">${p.image ? `<img src="${p.image}">` : `<span style="font-size:4rem;">${p.emoji || '🧸'}</span>`}</div><h3>${p.name}</h3><p>${p.description}</p><p style="font-weight:bold; color:var(--accent);">₹${p.price}</p><button class="add-to-cart-page-btn" onclick="addToCartFromPage(this, event)" data-product-id="${p.id}" data-name="${p.name}" data-price="${p.price}">Add to Cart</button></div>`).join('') + '</div>'; const style = document.createElement('style'); style.innerHTML = `.grid-fallback{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:20px;} .grid-item{background:var(--card);border-radius:20px;padding:20px;text-align:center;box-shadow:0 5px 15px var(--shadow);} .grid-img{width:100%;height:200px;object-fit:cover;border-radius:10px;background:var(--pink);display:flex;align-items:center;justify-content:center;margin-bottom:10px;} .grid-img img{width:100%;height:100%;object-fit:cover;border-radius:10px;} .grid-item h3{font-size:1.2rem;margin-bottom:5px;} .grid-item p{font-size:0.9rem;color:var(--muted);margin-bottom:5px;} @media(max-width:750px){.grid-fallback{grid-template-columns:1fr;}}`; document.head.appendChild(style); if (currentUser) loadCartData(); window.finishLoading(); }
