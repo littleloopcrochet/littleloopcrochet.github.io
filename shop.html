@@ -137,8 +137,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: auto; /* changed from 720px to auto */
-      overflow: visible; /* changed from hidden to visible */
+      height: auto;
+      overflow: visible;
       transition: transform 0.4s, box-shadow 0.4s;
     }
     #flipbook-container.book-hover {
@@ -168,10 +168,13 @@
     @keyframes floatYarn { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 25% { transform: translate(5px, -10px) rotate(10deg); } 50% { transform: translate(-5px, -5px) rotate(-10deg); } 75% { transform: translate(3px, -12px) rotate(5deg); } }
     @keyframes twinkle { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
     .photo-pop { position: absolute; pointer-events: none; z-index: 15; object-fit: contain; }
-    .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; max-width: 80%; max-height: 65%; margin-top: 15px; z-index: 10; }
-    .photo-frame { background: var(--frame-bg); padding: 8px 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid var(--frame-border); max-width: 100%; transition: transform 0.3s, box-shadow 0.3s; }
+    
+    /* FIXED: Force photo container and frame to fill page width */
+    .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; max-height: 65%; margin-top: 15px; z-index: 10; }
+    .photo-frame { background: var(--frame-bg); padding: 8px 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid var(--frame-border); width: 100%; max-width: 100%; transition: transform 0.3s, box-shadow 0.3s; }
     .photo-frame:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px var(--glow-color); }
-    .photo-frame img { width: 100%; height: auto; max-height: 320px; object-fit: cover; }
+    .photo-frame img { width: 100%; height: auto; max-height: 320px; object-fit: cover; display: block; }
+    
     .name-sticker { position: absolute; bottom: -12px; right: -12px; background: var(--sticker-bg); color: var(--sticker-text); padding: 8px 15px; border: 2px solid white; border-radius: 8px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); z-index: 10; transform: rotate(-12deg); transition: transform 0.3s, box-shadow 0.3s; }
     .name-sticker:hover { transform: rotate(-12deg) translateY(-3px) scale(1.05); box-shadow: 2px 2px 8px rgba(0,0,0,0.4), 0 0 15px var(--glow-color); }
     .name-sticker h3 { margin: 0; font-size: 15px; font-weight: bold; }
@@ -195,6 +198,7 @@
       #flipbook-container { height: auto; max-width: 100%; width: 100%; margin: 0 auto; padding: 0 10px; box-sizing: border-box; }
     }
 
+    /* Magic particles */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
     .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
     .butterfly .body{position:absolute;left:50%;top:50%;width:3px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#7d6877;z-index:3;}
@@ -332,7 +336,7 @@
     window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }); };
     function launchConfetti(pageElement) { const existing = pageElement.querySelector('.confetti-container'); if (existing) existing.remove(); const container = document.createElement('div'); container.className = 'confetti-container'; pageElement.appendChild(container); const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4']; const pieces = 180; for (let i = 0; i < pieces; i++) { const confetti = document.createElement('span'); confetti.className = 'confetti-piece'; confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; confetti.style.left = (5 + Math.random() * 90) + '%'; confetti.style.width = (6 + Math.random() * 8) + 'px'; confetti.style.height = (6 + Math.random() * 8) + 'px'; confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px'; confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's'; confetti.style.animationDelay = (Math.random() * 0.5) + 's'; container.appendChild(confetti); } setTimeout(() => { if (container.parentNode) container.remove(); }, 5000); }
 
-    // ===== FLIPBOOK (ROBUST FIX) =====
+    // ===== FLIPBOOK (ROBUST - DO NOT TOUCH) =====
     const defaultPages = [
       { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
       { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, hand-knitted.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -344,7 +348,7 @@
 
     let pagesData = [];
     let flipbook = null;
-    let isInitialized = false; // Guard against double init
+    let isInitialized = false;
 
     async function loadFlipbook() {
       try { const response = await fetch('pages.json'); if (!response.ok) throw new Error('Not found'); const data = await response.json(); pagesData = data.pages || defaultPages; } catch (e) { pagesData = defaultPages; }
@@ -352,27 +356,17 @@
     }
 
     function initFlipbook(pages) {
-      if (isInitialized) {
-        // Destroy existing before re-init
-        if (flipbook) flipbook.destroy();
-      }
+      if (isInitialized) { if (flipbook) flipbook.destroy(); }
       isInitialized = true;
 
       const flipbookDiv = document.getElementById('flipbook');
       const container = document.getElementById('flipbook-container');
       
-      // Fixed base page sizes (we'll scale later if needed)
-      let pageWidth = 500;
-      let pageHeight = 700;
-      
-      if (window.innerWidth <= 750) {
-        pageWidth = 300;
-        pageHeight = 420;
-      }
+      let pageWidth = 500; let pageHeight = 700;
+      if (window.innerWidth <= 750) { pageWidth = 300; pageHeight = 420; }
 
-      // Clear container
       flipbookDiv.innerHTML = '';
-      flipbookDiv.style.transform = 'none'; // Reset any previous scale
+      flipbookDiv.style.transform = 'none';
 
       const pageElements = [];
       pageElements.push(createCoverPage(true, 'Our Handmade Collection'));
@@ -382,60 +376,38 @@
 
       try {
         flipbook = new St.PageFlip(flipbookDiv, {
-          width: pageWidth,
-          height: pageHeight,
-          size: 'fixed',
-          showCover: true,
-          usePortrait: false,
-          maxShadowOpacity: 0.5,
-          mobileScrollSupport: false,
-          drawShadow: true,
-          flippingTime: 600
+          width: pageWidth, height: pageHeight, size: 'fixed', showCover: true,
+          usePortrait: false, maxShadowOpacity: 0.5, mobileScrollSupport: false,
+          drawShadow: true, flippingTime: 600
         });
         flipbook.loadFromHTML(pageElements);
 
-        // After the book is fully rendered, scale it to fit the container
-        // Use a delay to ensure layout is complete
         setTimeout(() => {
           const bookWidth = flipbookDiv.scrollWidth || flipbookDiv.offsetWidth;
           const bookHeight = flipbookDiv.scrollHeight || flipbookDiv.offsetHeight;
           const availW = container.clientWidth;
-          const availH = container.clientHeight || 720; // fallback height
+          const availH = container.clientHeight || 720;
           if (bookWidth > 0 && bookHeight > 0) {
             const scale = Math.min(availW / bookWidth, availH / bookHeight, 1);
             flipbookDiv.style.transformOrigin = 'center center';
             flipbookDiv.style.transform = `scale(${scale})`;
-            // Adjust container height to match scaled book
             container.style.height = (bookHeight * scale) + 'px';
           }
-        }, 300); // Delay 300ms to avoid race
-      } catch (e) {
-        console.error("Flipbook failed, using Grid Fallback:", e);
-        renderGridFallback();
-      }
+        }, 300);
+      } catch (e) { console.error("Flipbook failed, using Grid Fallback:", e); renderGridFallback(); }
 
       if (currentUser) loadCartData();
       window.finishLoading();
     }
 
-    function renderGridFallback() {
-      const container = document.getElementById('flipbook-container');
-      container.style.height = 'auto';
-      container.innerHTML = '<div class="grid-fallback">' + pagesData.map(p => `<div class="grid-item"><div class="grid-img">${p.image ? `<img src="${p.image}">` : `<span style="font-size:4rem;">${p.emoji || '🧸'}</span>`}</div><h3>${p.name}</h3><p>${p.description}</p><p style="font-weight:bold; color:var(--accent);">₹${p.price}</p><button class="add-to-cart-page-btn" onclick="addToCartFromPage(this, event)" data-product-id="${p.id}" data-name="${p.name}" data-price="${p.price}">Add to Cart</button></div>`).join('') + '</div>';
-      const style = document.createElement('style');
-      style.innerHTML = `.grid-fallback{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:20px;} .grid-item{background:var(--card);border-radius:20px;padding:20px;text-align:center;box-shadow:0 5px 15px var(--shadow);} .grid-img{width:100%;height:200px;object-fit:cover;border-radius:10px;background:var(--pink);display:flex;align-items:center;justify-content:center;margin-bottom:10px;} .grid-img img{width:100%;height:100%;object-fit:cover;border-radius:10px;} .grid-item h3{font-size:1.2rem;margin-bottom:5px;} .grid-item p{font-size:0.9rem;color:var(--muted);margin-bottom:5px;} @media(max-width:750px){.grid-fallback{grid-template-columns:1fr;}}`;
-      document.head.appendChild(style);
-      if (currentUser) loadCartData();
-      window.finishLoading();
-    }
+    function renderGridFallback() { const container = document.getElementById('flipbook-container'); container.style.height = 'auto'; container.innerHTML = '<div class="grid-fallback">' + pagesData.map(p => `<div class="grid-item"><div class="grid-img">${p.image ? `<img src="${p.image}">` : `<span style="font-size:4rem;">${p.emoji || '🧸'}</span>`}</div><h3>${p.name}</h3><p>${p.description}</p><p style="font-weight:bold; color:var(--accent);">₹${p.price}</p><button class="add-to-cart-page-btn" onclick="addToCartFromPage(this, event)" data-product-id="${p.id}" data-name="${p.name}" data-price="${p.price}">Add to Cart</button></div>`).join('') + '</div>'; const style = document.createElement('style'); style.innerHTML = `.grid-fallback{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:20px;} .grid-item{background:var(--card);border-radius:20px;padding:20px;text-align:center;box-shadow:0 5px 15px var(--shadow);} .grid-img{width:100%;height:200px;object-fit:cover;border-radius:10px;background:var(--pink);display:flex;align-items:center;justify-content:center;margin-bottom:10px;} .grid-img img{width:100%;height:100%;object-fit:cover;border-radius:10px;} .grid-item h3{font-size:1.2rem;margin-bottom:5px;} .grid-item p{font-size:0.9rem;color:var(--muted);margin-bottom:5px;} @media(max-width:750px){.grid-fallback{grid-template-columns:1fr;}}`; document.head.appendChild(style); if (currentUser) loadCartData(); window.finishLoading(); }
 
-    function createCoverPage(isFront, title) {
-      const page = document.createElement('div');
-      page.className = 'page cover';
-      if (isFront) { page.innerHTML = `<div class="cover-text"><h1>${title}</h1></div><div class="tap-to-open" onclick="openBook()">tap to open</div>`; }
-      else { page.innerHTML = `<div class="cover-text"><h1>Thank You</h1><p style="margin-top:5px;">For browsing</p></div>`; }
-      return page;
-    }
+    function createCoverPage(isFront, title) { const page = document.createElement('div'); page.className = 'page cover'; if (isFront) { page.innerHTML = `<div class="cover-text"><h1>${title}</h1></div><div class="tap-to-open" onclick="openBook()">tap to open</div>`; } else { page.innerHTML = `<div class="cover-text"><h1>Thank You</h1><p style="margin-top:5px;">For browsing</p></div>`; } return page; }
+
+    // ===== FLIPBOOK CONTENT (FIXED GIFS AND PHOTOS) =====
+    const totalGifs = 15;
+    const gifStyles = { 1: { top: '-95px', left: '20%', width: '80px', transform: 'translateX(-50%)' }, 2: { top: '-90px', left: '50%', width: '200px', transform: 'translateX(-50%) rotate(10deg)' }, 3: { top: '-120px', left: '15%', width: '200px', transform: 'translateX(-50%)' }, 4: { top: '-90px', left: '55%', width: '90px', transform: 'translateX(-50%) rotate(-5deg)' }, 5: { top: '-100px', left: '55%', width: '85px', transform: 'translateX(-50%)' }, 6: { top: '-80px', left: '80%', width: '75px', transform: 'translateX(-50%) rotate(15deg)' }, 7: { top: '-110px', left: '45%', width: '155px', transform: 'translateX(-50%)' }, 8: { top: '-100px', left: '50%', width: '100px', transform: 'translateX(-50%) rotate(-10deg)' }, 9: { top: '-130px', left: '45%', width: '100px', transform: 'translateX(-50%)' }, 10:{ top: '-100px', left: '55%', width: '70px', transform: 'translateX(-50%) rotate(5deg)' }, 11:{ top: '-120px', left: '60%', width: '90px', transform: 'translateX(-50%)' }, 12:{ top: '-150px', left: '40%', width: '85px', transform: 'translateX(-50%) rotate(-15deg)' }, 13:{ top: '-80px', left: '50%', width: '75px', transform: 'translateX(-50%)' }, 14:{ top: '-110px', left: '45%', width: '95px', transform: 'translateX(-50%) rotate(10deg)' }, 15:{ top: '-140px', left: '55%', width: '80px', transform: 'translateX(-50%)' } };
+    const defaultGifStyle = { top: '-150px', left: '50%', width: '80px', transform: 'translateX(-50%)' };
 
     function createContentPage(pageInfo, idx) {
       const page = document.createElement('div');
@@ -443,13 +415,24 @@
       const angle = (Math.random() * 10 - 5).toFixed(1);
       const imgSrc = pageInfo.image || '';
       const productId = pageInfo.id || `item-${idx}`;
+      
+      const gifNum = (idx % totalGifs) + 1;
+      const gifSrc = gifNum === 1 ? 'photo-pop.gif' : `photo-pop${gifNum}.gif`;
+      const style = gifStyles[gifNum] || defaultGifStyle;
+      const inlineStyle = `top: ${style.top}; left: ${style.left}; width: ${style.width}; transform: ${style.transform};`;
+
+      // Added onerror handlers so broken gifs or images don't leave broken icons
       page.innerHTML = `
         <div class="diary-page">
           <span class="party-popper">🎉</span><div class="confetti-container" style="display:none;"></div>
           <span class="doodle doodle-1">✧</span><span class="doodle doodle-2">♡</span><span class="doodle doodle-3">★</span><span class="doodle doodle-4">✦</span>
           <span class="deco yarn">🧶</span><span class="deco star">⭐</span><span class="deco cat">🐱</span>
           <div class="diary-photo-container" style="transform: rotate(${angle}deg);">
-            <div class="photo-frame magic-hover">${imgSrc ? `<img src="${imgSrc}">` : `<div style="font-size:4rem;">${pageInfo.emoji || '🧸'}</div>`}</div>
+            <div class="photo-frame magic-hover">
+              ${imgSrc ? `<img src="${imgSrc}" onerror="this.parentElement.style.display='none'">` : `<div style="font-size:4rem;">${pageInfo.emoji || '🧸'}</div>`}
+            </div>
+            <img src="${gifSrc}" class="photo-pop" onerror="this.remove()" alt="decorative animation" style="${inlineStyle}">
+            <div class="tape-strip"></div>
             <div class="name-sticker magic-hover"><h3>${pageInfo.name || 'Untitled'}</h3></div>
           </div>
           <div class="diary-text magic-hover"><p>${pageInfo.description || ''}</p><p style="font-size:1.2rem; font-weight:bold; color:var(--accent);">₹${pageInfo.price}</p></div>
@@ -460,10 +443,8 @@
 
     window.openBook = function() { if (flipbook) flipbook.flipNext(); };
 
-    // Load on DOM ready
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', loadFlipbook); } else { loadFlipbook(); }
 
-    // Minimal resize handling: only re-init if width changes significantly
     let lastWidth = window.innerWidth;
     window.addEventListener('resize', function() {
       if (Math.abs(window.innerWidth - lastWidth) > 50) {
@@ -472,29 +453,18 @@
       }
     });
 
-    // Magic particles & hearts (same as before)
+    // Magic particles & hearts
     let particleInterval = null, activeMagicElement = null;
     const magicContainer = document.createElement('div'); magicContainer.className = 'magic-particles'; document.body.appendChild(magicContainer);
     function randomNumber(min, max) { return Math.random() * (max - min) + min; }
     function createMagicParticle(element) {
-      if (!element || !element.isConnected) return;
-      if (element.classList.contains('heart-hover')) return;
-      const rect = element.getBoundingClientRect();
-      const angle = Math.random() * Math.PI * 2;
+      if (!element || !element.isConnected) return; if (element.classList.contains('heart-hover')) return;
+      const rect = element.getBoundingClientRect(); const angle = Math.random() * Math.PI * 2;
       const radius = Math.max(rect.width, rect.height) * 0.35 + Math.random() * 18;
-      const startX = rect.left + rect.width / 2 + Math.cos(angle) * radius;
-      const startY = rect.top + rect.height / 2 + Math.sin(angle) * radius;
-      const isNight = document.body.classList.contains('dark');
-      const particle = document.createElement('span');
+      const startX = rect.left + rect.width / 2 + Math.cos(angle) * radius; const startY = rect.top + rect.height / 2 + Math.sin(angle) * radius;
+      const isNight = document.body.classList.contains('dark'); const particle = document.createElement('span');
       if (isNight) { particle.className = 'firefly'; } else { particle.className = 'butterfly'; particle.innerHTML = '<span class="wing left"></span><span class="body"></span><span class="wing right"></span>'; }
-      particle.style.left = startX + 'px'; particle.style.top = startY + 'px';
-      particle.style.setProperty('--x1', randomNumber(-25, 25) + 'px'); particle.style.setProperty('--y1', randomNumber(-25, -5) + 'px');
-      particle.style.setProperty('--x2', randomNumber(-40, 40) + 'px'); particle.style.setProperty('--y2', randomNumber(-45, -15) + 'px');
-      particle.style.setProperty('--x3', randomNumber(-50, 50) + 'px'); particle.style.setProperty('--y3', randomNumber(-65, -30) + 'px');
-      particle.style.setProperty('--x4', randomNumber(-70, 70) + 'px'); particle.style.setProperty('--y4', randomNumber(-85, -45) + 'px');
-      particle.style.animationDuration = isNight ? randomNumber(5.5, 7.5) + 's' : randomNumber(6.0, 8.0) + 's';
-      magicContainer.appendChild(particle);
-      setTimeout(function() { particle.remove(); }, 7000);
+      particle.style.left = startX + 'px'; particle.style.top = startY + 'px'; particle.style.setProperty('--x1', randomNumber(-25, 25) + 'px'); particle.style.setProperty('--y1', randomNumber(-25, -5) + 'px'); particle.style.setProperty('--x2', randomNumber(-40, 40) + 'px'); particle.style.setProperty('--y2', randomNumber(-45, -15) + 'px'); particle.style.setProperty('--x3', randomNumber(-50, 50) + 'px'); particle.style.setProperty('--y3', randomNumber(-65, -30) + 'px'); particle.style.setProperty('--x4', randomNumber(-70, 70) + 'px'); particle.style.setProperty('--y4', randomNumber(-85, -45) + 'px'); particle.style.animationDuration = isNight ? randomNumber(5.5, 7.5) + 's' : randomNumber(6.0, 8.0) + 's'; magicContainer.appendChild(particle); setTimeout(function() { particle.remove(); }, 7000);
     }
     function startMagic(element) { if (element.classList.contains('heart-hover')) return; activeMagicElement = element; if (particleInterval !== null) return; for (let i = 0; i < 3; i++) { createMagicParticle(element); } particleInterval = setInterval(function() { if (activeMagicElement) { for (let i = 0; i < 3; i++) { createMagicParticle(activeMagicElement); } } }, 650); }
     function stopMagic() { activeMagicElement = null; if (particleInterval !== null) { clearInterval(particleInterval); particleInterval = null; } }
@@ -514,106 +484,26 @@
     // ===== FULL IMMERSIVE LANDSCAPE CANVAS =====
     (function() {
       const canvas = document.getElementById('aboutCanvas'); if (!canvas) return;
-      const ctx = canvas.getContext('2d', { alpha: true });
-      let width = 0, height = 0, dpr = 1, time = 0, raf = 0;
-      let isDark = document.body.classList.contains('dark');
-      const mouse = { x: .5, y: .5, tx: .5, ty: .5 };
+      const ctx = canvas.getContext('2d', { alpha: true }); let width = 0, height = 0, dpr = 1, time = 0, raf = 0;
+      let isDark = document.body.classList.contains('dark'); const mouse = { x: .5, y: .5, tx: .5, ty: .5 };
       let stars = [], clouds = [], butterflies = [], fireflies = [], meteors = [], flowers = [], reeds = [], birds = [];
       const rand = (a, b) => a + Math.random() * (b - a), lerp = (a, b, t) => a + (b - a) * t;
 
       function resize() { width = innerWidth; height = innerHeight; dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = width * dpr; canvas.height = height * dpr; canvas.style.width = width + 'px'; canvas.style.height = height + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); init(); }
-      function init() {
-        stars = Array.from({ length: 145 }, () => ({ x: rand(0, 1), y: rand(.025, .56), r: rand(.3, 1.35), p: rand(0, 6.28), tw: rand(.5, 1.8) }));
-        clouds = Array.from({ length: 6 }, () => ({ x: rand(-.3, 1), y: rand(.08, .32), w: rand(130, 290), h: rand(28, 70), s: rand(.008, .018), a: rand(.16, .34) }));
-        butterflies = Array.from({ length: 9 }, () => ({ x: rand(.06, .94), y: rand(.40, .69), vx: rand(-.00018, .00018), vy: rand(-.00010, .00010), p: rand(0, 6.28), h: rand(315, 350), size: rand(7, 11) }));
-        fireflies = Array.from({ length: 34 }, () => ({ x: rand(.03, .97), y: rand(.45, .91), vx: rand(-.00015, .00015), vy: rand(-.00012, .00012), p: rand(0, 6.28), r: rand(1, 2.2) }));
-        meteors = Array.from({ length: 6 }, () => ({ active: false, x: 0, y: 0, vx: 0, vy: 0, life: 0, max: 0 }));
-        flowers = Array.from({ length: 34 }, (_, i) => ({ x: rand(.01, .99), y: rand(.70, .94), s: rand(.6, 1.1), p: rand(0, 6.28), h: [332, 350, 28, 48, 285, 198][i % 6] }));
-        reeds = Array.from({ length: 90 }, () => ({ x: rand(0, 1), y: rand(.67, .99), h: rand(13, 45), p: rand(0, 6.28), a: rand(.25, .75) }));
-        birds = Array.from({ length: 4 }, () => ({ x: rand(.1, .9), y: rand(.18, .38), v: rand(.00005, .00011), p: rand(0, 6.28) }));
-      }
+      function init() { stars = Array.from({ length: 145 }, () => ({ x: rand(0, 1), y: rand(.025, .56), r: rand(.3, 1.35), p: rand(0, 6.28), tw: rand(.5, 1.8) })); clouds = Array.from({ length: 6 }, () => ({ x: rand(-.3, 1), y: rand(.08, .32), w: rand(130, 290), h: rand(28, 70), s: rand(.008, .018), a: rand(.16, .34) })); butterflies = Array.from({ length: 9 }, () => ({ x: rand(.06, .94), y: rand(.40, .69), vx: rand(-.00018, .00018), vy: rand(-.00010, .00010), p: rand(0, 6.28), h: rand(315, 350), size: rand(7, 11) })); fireflies = Array.from({ length: 34 }, () => ({ x: rand(.03, .97), y: rand(.45, .91), vx: rand(-.00015, .00015), vy: rand(-.00012, .00012), p: rand(0, 6.28), r: rand(1, 2.2) })); meteors = Array.from({ length: 6 }, () => ({ active: false, x: 0, y: 0, vx: 0, vy: 0, life: 0, max: 0 })); flowers = Array.from({ length: 34 }, (_, i) => ({ x: rand(.01, .99), y: rand(.70, .94), s: rand(.6, 1.1), p: rand(0, 6.28), h: [332, 350, 28, 48, 285, 198][i % 6] })); reeds = Array.from({ length: 90 }, () => ({ x: rand(0, 1), y: rand(.67, .99), h: rand(13, 45), p: rand(0, 6.28), a: rand(.25, .75) })); birds = Array.from({ length: 4 }, () => ({ x: rand(.1, .9), y: rand(.18, .38), v: rand(.00005, .00011), p: rand(0, 6.28) })); }
       function hill(y, amp, phase) { ctx.beginPath(); ctx.moveTo(-10, height * y); for (let x = -10; x <= width + 10; x += Math.max(18, width / 20)) { const n = x / width; const yy = height * (y + Math.sin(n * 7 + phase) * amp + Math.sin(n * 2.8 + phase) * amp * .5); ctx.lineTo(x, yy); } ctx.lineTo(width + 10, height); ctx.lineTo(-10, height); ctx.closePath(); }
-      function drawSky() {
-        const g = ctx.createLinearGradient(0, 0, 0, height);
-        if (isDark) { g.addColorStop(0, '#070918'); g.addColorStop(.34, '#111a34'); g.addColorStop(.63, '#263c53'); g.addColorStop(1, '#10272b'); } else { g.addColorStop(0, '#8fd4f2'); g.addColorStop(.34, '#c4eaf4'); g.addColorStop(.62, '#f8dfc7'); g.addColorStop(1, '#b9d5bd'); }
-        ctx.fillStyle = g; ctx.fillRect(0, 0, width, height);
-        const px = (mouse.x - .5) * 20, py = (mouse.y - .5) * 11;
-        if (isDark) {
-          stars.forEach(s => { const tw = .22 + .78 * (.5 + .5 * Math.sin(time * .001 * s.tw + s.p)); ctx.globalAlpha = tw * .78; ctx.fillStyle = '#fff8df'; ctx.beginPath(); ctx.arc(s.x * width + px, s.y * height + py, s.r, 0, 6.28); ctx.fill(); if (s.r > 1) { ctx.fillRect(s.x * width + px - 2, s.y * height + py, .8, 4); ctx.fillRect(s.x * width + px - 2, s.y * height + py - 2, 4, .8); } });
-          ctx.globalAlpha = 1;
-          const mx = width * .79 + px, my = height * .15 + py;
-          ctx.shadowColor = 'rgba(255,236,185,.45)'; ctx.shadowBlur = 75; ctx.fillStyle = '#fff0c7'; ctx.beginPath(); ctx.arc(mx, my, 31, 0, 6.28); ctx.fill(); ctx.shadowBlur = 0;
-          ctx.fillStyle = '#111a34'; ctx.beginPath(); ctx.arc(mx + 12, my - 8, 25, 0, 6.28); ctx.fill();
-          birds.forEach(b => { b.x += b.v; if (b.x > 1.08) b.x = -.08; const x = b.x * width + px, y = b.y * height + py; ctx.strokeStyle = 'rgba(35,40,52,.5)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, 5, Math.PI + .2, 6.05); ctx.arc(x + 8, y, 5, Math.PI + .2, 6.05); ctx.stroke(); });
-        } else {
-          const sx = width * .82 + px, sy = height * .13 + py;
-          ctx.shadowColor = 'rgba(255,190,85,.38)'; ctx.shadowBlur = 100; ctx.fillStyle = '#ffe4a0'; ctx.beginPath(); ctx.arc(sx, sy, 38, 0, 6.28); ctx.fill(); ctx.shadowBlur = 0;
-          clouds.forEach(c => { c.x += c.s / 60; if (c.x > 1.3) c.x = -.3; const x = c.x * width + px, y = c.y * height + py; ctx.globalAlpha = c.a; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(x, y, c.w * .5, c.h * .32, 0, 0, 6.28); ctx.ellipse(x - c.w * .24, y + 8, c.w * .3, c.h * .3, 0, 0, 6.28); ctx.ellipse(x + c.w * .22, y + 7, c.w * .28, c.h * .28, 0, 0, 6.28); ctx.fill(); });
-          ctx.globalAlpha = 1;
-        }
-      }
-      function drawLandscape() {
-        const p = mouse.x - .5;
-        ctx.save(); ctx.translate(p * 8, 0); hill(.47, .07, .2); ctx.fillStyle = isDark ? '#26354b' : '#91b29b'; ctx.fill(); ctx.restore();
-        ctx.save(); ctx.translate(p * 15, 0); hill(.55, .075, 1.5); ctx.fillStyle = isDark ? '#1b3138' : '#638c6d'; ctx.fill(); ctx.restore();
-        ctx.save(); ctx.translate(p * 23, 0); hill(.64, .055, 2.8); ctx.fillStyle = isDark ? '#11272a' : '#3f7057'; ctx.fill(); ctx.restore();
-        const hg = ctx.createLinearGradient(0, height * .58, 0, height * .72);
-        hg.addColorStop(0, isDark ? 'rgba(150,180,205,.05)' : 'rgba(255,245,220,.20)'); hg.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = hg; ctx.fillRect(0, height * .54, width, height * .2);
-      }
-      function drawWater() {
-        const top = height * .68;
-        const g = ctx.createLinearGradient(0, top, 0, height);
-        g.addColorStop(0, isDark ? '#294c5a' : '#9bcbd0'); g.addColorStop(.25, isDark ? '#1e3e4c' : '#72b2bd'); g.addColorStop(1, isDark ? '#091c25' : '#3e7780');
-        ctx.fillStyle = g; ctx.fillRect(0, top, width, height - top);
-        for (let i = 0; i < 38; i++) {
-          const y = top + 7 + i * ((height - top) / 39);
-          const amp = 2 + Math.sin(i * .7) * 1.5;
-          const wave = Math.sin(time * .0013 + i * .55) * amp + Math.sin(time * .0007 + i) * 2;
-          ctx.beginPath(); ctx.moveTo(0, y);
-          ctx.bezierCurveTo(width * .22, y + wave, width * .48, y - wave, width * .72, y + wave * .4);
-          ctx.bezierCurveTo(width * .84, y + wave * .7, width * .93, y - wave * .3, width, y + wave);
-          ctx.strokeStyle = isDark ? `rgba(187,219,225,${.025 + (i % 5) * .009})` : `rgba(255,250,225,${.045 + (i % 5) * .012})`;
-          ctx.lineWidth = 1; ctx.stroke();
-        }
-      }
-      function drawWindmill() {
-        const x = width * .20 + (mouse.x - .5) * 28, y = height * .43 + (mouse.y - .5) * 6;
-        ctx.save(); ctx.translate(x, y);
-        ctx.fillStyle = isDark ? 'rgba(255,230,190,.04)' : 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.arc(0, 0, 55, 0, 6.28); ctx.fill();
-        ctx.fillStyle = isDark ? '#756f72' : '#8f725c'; ctx.beginPath(); ctx.moveTo(-8, 5); ctx.lineTo(8, 5); ctx.lineTo(5, 105); ctx.lineTo(-5, 105); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = isDark ? '#c0b4ae' : '#f4e5d0'; ctx.fillRect(-12, 27, 24, 4); ctx.fillRect(-10, 53, 20, 4); ctx.fillRect(-7, 79, 14, 4);
-        ctx.fillStyle = isDark ? '#4e4750' : '#6f594d'; ctx.beginPath(); ctx.arc(0, 0, 9, 0, 6.28); ctx.fill();
-        ctx.rotate(time * .00055);
-        for (let i = 0; i < 4; i++) { ctx.rotate(Math.PI / 2); ctx.fillStyle = isDark ? '#9c949b' : '#f8f1e7'; ctx.beginPath(); ctx.moveTo(-2, -7); ctx.lineTo(3, -7); ctx.lineTo(9, -76); ctx.lineTo(-8, -66); ctx.closePath(); ctx.fill(); }
-        ctx.restore();
-      }
-      function drawVegetation() {
-        reeds.forEach(r => { const x = r.x * width + (mouse.x - .5) * 18, y = r.y * height, s = Math.sin(time * .001 + r.p) * 4; ctx.strokeStyle = isDark ? `rgba(70,105,76,${r.a})` : `rgba(47,104,67,${r.a})`; ctx.lineWidth = 1.25; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + s, y - r.h * .45, x + s * 1.4, y - r.h); ctx.stroke(); });
-        flowers.forEach(f => {
-          const x = f.x * width + (mouse.x - .5) * 20 * f.s, ground = f.y * height, sway = Math.sin(time * .0011 + f.p) * 3 * f.s, top = ground - 29 * f.s;
-          ctx.strokeStyle = isDark ? 'rgba(43,75,61,.9)' : 'rgba(55,105,68,.9)'; ctx.lineWidth = 1.4;
-          ctx.beginPath(); ctx.moveTo(x, ground); ctx.quadraticCurveTo(x + sway, ground - 15 * f.s, x + sway * .4, top); ctx.stroke();
-          ctx.save(); ctx.translate(x + sway * .4, top); ctx.rotate(sway * .02); ctx.globalAlpha = .86;
-          const col = `hsl(${f.h}, ${isDark ? 45 : 62}%, ${isDark ? 65 : 74}%)`;
-          const colDark = `hsl(${f.h}, ${isDark ? 55 : 70}%, ${isDark ? 55 : 65}%)`;
-          ctx.fillStyle = colDark; ctx.beginPath(); ctx.moveTo(0, -2 * f.s); ctx.quadraticCurveTo(-8 * f.s, -18 * f.s, 0, -24 * f.s); ctx.quadraticCurveTo(8 * f.s, -18 * f.s, 0, -2 * f.s); ctx.fill();
-          ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0, -4 * f.s); ctx.quadraticCurveTo(-10 * f.s, -12 * f.s, -8 * f.s, -20 * f.s); ctx.quadraticCurveTo(-4 * f.s, -24 * f.s, 0, -16 * f.s); ctx.fill();
-          ctx.beginPath(); ctx.moveTo(0, -4 * f.s); ctx.quadraticCurveTo(10 * f.s, -12 * f.s, 8 * f.s, -20 * f.s); ctx.quadraticCurveTo(4 * f.s, -24 * f.s, 0, -16 * f.s); ctx.fill();
-          ctx.fillStyle = colDark; ctx.beginPath(); ctx.moveTo(-4 * f.s, -16 * f.s); ctx.quadraticCurveTo(0, -26 * f.s, 4 * f.s, -16 * f.s); ctx.quadraticCurveTo(2 * f.s, -8 * f.s, 0, -8 * f.s); ctx.quadraticCurveTo(-2 * f.s, -8 * f.s, -4 * f.s, -16 * f.s); ctx.fill();
-          ctx.restore();
-        });
-      }
+      function drawSky() { const g = ctx.createLinearGradient(0, 0, 0, height); if (isDark) { g.addColorStop(0, '#070918'); g.addColorStop(.34, '#111a34'); g.addColorStop(.63, '#263c53'); g.addColorStop(1, '#10272b'); } else { g.addColorStop(0, '#8fd4f2'); g.addColorStop(.34, '#c4eaf4'); g.addColorStop(.62, '#f8dfc7'); g.addColorStop(1, '#b9d5bd'); } ctx.fillStyle = g; ctx.fillRect(0, 0, width, height); const px = (mouse.x - .5) * 20, py = (mouse.y - .5) * 11; if (isDark) { stars.forEach(s => { const tw = .22 + .78 * (.5 + .5 * Math.sin(time * .001 * s.tw + s.p)); ctx.globalAlpha = tw * .78; ctx.fillStyle = '#fff8df'; ctx.beginPath(); ctx.arc(s.x * width + px, s.y * height + py, s.r, 0, 6.28); ctx.fill(); if (s.r > 1) { ctx.fillRect(s.x * width + px - 2, s.y * height + py, .8, 4); ctx.fillRect(s.x * width + px - 2, s.y * height + py - 2, 4, .8); } }); ctx.globalAlpha = 1; const mx = width * .79 + px, my = height * .15 + py; ctx.shadowColor = 'rgba(255,236,185,.45)'; ctx.shadowBlur = 75; ctx.fillStyle = '#fff0c7'; ctx.beginPath(); ctx.arc(mx, my, 31, 0, 6.28); ctx.fill(); ctx.shadowBlur = 0; ctx.fillStyle = '#111a34'; ctx.beginPath(); ctx.arc(mx + 12, my - 8, 25, 0, 6.28); ctx.fill(); birds.forEach(b => { b.x += b.v; if (b.x > 1.08) b.x = -.08; const x = b.x * width + px, y = b.y * height + py; ctx.strokeStyle = 'rgba(35,40,52,.5)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, 5, Math.PI + .2, 6.05); ctx.arc(x + 8, y, 5, Math.PI + .2, 6.05); ctx.stroke(); }); } else { const sx = width * .82 + px, sy = height * .13 + py; ctx.shadowColor = 'rgba(255,190,85,.38)'; ctx.shadowBlur = 100; ctx.fillStyle = '#ffe4a0'; ctx.beginPath(); ctx.arc(sx, sy, 38, 0, 6.28); ctx.fill(); ctx.shadowBlur = 0; clouds.forEach(c => { c.x += c.s / 60; if (c.x > 1.3) c.x = -.3; const x = c.x * width + px, y = c.y * height + py; ctx.globalAlpha = c.a; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(x, y, c.w * .5, c.h * .32, 0, 0, 6.28); ctx.ellipse(x - c.w * .24, y + 8, c.w * .3, c.h * .3, 0, 0, 6.28); ctx.ellipse(x + c.w * .22, y + 7, c.w * .28, c.h * .28, 0, 0, 6.28); ctx.fill(); }); ctx.globalAlpha = 1; } }
+      function drawLandscape() { const p = mouse.x - .5; ctx.save(); ctx.translate(p * 8, 0); hill(.47, .07, .2); ctx.fillStyle = isDark ? '#26354b' : '#91b29b'; ctx.fill(); ctx.restore(); ctx.save(); ctx.translate(p * 15, 0); hill(.55, .075, 1.5); ctx.fillStyle = isDark ? '#1b3138' : '#638c6d'; ctx.fill(); ctx.restore(); ctx.save(); ctx.translate(p * 23, 0); hill(.64, .055, 2.8); ctx.fillStyle = isDark ? '#11272a' : '#3f7057'; ctx.fill(); ctx.restore(); const hg = ctx.createLinearGradient(0, height * .58, 0, height * .72); hg.addColorStop(0, isDark ? 'rgba(150,180,205,.05)' : 'rgba(255,245,220,.20)'); hg.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = hg; ctx.fillRect(0, height * .54, width, height * .2); }
+      function drawWater() { const top = height * .68; const g = ctx.createLinearGradient(0, top, 0, height); g.addColorStop(0, isDark ? '#294c5a' : '#9bcbd0'); g.addColorStop(.25, isDark ? '#1e3e4c' : '#72b2bd'); g.addColorStop(1, isDark ? '#091c25' : '#3e7780'); ctx.fillStyle = g; ctx.fillRect(0, top, width, height - top); for (let i = 0; i < 38; i++) { const y = top + 7 + i * ((height - top) / 39); const amp = 2 + Math.sin(i * .7) * 1.5; const wave = Math.sin(time * .0013 + i * .55) * amp + Math.sin(time * .0007 + i) * 2; ctx.beginPath(); ctx.moveTo(0, y); ctx.bezierCurveTo(width * .22, y + wave, width * .48, y - wave, width * .72, y + wave * .4); ctx.bezierCurveTo(width * .84, y + wave * .7, width * .93, y - wave * .3, width, y + wave); ctx.strokeStyle = isDark ? `rgba(187,219,225,${.025 + (i % 5) * .009})` : `rgba(255,250,225,${.045 + (i % 5) * .012})`; ctx.lineWidth = 1; ctx.stroke(); } }
+      function drawWindmill() { const x = width * .20 + (mouse.x - .5) * 28, y = height * .43 + (mouse.y - .5) * 6; ctx.save(); ctx.translate(x, y); ctx.fillStyle = isDark ? 'rgba(255,230,190,.04)' : 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.arc(0, 0, 55, 0, 6.28); ctx.fill(); ctx.fillStyle = isDark ? '#756f72' : '#8f725c'; ctx.beginPath(); ctx.moveTo(-8, 5); ctx.lineTo(8, 5); ctx.lineTo(5, 105); ctx.lineTo(-5, 105); ctx.closePath(); ctx.fill(); ctx.fillStyle = isDark ? '#c0b4ae' : '#f4e5d0'; ctx.fillRect(-12, 27, 24, 4); ctx.fillRect(-10, 53, 20, 4); ctx.fillRect(-7, 79, 14, 4); ctx.fillStyle = isDark ? '#4e4750' : '#6f594d'; ctx.beginPath(); ctx.arc(0, 0, 9, 0, 6.28); ctx.fill(); ctx.rotate(time * .00055); for (let i = 0; i < 4; i++) { ctx.rotate(Math.PI / 2); ctx.fillStyle = isDark ? '#9c949b' : '#f8f1e7'; ctx.beginPath(); ctx.moveTo(-2, -7); ctx.lineTo(3, -7); ctx.lineTo(9, -76); ctx.lineTo(-8, -66); ctx.closePath(); ctx.fill(); } ctx.restore(); }
+      function drawVegetation() { reeds.forEach(r => { const x = r.x * width + (mouse.x - .5) * 18, y = r.y * height, s = Math.sin(time * .001 + r.p) * 4; ctx.strokeStyle = isDark ? `rgba(70,105,76,${r.a})` : `rgba(47,104,67,${r.a})`; ctx.lineWidth = 1.25; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + s, y - r.h * .45, x + s * 1.4, y - r.h); ctx.stroke(); }); flowers.forEach(f => { const x = f.x * width + (mouse.x - .5) * 20 * f.s, ground = f.y * height, sway = Math.sin(time * .0011 + f.p) * 3 * f.s, top = ground - 29 * f.s; ctx.strokeStyle = isDark ? 'rgba(43,75,61,.9)' : 'rgba(55,105,68,.9)'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(x, ground); ctx.quadraticCurveTo(x + sway, ground - 15 * f.s, x + sway * .4, top); ctx.stroke(); ctx.save(); ctx.translate(x + sway * .4, top); ctx.rotate(sway * .02); ctx.globalAlpha = .86; const col = `hsl(${f.h}, ${isDark ? 45 : 62}%, ${isDark ? 65 : 74}%)`; const colDark = `hsl(${f.h}, ${isDark ? 55 : 70}%, ${isDark ? 55 : 65}%)`; ctx.fillStyle = colDark; ctx.beginPath(); ctx.moveTo(0, -2 * f.s); ctx.quadraticCurveTo(-8 * f.s, -18 * f.s, 0, -24 * f.s); ctx.quadraticCurveTo(8 * f.s, -18 * f.s, 0, -2 * f.s); ctx.fill(); ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0, -4 * f.s); ctx.quadraticCurveTo(-10 * f.s, -12 * f.s, -8 * f.s, -20 * f.s); ctx.quadraticCurveTo(-4 * f.s, -24 * f.s, 0, -16 * f.s); ctx.fill(); ctx.beginPath(); ctx.moveTo(0, -4 * f.s); ctx.quadraticCurveTo(10 * f.s, -12 * f.s, 8 * f.s, -20 * f.s); ctx.quadraticCurveTo(4 * f.s, -24 * f.s, 0, -16 * f.s); ctx.fill(); ctx.fillStyle = colDark; ctx.beginPath(); ctx.moveTo(-4 * f.s, -16 * f.s); ctx.quadraticCurveTo(0, -26 * f.s, 4 * f.s, -16 * f.s); ctx.quadraticCurveTo(2 * f.s, -8 * f.s, 0, -8 * f.s); ctx.quadraticCurveTo(-2 * f.s, -8 * f.s, -4 * f.s, -16 * f.s); ctx.fill(); ctx.restore(); }); }
       function drawButterflies() { if (isDark) return; butterflies.forEach(b => { b.p += .012; b.x += b.vx + Math.sin(time * .0009 + b.p) * .00008; b.y += b.vy + Math.cos(time * .0012 + b.p) * .00005; if (b.x < .03 || b.x > .97) b.vx *= -1; if (b.y < .34 || b.y > .70) b.vy *= -1; const x = b.x * width + (mouse.x - .5) * 30, y = b.y * height + (mouse.y - .5) * 14, flap = .72 + .28 * Math.sin(time * .02 + b.p); ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(b.p) * .18); ctx.globalAlpha = .72; ctx.fillStyle = `hsl(${b.h},68%,76%)`; ctx.beginPath(); ctx.ellipse(-4, -3, 6, 4.5 * flap, -.35, 0, 6.28); ctx.ellipse(-4, 3.5, 5, 3.5 * flap, .35, 0, 6.28); ctx.ellipse(4, -3, 6, 4.5 * flap, .35, 0, 6.28); ctx.ellipse(4, 3.5, 5, 3.5 * flap, -.35, 0, 6.28); ctx.fill(); ctx.fillStyle = '#63545b'; ctx.fillRect(-1, -5, 2, 10); ctx.restore(); }); }
       function drawFireflies() { if (!isDark) return; fireflies.forEach(f => { f.x += f.vx + Math.sin(time * .0005 + f.p) * .00008; f.y += f.vy + Math.cos(time * .0008 + f.p) * .00005; if (f.x < .01 || f.x > .99) f.vx *= -1; if (f.y < .43 || f.y > .93) f.vy *= -1; const glow = .25 + .75 * (.5 + .5 * Math.sin(time * .0027 + f.p)), x = f.x * width, y = f.y * height; ctx.shadowColor = 'rgba(205,255,172,.8)'; ctx.shadowBlur = 15; ctx.fillStyle = `rgba(219,255,177,${.18 + .72 * glow})`; ctx.beginPath(); ctx.arc(x, y, f.r * (.65 + glow * .55), 0, 6.28); ctx.fill(); ctx.shadowBlur = 0; }); }
       function drawMeteors() { if (!isDark) return; meteors.forEach(m => { if (!m.active && Math.random() < .0012) { m.active = true; m.x = rand(.15, .9) * width; m.y = rand(.02, .30) * height; m.vx = rand(7, 13); m.vy = rand(3, 6); m.life = 0; m.max = rand(28, 55); } if (m.active) { m.x += m.vx; m.y += m.vy; m.life++; const a = 1 - m.life / m.max; ctx.save(); ctx.globalAlpha = Math.max(0, a); const grad = ctx.createLinearGradient(m.x - m.vx * 7, m.y - m.vy * 7, m.x, m.y); grad.addColorStop(0, 'rgba(255,255,255,0)'); grad.addColorStop(.75, 'rgba(255,246,210,.35)'); grad.addColorStop(1, 'rgba(255,255,255,1)'); ctx.strokeStyle = grad; ctx.shadowColor = '#fff'; ctx.shadowBlur = 16; ctx.lineWidth = 1.7; ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x - m.vx * 6, m.y - m.vy * 6); ctx.stroke(); ctx.restore(); if (m.life > m.max) m.active = false; } }); }
       function draw() { mouse.x = lerp(mouse.x, mouse.tx, .045); mouse.y = lerp(mouse.y, mouse.ty, .045); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height); drawSky(); drawLandscape(); drawWater(); drawWindmill(); drawVegetation(); drawButterflies(); drawFireflies(); drawMeteors(); time += 16; raf = requestAnimationFrame(draw); }
-      addEventListener('pointermove', e => { mouse.tx = e.clientX / width; mouse.ty = e.clientY / height; }, { passive: true });
-      addEventListener('resize', resize);
-      const observer = new MutationObserver(() => { const d = document.body.classList.contains('dark'); if (d !== isDark) { isDark = d; init(); } });
-      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-      window.aboutArt = { updateTheme: (dark) => { isDark = !!dark; init(); } };
-      resize(); draw();
+      addEventListener('pointermove', e => { mouse.tx = e.clientX / width; mouse.ty = e.clientY / height; }, { passive: true }); addEventListener('resize', resize);
+      const observer = new MutationObserver(() => { const d = document.body.classList.contains('dark'); if (d !== isDark) { isDark = d; init(); } }); observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      window.aboutArt = { updateTheme: (dark) => { isDark = !!dark; init(); } }; resize(); draw();
     })();
 
   })();
