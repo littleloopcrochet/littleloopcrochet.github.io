@@ -133,7 +133,7 @@
     .shop-banner h1 { font-size: 3rem; margin-bottom: 15px; color: var(--text); }
     .shop-banner p { font-size: 1.2rem; color: var(--text-soft); max-width: 600px; margin: 0 auto; }
 
-    /* Flipbook container */
+    /* Flipbook container - FIXED MOBILE */
     #flipbook-container {
       width: 100%;
       max-width: 1040px;
@@ -192,6 +192,7 @@
 
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
 
+    /* MOBILE FIXES - REDUCED BOOK SIZE */
     @media(max-width:750px){
       nav{padding:20px 6%}
       .shop-page{padding: 60px 6%}
@@ -359,7 +360,7 @@
     window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }).catch(function() { if (btn) btn.dataset.processing = 'false'; }); };
     function launchConfetti(pageElement) { const existing = pageElement.querySelector('.confetti-container'); if (existing) existing.remove(); const container = document.createElement('div'); container.className = 'confetti-container'; pageElement.appendChild(container); const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4']; const pieces = 180; for (let i = 0; i < pieces; i++) { const confetti = document.createElement('span'); confetti.className = 'confetti-piece'; confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; confetti.style.left = (5 + Math.random() * 90) + '%'; confetti.style.width = (6 + Math.random() * 8) + 'px'; confetti.style.height = (6 + Math.random() * 8) + 'px'; confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px'; confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's'; confetti.style.animationDelay = (Math.random() * 0.5) + 's'; container.appendChild(confetti); } setTimeout(() => { if (container.parentNode) container.remove(); }, 5000); }
 
-    // ===== FLIPBOOK (FIXED) =====
+    // ===== FLIPBOOK (FIXED FOR MOBILE) =====
     const defaultPages = [
       { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
       { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, hand-knitted.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -374,7 +375,8 @@
 
     async function loadFlipbook() {
       try { const response = await fetch('pages.json'); if (!response.ok) throw new Error('Not found'); const data = await response.json(); pagesData = data.pages || defaultPages; } catch (e) { pagesData = defaultPages; }
-      initFlipbook(pagesData);
+      // Small delay to ensure DOM is ready
+      setTimeout(() => initFlipbook(pagesData), 200);
     }
 
     function initFlipbook(pages) {
@@ -388,10 +390,15 @@
 
       if (flipbook) flipbook.destroy();
 
-      let pageWidth = 500, pageHeight = 700;
+      // SAFER WIDTH CALCULATION
+      let pageWidth = 500;
+      let pageHeight = 700;
       const container = document.getElementById('flipbook-container');
+      const containerWidth = container && container.clientWidth > 0 ? container.clientWidth : window.innerWidth;
+
       if (window.innerWidth <= 750) {
-        pageWidth = Math.min(340, container.clientWidth - 20);
+        pageWidth = Math.min(340, containerWidth - 20);
+        if (pageWidth < 200) pageWidth = Math.max(200, window.innerWidth - 40);
         pageHeight = Math.round(pageWidth * 1.4);
       }
 
