@@ -55,7 +55,10 @@
       background:none;
       border:none;
       cursor:pointer;
-      z-index: 10002;
+      /* FIXED: increased z-index to stay on top of nav-right */
+      z-index: 10070;
+      transition: all .3s ease;
+      position: relative;
     }
     .hamburger span{
       display:block;
@@ -66,11 +69,21 @@
       transition: all .3s ease;
     }
     
+    /* Hamburger active state (X) */
+    .hamburger.active span:nth-child(1) {
+      transform: translateY(10px) rotate(45deg);
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: translateY(-10px) rotate(-45deg);
+    }
+    
     /* ===== RESPONSIVE NAVIGATION (Mobile) ===== */
     @media(max-width:750px){
       nav{padding:15px 4%;}
       .hamburger{display:flex;}
-      /* FIX: Use transform instead of right, bump z-index to 10050 */
       .nav-right{
         display:flex;
         flex-direction:column;
@@ -97,6 +110,32 @@
       .nav-actions{margin-left:auto;display:flex;gap:5px;align-items:center;}
       .theme-wrapper, .mute-wrapper{display:flex;justify-content:center;}
       .theme-toggle,.mute-toggle{width:34px;height:34px;font-size:1rem;}
+    }
+
+    /* ===== CLOSE MENU BUTTON (Mobile only) ===== */
+    .close-menu-btn {
+      display: none;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: var(--text);
+      cursor: pointer;
+      z-index: 10071;
+      line-height: 1;
+      padding: 5px;
+      transition: color .3s ease, transform .3s ease;
+    }
+    .close-menu-btn:hover {
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+    @media(max-width:750px){
+      .close-menu-btn {
+        display: block;
+      }
     }
 
     .orders-page { min-height: 90vh; padding: 100px 7%; max-width: 1100px; margin: 0 auto; } 
@@ -210,12 +249,16 @@
   <div class="nav-actions">
     <div class="mute-wrapper magic-hover"><button class="mute-toggle" id="muteToggle" aria-label="Toggle sound" title="Mute / Unmute"><span class="mute-icon" id="muteIcon">🔊</span></button></div>
     <div class="theme-wrapper magic-hover"><button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme"><span class="theme-icon" id="themeIcon">☀️</span></button></div>
-    <button class="hamburger" onclick="toggleMenu()">
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
   </div>
   
   <div class="nav-right" id="navRight">
+    <!-- NEW: close menu button at top of sidebar -->
+    <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">
+      <span>&times;</span>
+    </button>
     <ul class="nav-links">
       <li><a href="index.html" class="magic-hover">Home</a></li>
       <li><a href="shop.html" class="magic-hover">Shop</a></li>
@@ -256,7 +299,9 @@
   // ===== HAMBURGER MENU LOGIC =====
   window.toggleMenu = function() {
     const navRight = document.getElementById('navRight');
+    const hamburger = document.querySelector('.hamburger');
     navRight.classList.toggle('open');
+    hamburger.classList.toggle('active');
   };
 
   const toggle = document.getElementById('themeToggle'); const icon = document.getElementById('themeIcon'); const savedTheme = localStorage.getItem('theme');
