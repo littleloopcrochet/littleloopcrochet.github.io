@@ -26,7 +26,7 @@
     body{font-family:"Comfortaa",sans-serif;background:transparent;color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden}
     a{color:inherit;text-decoration:none}
 
-    /* Navigation (identical to all other pages) */
+    /* Navigation */
     nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:10080;transition:background .5s ease}
     nav a, nav .logo, .nav-links a { text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
     body.dark nav a, body.dark nav .logo, body.dark .nav-links a { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
@@ -71,7 +71,7 @@
       .theme-toggle,.mute-toggle{width:34px;height:34px;font-size:1rem;}
     }
 
-    /* Modal (login) – same as all pages */
+    /* Modal */
     .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
     .modal.show { display: flex; align-items: center; justify-content: center; }
     .modal-content { background-color: var(--surface); padding: 40px; border-radius: 30px; width: 90%; max-width: 400px; box-shadow: 0 25px 80px rgba(0,0,0,0.3); position: relative; animation: modalSlideIn .3s ease; border: 1px solid rgba(255,255,255,0.2); }
@@ -102,7 +102,7 @@
     .auth-loading.show { display: flex; }
     .auth-loading span { font-size: 1rem; color: var(--accent); font-weight: 600; }
 
-    /* Loader (identical to all pages) */
+    /* Loader */
     body.is-loading{overflow:hidden}
     body.is-loading > *:not(#pageLoader):not(nav){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
@@ -124,7 +124,7 @@
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))}
     .hero,.about,.why-us-section,footer{position:relative;z-index:2}
 
-    /* Magic particles & hearts */
+    /* Magic Particles */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
     .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s cubic-bezier(.25,.65,.35,1) forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
     .butterfly .body{position:absolute;left:50%;top:50%;width:3px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#7d6877;z-index:3;}
@@ -150,8 +150,8 @@
     .button{display:inline-block;background:var(--accent);color:white;padding:14px 25px;border-radius:50px;font-size:.9rem;font-weight:600;transition:transform .3s ease,background .3s ease,box-shadow .3s ease;}
     .button:hover{transform:translateY(-4px) scale(1.02);background:var(--accent-hover);box-shadow:0 12px 30px var(--shadow);}
 
-    /* Hero Gallery - FIXED for desktop and mobile */
-    .hero-gallery{height:500px;position:relative;overflow:visible;background:transparent;box-shadow:none;border-radius:0;transition:transform .5s ease;cursor:pointer;width:100%;} /* CHANGED from 130% to 100% */
+    /* Hero Gallery */
+    .hero-gallery{height:500px;position:relative;overflow:visible;background:transparent;box-shadow:none;border-radius:0;transition:transform .5s ease;cursor:pointer;width:100%;}
     .hero-gallery:hover{transform:translateY(-5px);}
     .memory-gallery{position:absolute;inset:0;width:100%;height:100%;perspective:1200px;pointer-events:none;}
     .gallery-heading{position:absolute;z-index:30;top:5px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;opacity:.9;text-shadow:0 4px 25px rgba(0,0,0,.25);}
@@ -188,13 +188,14 @@
     body.dark .gallery-orbit{border-color:rgba(176,194,255,.13)}
     body.dark .gallery-orbit:before,body.dark .gallery-orbit:after{box-shadow:0 0 12px 4px rgba(151,179,255,.45)}
 
-    /* Mobile adjustments - FIXED */
+    /* Mobile Adjustments - FIXED */
     @media(max-width:700px){
       .hero{grid-template-columns:1fr;gap:40px;text-align:center;}
-      .hero-gallery{height:380px;width:100%;margin-left:0;} /* Removed overflow */
+      .hero-gallery{height:420px;width:100%;margin-left:0;}
       .memory-card{width:160px;top:58%;padding:8px 8px 28px;}
       .photo-placeholder{height:120px;}
       .photo-caption{font-size:12px;bottom:8px;}
+      /* FIX: Matches JS mobile offsets exactly */
       .card-1{transform:translate(-50%,-50%) translate(-100px,40px) rotate(-12deg) scale(.6);opacity:.65}
       .card-2{transform:translate(-50%,-50%) translate(-65px,0) rotate(-7deg) scale(.7);opacity:.8}
       .card-3{transform:translate(-50%,-50%) translate(-30px,-30px) rotate(-3deg) scale(.8);opacity:.9}
@@ -205,7 +206,9 @@
       .gallery-arrow{top:auto;bottom:28px;}
       .gallery-arrow.prev{left:28%;}
       .gallery-arrow.next{right:28%;}
-      .gallery-heading{top:-10px;}
+      /* FIX: Prevent clipping */
+      .gallery-heading{top:0; width:100%; padding:0 10px;}
+      .gallery-heading strong{white-space:nowrap;}
     }
 
     /* Why Us Section */
@@ -237,7 +240,7 @@
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
 
-<!-- Loader (identical to all pages) -->
+<!-- Loader -->
 <div id="pageLoader" class="page-loader">
   <div class="loader-backdrop"></div>
   <div class="loader-card">
@@ -287,7 +290,7 @@
     <a href="shop.html" class="button magic-hover">Explore the collection →</a>
   </div>
 
-  <!-- Memory Constellation Gallery (fixed) -->
+  <!-- Memory Constellation Gallery -->
   <div class="hero-gallery" id="heroGallery">
     <div class="memory-gallery" aria-label="Seven magical memories">
       <div class="gallery-orbit"></div>
@@ -477,7 +480,7 @@
       hamburger.classList.toggle('active');
     };
 
-    // ===== Memory Constellation =====
+    // ===== Memory Constellation (FIXED for mobile) =====
     const memoryCards = document.querySelectorAll(".memory-card");
     const dotBox = document.querySelector(".gallery-dots");
     const prevMemory = document.querySelector(".gallery-arrow.prev");
@@ -493,7 +496,10 @@
 
     function focusMemory(index) {
       memoryIndex = (index + 7) % 7;
-      const offsets = [
+      
+      // FIX: Detect mobile width and use matching offsets
+      const isMobile = window.innerWidth <= 700;
+      const offsetsDesktop = [
         [-345, 67, -11, 0.7, 0.68, 2],
         [-240, -37, -6, 0.8, 0.82, 4],
         [-120, -72, -3, 0.9, 0.94, 6],
@@ -502,6 +508,17 @@
         [240, -22, 7, 0.8, 0.82, 4],
         [345, 72, 12, 0.7, 0.68, 2]
       ];
+      const offsetsMobile = [
+        [-100, 40, -12, 0.6, 0.65, 2],
+        [-65, 0, -7, 0.7, 0.8, 4],
+        [-30, -30, -3, 0.8, 0.9, 6],
+        [0, -40, 1, 0.9, 1, 10],
+        [30, -30, 4, 0.8, 0.9, 6],
+        [65, 0, 7, 0.7, 0.8, 4],
+        [100, 40, 12, 0.6, 0.65, 2]
+      ];
+      const offsets = isMobile ? offsetsMobile : offsetsDesktop;
+      
       memoryCards.forEach(function(card, i) {
         const pos = (i - memoryIndex + 7) % 7;
         const data = offsets[pos];
@@ -714,7 +731,7 @@
 </script>
 <script>
 (function() {
-  // ===== Audio Manager (same as all pages) =====
+  // ===== Audio Manager =====
   const audioManager = {
     muted: false, currentTheme: null, audioElements: [], config: null, started: false,
     defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.5 }, { src: 's2d.mp3', volume: 0.3 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.5 }, { src: 's2n.mp3', volume: 0.5 }]}},
