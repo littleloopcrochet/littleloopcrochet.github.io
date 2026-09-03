@@ -37,36 +37,31 @@
       --doodle-color:#f2a6b8; --glow-color: rgba(215,149,167,0.4);
 
       /* ===== CONTENT / LAYOUT PARAMETERS ===== */
-      /* Move content down/up on every page (increase to push down) */
       --content-padding-top: 110px; 
-
-      /* Image height on desktop (smaller = more room for text) */
       --photo-max-height: 280px;
 
       /* Text sizes - Desktop */
-      --desc-font-size: 18px;  /* Description text */
-      --sticker-font-size: 18px; /* Name sticker text */
+      --desc-font-size: 18px;  
+      --sticker-font-size: 18px;
+
+      /* ===== FRONT COVER TEXT & LOGO ===== */
+      --cover-title: "Our Handmade Collection";
+      --cover-title-size: 42px;
+      --cover-title-color: #f2a6b8;
+      --cover-tap-text: "tap to open";
+      --cover-tap-size: 20px;
+      --cover-tap-color: #f2a6b8;
+      --cover-bg-opacity: 0.5;
     }
 
-    /* ===== MOBILE OVERRIDES ===== */
     @media(max-width:750px){
       :root {
-        /* Mobile specific values */
-        --content-padding-top: 55px;  /* Keep same or adjust separately */
-        
-        /* Smaller image on mobile */
+        --content-padding-top: 55px;
         --photo-max-height: 220px;
-
-        /* Text sizes - Mobile */
         --desc-font-size: 8px;
         --sticker-font-size: 8px;
       }
     }
-
-    /* ============================================================
-       ============================================================
-       ===== END OF ADJUSTABLE PARAMETERS ==========================
-       ============================================================ */
 
     body.dark {
       --bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd;
@@ -76,6 +71,9 @@
       --page-bg:#1a1420; --page-line:#2e2438; --frame-bg:#241d2c; --frame-border:#3a2f45;
       --text-sticker-bg:#2e2438; --text-sticker-border:#5b4a6b; --sticker-bg:#bd7cff;
       --sticker-text:#ffffff; --doodle-color:#bd7cff; --glow-color: rgba(189,124,255,0.5);
+      --cover-title-color: #bd7cff;
+      --cover-tap-color: #bd7cff;
+      --cover-bg-opacity: 0.5;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:auto; overflow-x:hidden;}
@@ -182,7 +180,6 @@
     .shop-banner h1 { font-size: 3rem; margin-bottom: 15px; color: var(--text); }
     .shop-banner p { font-size: 1.2rem; color: var(--text-soft); max-width: 600px; margin: 0 auto; }
 
-    /* CONTAINER HEIGHT: DESKTOP 700px, MOBILE 450px */
     #flipbook-container {
       width: 100%;
       max-width: 1040px;
@@ -207,7 +204,6 @@
 
     .page { background: transparent; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: visible; }
     
-    /* FIXED: Cover now fills the entire page */
     .cover { 
       background-image: url('logo.png'); 
       background-size: cover; 
@@ -223,13 +219,31 @@
       width: 100%;
       height: 100%;
     }
-    .cover-text { background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px; font-family: 'Caveat', cursive; color: #f2a6b8; }
-    body.dark .cover-text { color: #bd7cff; }
-    .cover h1 { font-size: 42px; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-    .tap-to-open { font-family: 'Caveat', cursive; font-size: 20px; color: #f2a6b8; opacity: 0.4; margin-top: 20px; cursor: pointer; transition: opacity 0.3s, transform 0.3s; }
+    .cover-text { 
+      background: rgba(0,0,0,var(--cover-bg-opacity)); 
+      padding: 10px 20px; 
+      border-radius: 10px; 
+      font-family: 'Caveat', cursive; 
+      color: var(--cover-title-color); 
+    }
+    body.dark .cover-text { color: var(--cover-title-color); }
+    .cover h1 { 
+      font-size: var(--cover-title-size); 
+      margin: 0; 
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
+      content: var(--cover-title);
+    }
+    .tap-to-open { 
+      font-family: 'Caveat', cursive; 
+      font-size: var(--cover-tap-size); 
+      color: var(--cover-tap-color); 
+      opacity: 0.4; 
+      margin-top: 20px; 
+      cursor: pointer; 
+      transition: opacity 0.3s, transform 0.3s; 
+    }
     .tap-to-open:hover { opacity: 1; transform: scale(1.1); }
 
-    /* FIXED: Content moved down using var(--content-padding-top) */
     .diary-page {
       background: var(--page-bg);
       background-image: repeating-linear-gradient(transparent, transparent 27px, var(--page-line) 28px);
@@ -259,22 +273,58 @@
     .photo-pop { position: absolute; pointer-events: none; z-index: 15; object-fit: contain; }
     
     .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; max-height: 65%; margin-top: 10px; z-index: 10; }
-    .photo-frame { background: var(--frame-bg); padding: 8px 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid var(--frame-border); width: 100%; max-width: 100%; transition: transform 0.3s, box-shadow 0.3s; }
-    .photo-frame:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px var(--glow-color); }
     
-    /* FIXED: Desktop photos now show the entire image without zooming/cropping */
+    /* ===== FIXED: Borders added to match mobile ===== */
+    .photo-frame { 
+      background: var(--frame-bg); 
+      padding: 8px 8px 20px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+      border: 1px solid var(--frame-border); 
+      width: 100%; 
+      max-width: 100%; 
+      transition: transform 0.3s, box-shadow 0.3s; 
+    }
+    .photo-frame:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px var(--glow-color); }
     .photo-frame img { 
       width: 100%; 
       height: auto; 
       max-height: var(--photo-max-height); 
-      object-fit: contain;  /* Changed from cover to contain */
+      object-fit: contain; 
       display: block; 
     }
     
-    .name-sticker { position: absolute; bottom: -12px; right: -12px; background: var(--sticker-bg); color: var(--sticker-text); padding: 8px 15px; border: 2px solid white; border-radius: 8px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); z-index: 10; transform: rotate(-12deg); transition: transform 0.3s, box-shadow 0.3s; }
+    .name-sticker { 
+      position: absolute; 
+      bottom: -12px; 
+      right: -12px; 
+      background: var(--sticker-bg); 
+      color: var(--sticker-text); 
+      padding: 8px 15px; 
+      border: 2px solid white; 
+      border-radius: 8px; 
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3); 
+      z-index: 10; 
+      transform: rotate(-12deg); 
+      transition: transform 0.3s, box-shadow 0.3s; 
+    }
     .name-sticker:hover { transform: rotate(-12deg) translateY(-3px) scale(1.05); box-shadow: 2px 2px 8px rgba(0,0,0,0.4), 0 0 15px var(--glow-color); }
     .name-sticker h3 { margin: 0; font-size: var(--sticker-font-size); font-weight: bold; }
-    .diary-text { background: var(--text-sticker-bg); border: 2px solid var(--text-sticker-border); border-radius: 10px; padding: 8px 12px; font-family: 'Caveat', cursive; font-size: var(--desc-font-size); color: var(--text-soft); text-align: center; max-width: 85%; margin-top: 10px; transform: rotate(2deg); z-index: 10; transition: transform 0.3s, box-shadow 0.3s; }
+    
+    .diary-text { 
+      background: var(--text-sticker-bg); 
+      border: 2px solid var(--text-sticker-border); 
+      border-radius: 10px; 
+      padding: 8px 12px; 
+      font-family: 'Caveat', cursive; 
+      font-size: var(--desc-font-size); 
+      color: var(--text-soft); 
+      text-align: center; 
+      max-width: 85%; 
+      margin-top: 10px; 
+      transform: rotate(2deg); 
+      z-index: 10; 
+      transition: transform 0.3s, box-shadow 0.3s; 
+    }
     .diary-text:hover { transform: rotate(2deg) translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
     .add-to-cart-page-btn { background: var(--accent); color: white; border: none; border-radius: 50px; padding: 8px 20px; font-family: inherit; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.3s, transform 0.3s; }
@@ -283,7 +333,7 @@
     .add-to-cart-page-btn.cart-counter button { background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .add-to-cart-page-btn.cart-counter span { min-width: 16px; text-align: center; font-weight: bold; }
 
-    /* CONFETTI EFFECT (FULLY RESTORED) */
+    /* CONFETTI EFFECT */
     .confetti-container {
       position: absolute;
       top: 0;
@@ -460,7 +510,7 @@
     window.addToCartFromPage = function(btn, event) { if (event) event.stopPropagation(); if (!currentUser) { alert('Please sign in to add items to your cart.'); return; } const productId = btn.dataset.productId; if (!productId) return; if (btn.dataset.processing === 'true') return; btn.dataset.processing = 'true'; const item = { id: productId, name: btn.dataset.name, price: parseFloat(btn.dataset.price), image: btn.dataset.image || btn.dataset.emoji || '', quantity: 1 }; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (doc.exists) { const newQty = doc.data().quantity + 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } else { transaction.set(cartRef, item); return 1; } }); }).then(function(newQty) { updateButtonToCounter(btn, newQty); const page = btn.closest('.diary-page'); if (page) launchConfetti(page); }).catch(function(err) { console.error("Error adding to cart: ", err); btn.dataset.processing = 'false'; }); };
     window.handleMinus = function(clickedBtn, event) { event.stopPropagation(); const btn = clickedBtn.closest('.add-to-cart-page-btn'); decreaseCart(btn.dataset.productId, event, btn); };
     window.handlePlus = function(clickedBtn, event) { event.stopPropagation(); const btn = clickedBtn.closest('.add-to-cart-page-btn'); increaseCart(btn.dataset.productId, event, btn); };
-    window.increaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return; const newQty = doc.data().quantity + 1; transaction.update(cartRef, { quantity: newQty }); return newQty; }); }).then(function(newQty) { if (btn) updateButtonToCounter(btn, newQty); }).catch(function() { if (btn) btn.dataset.processing = 'false'; }); };
+    window.increaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return; const newQty = doc.data().quantity + 1; transaction.update(cartRef, { quantity: newQty }); return newQty; }); }).then(function(newQty) { if (btn) updateButtonToCounter(btn, newQty); const page = btn.closest('.diary-page'); if (page) launchConfetti(page); }).catch(function() { if (btn) btn.dataset.processing = 'false'; }); };
     window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }); };
     function launchConfetti(pageElement) {
       const existing = pageElement.querySelector('.confetti-container');
@@ -511,7 +561,6 @@
       const flipbookDiv = document.getElementById('flipbook');
       const container = document.getElementById('flipbook-container');
       
-      // Use the consolidated config
       const useMobile = window.innerWidth <= 750;
       const config = useMobile ? BOOK_CONFIG.mobile : BOOK_CONFIG.desktop;
       let pageWidth = config.width; let pageHeight = config.height;
