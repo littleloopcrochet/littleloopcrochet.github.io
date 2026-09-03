@@ -28,7 +28,6 @@
     body{font-family:"Comfortaa",sans-serif;background:transparent;color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden}
     a{color:inherit;text-decoration:none}
 
-    /* Navigation */
     nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:10080;transition:background .5s ease}
     nav a, nav .logo, .nav-links a { text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
     body.dark nav a, body.dark nav .logo, body.dark .nav-links a { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
@@ -73,7 +72,6 @@
       .theme-toggle,.mute-toggle{width:34px;height:34px;font-size:1rem;}
     }
 
-    /* Modal */
     .modal { display: none !important; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
     .modal.show { display: flex !important; align-items: center; justify-content: center; }
     .modal-content { background-color: var(--surface); padding: 40px; border-radius: 30px; width: 90%; max-width: 400px; box-shadow: 0 25px 80px rgba(0,0,0,0.3); position: relative; animation: modalSlideIn .3s ease; border: 1px solid rgba(255,255,255,0.2); }
@@ -104,7 +102,6 @@
     .auth-loading.show { display: flex; }
     .auth-loading span { font-size: 1rem; color: var(--accent); font-weight: 600; }
 
-    /* Loader */
     body.is-loading{overflow:hidden}
     body.is-loading > *:not(#pageLoader):not(nav){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
@@ -121,19 +118,16 @@
     @keyframes yarnBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}}
     .loader-percent{margin-top:13px;color:var(--accent);font-size:.68rem;font-weight:700}
 
-    /* Background & Z-index */
     body{position:relative;isolation:isolate}
     #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block}
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))}
     .shop-page,footer{position:relative;z-index:2}
 
-    /* Shop Page */
     .shop-page { min-height: 80vh; padding: 100px 7%; }
     .shop-banner { background: linear-gradient(135deg, var(--pink), var(--yellow)); border-radius: 35px; padding: 50px; margin-bottom: 60px; text-align: center; box-shadow: 0 20px 60px var(--shadow); border: 1px solid rgba(255,255,255,0.4); }
     .shop-banner h1 { font-size: 3rem; margin-bottom: 15px; color: var(--text); }
     .shop-banner p { font-size: 1.2rem; color: var(--text-soft); max-width: 600px; margin: 0 auto; }
 
-    /* Flipbook container - FIXED MOBILE */
     #flipbook-container {
       width: 100%;
       max-width: 1040px;
@@ -151,7 +145,7 @@
       transform: translateY(-10px) scale(1.02);
       box-shadow: 0 20px 60px var(--shadow), 0 0 40px var(--glow-color);
     }
-    #flipbook { position: relative; }
+    #flipbook { position: relative; transform-origin: center center; transition: none; } /* transition: none for initial load */
 
     .page { background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: visible; }
     .cover { background-image: url('logo.png'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; position: relative; }
@@ -192,7 +186,6 @@
 
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
 
-    /* MOBILE FIXES - REDUCED BOOK SIZE */
     @media(max-width:750px){
       nav{padding:20px 6%}
       .shop-page{padding: 60px 6%}
@@ -202,7 +195,6 @@
       #flipbook-container { height: auto; max-width: 100%; width: 100%; margin: 0 auto; overflow: hidden; padding: 0 10px; box-sizing: border-box; }
     }
 
-    /* Magic particles & hearts */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
     .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
     .butterfly .body{position:absolute;left:50%;top:50%;width:3px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#7d6877;z-index:3;}
@@ -219,11 +211,8 @@
     @keyframes heartBubble{0%{opacity:0;transform:translate(0,5px) scale(.25) rotate(-12deg)}15%{opacity:1;transform:translate(0,0) scale(.85) rotate(5deg)}45%{transform:translate(var(--heart-x),-24px) scale(1) rotate(-8deg)}75%{opacity:.85;transform:translate(calc(var(--heart-x) * .7),-45px) scale(.85) rotate(9deg)}100%{opacity:0;transform:translate(calc(var(--heart-x) * 1.4),-70px) scale(.05) rotate(-15deg)}}
   </style>
 </head>
-
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
-
-<!-- Loader -->
 <div id="pageLoader" class="page-loader">
   <div class="loader-backdrop"></div>
   <div class="loader-card">
@@ -232,8 +221,6 @@
     <div class="loader-percent" id="loaderPercent">0%</div>
   </div>
 </div>
-
-<!-- Navigation -->
 <nav>
   <a href="index.html" class="logo magic-hover">♡ Little Loop</a>
   <div class="nav-actions">
@@ -254,8 +241,6 @@
     <button id="logoutBtn" class="logout-btn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text);" onclick="logout()" title="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button>
   </div>
 </nav>
-
-<!-- SHOP CONTENT -->
 <section class="shop-page">
   <div class="shop-banner">
     <h1>Our Handmade Collection</h1>
@@ -263,13 +248,10 @@
   </div>
   <div id="flipbook-container"><div id="flipbook"></div></div>
 </section>
-
 <footer>
   <p>♡ Little Loop Crochet</p>
   <p>Made by hand · Made with love</p>
 </footer>
-
-<!-- LOGIN MODAL -->
 <div id="loginModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
@@ -306,7 +288,6 @@
     </form>
   </div>
 </div>
-
 <script>
   const firebaseConfig = { apiKey: "AIzaSyCeiXIZhofwxkUrWkowZuiMSHyRcsfeHE0", authDomain: "littleloopcrochet-2dcdf.firebaseapp.com", projectId: "littleloopcrochet-2dcdf", storageBucket: "littleloopcrochet-2dcdf.firebasestorage.app", messagingSenderId: "837032344744", appId: "1:837032344744:web:41f17ab83bb6071240969d", measurementId: "G-1F2GVL84HC" };
   firebase.initializeApp(firebaseConfig);
@@ -315,15 +296,12 @@
 
   (function() {
     'use strict';
-    
-    // Loader
     const pageLoader = document.getElementById('pageLoader');
     const progressBar = document.querySelector('.yarn-progress');
     const percentDisplay = document.getElementById('loaderPercent');
     let progress = 0, finished = false;
     const startTime = performance.now();
     const MIN_LOAD_TIME = 500;
-    
     function setProgress(value) { progress = Math.max(progress, Math.min(100, value)); progressBar.style.width = progress + '%'; percentDisplay.textContent = Math.round(progress) + '%'; }
     const ticker = setInterval(function() { if(finished) return; if(progress < 95) { setProgress(progress + Math.max(0.5, (95 - progress) * 0.04)); } }, 80);
     function finishLoading() { if(finished) return; finished = true; const wait = Math.max(0, MIN_LOAD_TIME - (performance.now() - startTime)); setTimeout(function(){ clearInterval(ticker); setProgress(100); setTimeout(function(){ pageLoader.classList.add('loaded'); document.body.classList.remove('is-loading'); setTimeout(() => pageLoader.remove(), 750); }, 400); }, wait); }
@@ -340,27 +318,25 @@
     // Hamburger
     window.toggleMenu = function() { const navRight = document.getElementById('navRight'); const hamburger = document.querySelector('.hamburger'); navRight.classList.toggle('open'); hamburger.classList.toggle('active'); };
 
-    // Auth Logic
+    // Auth
     let currentUser = null;
     auth.onAuthStateChanged(function(user) { currentUser = user; const authButtonText = document.getElementById('authButtonText'); const logoutBtn = document.getElementById('logoutBtn'); if (user) { authButtonText.textContent = user.displayName || user.phoneNumber || 'Account'; logoutBtn.style.display = 'inline-flex'; loadCartData(); } else { authButtonText.textContent = 'Sign In'; logoutBtn.style.display = 'none'; resetCartButtons(); } });
-
     window.openAuthModal = function() { if (currentUser) return; document.getElementById('loginModal').classList.add('show'); switchTab('signin'); };
     window.logout = function() { auth.signOut().then(function() { window.location.href = 'index.html'; }); };
     window.switchTab = function(tab) { const signInForm = document.getElementById('signInForm'); const signUpForm = document.getElementById('signUpForm'); const phoneForm = document.getElementById('phoneForm'); const modalTitle = document.getElementById('modalTitle'); const signInTab = document.getElementById('signInTab'); const signUpTab = document.getElementById('signUpTab'); const phoneTab = document.getElementById('phoneTab'); if (tab === 'signin') { signInForm.style.display = 'block'; signUpForm.style.display = 'none'; phoneForm.style.display = 'none'; modalTitle.textContent = 'Welcome back'; signInTab.classList.add('active'); signUpTab.classList.remove('active'); phoneTab.classList.remove('active'); } else if (tab === 'phone') { signInForm.style.display = 'none'; signUpForm.style.display = 'none'; phoneForm.style.display = 'block'; modalTitle.textContent = 'Sign in with Phone'; phoneTab.classList.add('active'); signInTab.classList.remove('active'); signUpTab.classList.remove('active'); } else { signInForm.style.display = 'none'; signUpForm.style.display = 'block'; phoneForm.style.display = 'none'; modalTitle.textContent = 'Create your account'; signUpTab.classList.add('active'); signInTab.classList.remove('active'); phoneTab.classList.remove('active'); } };
 
     // Cart Logic
-    function loadCartData() { if (!currentUser) return; db.collection('users').doc(currentUser.uid).collection('cart').get().then(function(snapshot) { const cartMap = {}; snapshot.forEach(function(doc) { cartMap[doc.id] = doc.data().quantity || 1; }); document.querySelectorAll('.add-to-cart-page-btn').forEach(function(btn) { const productId = btn.dataset.productId; if (cartMap[productId]) { updateButtonToCounter(btn, cartMap[productId]); } }); }).catch(function(err) { console.error("Error loading cart: ", err); }); }
+    function loadCartData() { if (!currentUser) return; db.collection('users').doc(currentUser.uid).collection('cart').get().then(function(snapshot) { const cartMap = {}; snapshot.forEach(function(doc) { cartMap[doc.id] = doc.data().quantity || 1; }); document.querySelectorAll('.add-to-cart-page-btn').forEach(function(btn) { const productId = btn.dataset.productId; if (cartMap[productId]) { updateButtonToCounter(btn, cartMap[productId]); } }); }); }
     function resetCartButtons() { document.querySelectorAll('.add-to-cart-page-btn').forEach(function(btn) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; }); }
     function updateButtonToCounter(btn, quantity) { btn.innerHTML = `<button class="cart-minus" onclick="handleMinus(this, event)">−</button><span>${quantity}</span><button class="cart-plus" onclick="handlePlus(this, event)">+</button>`; btn.classList.add('cart-counter'); btn.style.display = 'inline-flex'; btn.dataset.quantity = quantity; btn.dataset.processing = 'false'; }
-    
     window.addToCartFromPage = function(btn, event) { if (event) event.stopPropagation(); if (!currentUser) { alert('Please sign in to add items to your cart.'); return; } const productId = btn.dataset.productId; if (!productId) return; if (btn.dataset.processing === 'true') return; btn.dataset.processing = 'true'; const item = { id: productId, name: btn.dataset.name, price: parseFloat(btn.dataset.price), image: btn.dataset.image || btn.dataset.emoji || '', quantity: 1 }; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (doc.exists) { const newQty = doc.data().quantity + 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } else { transaction.set(cartRef, item); return 1; } }); }).then(function(newQty) { updateButtonToCounter(btn, newQty); const page = btn.closest('.diary-page'); if (page) launchConfetti(page); }).catch(function(err) { console.error("Error adding to cart: ", err); btn.dataset.processing = 'false'; }); };
     window.handleMinus = function(clickedBtn, event) { event.stopPropagation(); const btn = clickedBtn.closest('.add-to-cart-page-btn'); decreaseCart(btn.dataset.productId, event, btn); };
     window.handlePlus = function(clickedBtn, event) { event.stopPropagation(); const btn = clickedBtn.closest('.add-to-cart-page-btn'); increaseCart(btn.dataset.productId, event, btn); };
     window.increaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return; const newQty = doc.data().quantity + 1; transaction.update(cartRef, { quantity: newQty }); return newQty; }); }).then(function(newQty) { if (btn) updateButtonToCounter(btn, newQty); }).catch(function() { if (btn) btn.dataset.processing = 'false'; }); };
-    window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }).catch(function() { if (btn) btn.dataset.processing = 'false'; }); };
+    window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }); };
     function launchConfetti(pageElement) { const existing = pageElement.querySelector('.confetti-container'); if (existing) existing.remove(); const container = document.createElement('div'); container.className = 'confetti-container'; pageElement.appendChild(container); const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4']; const pieces = 180; for (let i = 0; i < pieces; i++) { const confetti = document.createElement('span'); confetti.className = 'confetti-piece'; confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; confetti.style.left = (5 + Math.random() * 90) + '%'; confetti.style.width = (6 + Math.random() * 8) + 'px'; confetti.style.height = (6 + Math.random() * 8) + 'px'; confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px'; confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's'; confetti.style.animationDelay = (Math.random() * 0.5) + 's'; container.appendChild(confetti); } setTimeout(() => { if (container.parentNode) container.remove(); }, 5000); }
 
-    // ===== FLIPBOOK (FIXED FOR MOBILE) =====
+    // ===== FLIPBOOK WITH SCALING FIX =====
     const defaultPages = [
       { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
       { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, hand-knitted.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -375,13 +351,29 @@
 
     async function loadFlipbook() {
       try { const response = await fetch('pages.json'); if (!response.ok) throw new Error('Not found'); const data = await response.json(); pagesData = data.pages || defaultPages; } catch (e) { pagesData = defaultPages; }
-      // Small delay to ensure DOM is ready
       setTimeout(() => initFlipbook(pagesData), 200);
+    }
+
+    function fitBookToContainer() {
+      const container = document.getElementById('flipbook-container');
+      const flipbookDiv = document.getElementById('flipbook');
+      flipbookDiv.style.transform = 'scale(1)';
+      const bookWidth = flipbookDiv.scrollWidth || flipbookDiv.offsetWidth;
+      const bookHeight = flipbookDiv.scrollHeight || flipbookDiv.offsetHeight;
+      if (!bookWidth || !bookHeight) return;
+      const availW = container.clientWidth;
+      const availH = container.clientHeight;
+      const scale = Math.min(availW / bookWidth, availH / bookHeight, 1);
+      flipbookDiv.style.transformOrigin = 'center center';
+      flipbookDiv.style.transform = `scale(${scale})`;
+      // Adjust container height to match scaled book (prevents extra whitespace on mobile)
+      container.style.height = (bookHeight * scale) + 'px';
     }
 
     function initFlipbook(pages) {
       const flipbookDiv = document.getElementById('flipbook');
       flipbookDiv.innerHTML = '';
+      flipbookDiv.style.transform = 'none';
       const pageElements = [];
       pageElements.push(createCoverPage(true, 'Our Handmade Collection'));
       pages.forEach((pageInfo, idx) => { pageElements.push(createContentPage(pageInfo, idx)); });
@@ -390,7 +382,6 @@
 
       if (flipbook) flipbook.destroy();
 
-      // SAFER WIDTH CALCULATION
       let pageWidth = 500;
       let pageHeight = 700;
       const container = document.getElementById('flipbook-container');
@@ -400,13 +391,16 @@
         pageWidth = Math.min(340, containerWidth - 20);
         if (pageWidth < 200) pageWidth = Math.max(200, window.innerWidth - 40);
         pageHeight = Math.round(pageWidth * 1.4);
+      } else {
+        pageWidth = Math.min(500, Math.max(260, containerWidth / 2 - 20));
+        pageHeight = Math.round(pageWidth * 1.4);
       }
 
       try {
         flipbook = new St.PageFlip(flipbookDiv, { width: pageWidth, height: pageHeight, size: 'fixed', showCover: true, usePortrait: false, maxShadowOpacity: 0.5, mobileScrollSupport: false, drawShadow: true, flippingTime: 600 });
         flipbook.loadFromHTML(pageElements);
-        flipbookDiv.style.width = pageWidth + 'px';
-        flipbookDiv.style.height = pageHeight + 'px';
+        // No manual width/height on flipbookDiv – let PageFlip size it naturally.
+        requestAnimationFrame(() => requestAnimationFrame(fitBookToContainer));
       } catch (e) {
         console.error("Flipbook failed, using Grid Fallback:", e);
         renderGridFallback();
@@ -419,7 +413,7 @@
     function renderGridFallback() {
       const container = document.getElementById('flipbook-container');
       container.style.height = 'auto';
-      container.innerHTML = '<div class="grid-fallback">' + pagesData.map(p => `<div class="grid-item"><div class="grid-img">${p.image ? `<img src="${p.image}">` : `<span style="font-size:4rem;">${p.emoji || '🧸'}</span>`}</div><h3>${p.name}</h3><p>${p.description}</p><p style="font-weight:bold; color:var(--accent);">₹${p.price}</p><button class="add-to-cart-page-btn" onclick="addToCartFromPage(this, event)" data-product-id="${p.id}" data-name="${p.name}" data-price="${p.price}" data-image="${p.image || ''}" data-emoji="${p.emoji || ''}">Add to Cart</button></div>`).join('') + '</div>';
+      container.innerHTML = '<div class="grid-fallback">' + pagesData.map(p => `<div class="grid-item"><div class="grid-img">${p.image ? `<img src="${p.image}">` : `<span style="font-size:4rem;">${p.emoji || '🧸'}</span>`}</div><h3>${p.name}</h3><p>${p.description}</p><p style="font-weight:bold; color:var(--accent);">₹${p.price}</p><button class="add-to-cart-page-btn" onclick="addToCartFromPage(this, event)" data-product-id="${p.id}" data-name="${p.name}" data-price="${p.price}">Add to Cart</button></div>`).join('') + '</div>';
       const style = document.createElement('style');
       style.innerHTML = `.grid-fallback{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:20px;} .grid-item{background:var(--card);border-radius:20px;padding:20px;text-align:center;box-shadow:0 5px 15px var(--shadow);} .grid-img{width:100%;height:200px;object-fit:cover;border-radius:10px;background:var(--pink);display:flex;align-items:center;justify-content:center;margin-bottom:10px;} .grid-img img{width:100%;height:100%;object-fit:cover;border-radius:10px;} .grid-item h3{font-size:1.2rem;margin-bottom:5px;} .grid-item p{font-size:0.9rem;color:var(--muted);margin-bottom:5px;} @media(max-width:750px){.grid-fallback{grid-template-columns:1fr;}}`;
       document.head.appendChild(style);
@@ -458,14 +452,12 @@
 
     window.openBook = function() { if (flipbook) flipbook.flipNext(); };
 
-    // Ensure load after DOM ready
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', loadFlipbook); } else { loadFlipbook(); }
 
-    // Reinitialize on resize
     let resizeTimeout;
     window.addEventListener('resize', function() { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(function() { if (typeof pagesData !== 'undefined') initFlipbook(pagesData); }, 300); });
 
-    // ===== MAGIC PARTICLES & HEARTS =====
+    // Magic particles
     let particleInterval = null, activeMagicElement = null;
     const magicContainer = document.createElement('div'); magicContainer.className = 'magic-particles'; document.body.appendChild(magicContainer);
     function randomNumber(min, max) { return Math.random() * (max - min) + min; }
@@ -491,15 +483,16 @@
     }
     function startMagic(element) { if (element.classList.contains('heart-hover')) return; activeMagicElement = element; if (particleInterval !== null) return; for (let i = 0; i < 3; i++) { createMagicParticle(element); } particleInterval = setInterval(function() { if (activeMagicElement) { for (let i = 0; i < 3; i++) { createMagicParticle(activeMagicElement); } } }, 650); }
     function stopMagic() { activeMagicElement = null; if (particleInterval !== null) { clearInterval(particleInterval); particleInterval = null; } }
+    document.addEventListener('mouseover', function(e) { const elem = e.target.closest('.magic-hover'); if (elem && !elem._magicActive) { elem._magicActive = true; startMagic(elem); } });
+    document.addEventListener('mouseout', function(e) { const elem = e.target.closest('.magic-hover'); if (elem && elem._magicActive) { elem._magicActive = false; stopMagic(); } });
+
+    // Hearts
     function getHeartColour(text) { if (text.includes('🤍')) return '🤍'; if (text.includes('🖤')) return '🖤'; if (text.includes('💜')) return '💜'; if (text.includes('❤️') || text.includes('♥')) return '♥'; return '♥'; }
     document.querySelectorAll('*').forEach(function(element) { const directText = Array.from(element.childNodes).filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join(''); if (directText.includes('♡') || directText.includes('♥') || directText.includes('❤️') || directText.includes('🤍') || directText.includes('🖤') || directText.includes('💜')) { element.classList.add('heart-hover'); element.classList.remove('magic-hover'); } });
     let heartInterval = null, activeHeartElement = null;
     function createHeartBubble(element) { if (!element || !element.isConnected) return; const rect = element.getBoundingClientRect(); const heart = document.createElement('span'); heart.className = 'heart-bubble'; heart.textContent = getHeartColour(element.textContent); heart.style.setProperty('--heart-x', Math.floor(Math.random() * 40 - 20) + 'px'); heart.style.fontSize = (10 + Math.random() * 8) + 'px'; heart.style.left = (rect.left + rect.width / 2 + randomNumber(-5, 5)) + 'px'; heart.style.top = (rect.top + rect.height / 2) + 'px'; document.body.appendChild(heart); setTimeout(function() { heart.remove(); }, 1400); }
     function startHeartMagic(element) { stopMagic(); activeHeartElement = element; if (heartInterval !== null) return; createHeartBubble(element); heartInterval = setInterval(function() { if (activeHeartElement) { createHeartBubble(activeHeartElement); } }, 420); }
     function stopHeartMagic() { activeHeartElement = null; if (heartInterval !== null) { clearInterval(heartInterval); heartInterval = null; } }
-    
-    document.addEventListener('mouseover', function(e) { const elem = e.target.closest('.magic-hover'); if (elem && !elem._magicActive) { elem._magicActive = true; startMagic(elem); } });
-    document.addEventListener('mouseout', function(e) { const elem = e.target.closest('.magic-hover'); if (elem && elem._magicActive) { elem._magicActive = false; stopMagic(); } });
     document.addEventListener('mouseover', function(e) { const elem = e.target.closest('.heart-hover'); if (elem && !elem._heartActive) { elem._heartActive = true; startHeartMagic(elem); } });
     document.addEventListener('mouseout', function(e) { const elem = e.target.closest('.heart-hover'); if (elem && elem._heartActive) { elem._heartActive = false; stopHeartMagic(); } });
 
@@ -512,9 +505,8 @@
       const mouse = { x: .5, y: .5, tx: .5, ty: .5 };
       let stars = [], clouds = [], butterflies = [], fireflies = [], meteors = [], flowers = [], reeds = [], birds = [];
       const rand = (a, b) => a + Math.random() * (b - a), lerp = (a, b, t) => a + (b - a) * t;
-      
+
       function resize() { width = innerWidth; height = innerHeight; dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = width * dpr; canvas.height = height * dpr; canvas.style.width = width + 'px'; canvas.style.height = height + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); init(); }
-      
       function init() {
         stars = Array.from({ length: 145 }, () => ({ x: rand(0, 1), y: rand(.025, .56), r: rand(.3, 1.35), p: rand(0, 6.28), tw: rand(.5, 1.8) }));
         clouds = Array.from({ length: 6 }, () => ({ x: rand(-.3, 1), y: rand(.08, .32), w: rand(130, 290), h: rand(28, 70), s: rand(.008, .018), a: rand(.16, .34) }));
@@ -525,9 +517,7 @@
         reeds = Array.from({ length: 90 }, () => ({ x: rand(0, 1), y: rand(.67, .99), h: rand(13, 45), p: rand(0, 6.28), a: rand(.25, .75) }));
         birds = Array.from({ length: 4 }, () => ({ x: rand(.1, .9), y: rand(.18, .38), v: rand(.00005, .00011), p: rand(0, 6.28) }));
       }
-      
       function hill(y, amp, phase) { ctx.beginPath(); ctx.moveTo(-10, height * y); for (let x = -10; x <= width + 10; x += Math.max(18, width / 20)) { const n = x / width; const yy = height * (y + Math.sin(n * 7 + phase) * amp + Math.sin(n * 2.8 + phase) * amp * .5); ctx.lineTo(x, yy); } ctx.lineTo(width + 10, height); ctx.lineTo(-10, height); ctx.closePath(); }
-      
       function drawSky() {
         const g = ctx.createLinearGradient(0, 0, 0, height);
         if (isDark) { g.addColorStop(0, '#070918'); g.addColorStop(.34, '#111a34'); g.addColorStop(.63, '#263c53'); g.addColorStop(1, '#10272b'); } else { g.addColorStop(0, '#8fd4f2'); g.addColorStop(.34, '#c4eaf4'); g.addColorStop(.62, '#f8dfc7'); g.addColorStop(1, '#b9d5bd'); }
@@ -547,7 +537,6 @@
           ctx.globalAlpha = 1;
         }
       }
-      
       function drawLandscape() {
         const p = mouse.x - .5;
         ctx.save(); ctx.translate(p * 8, 0); hill(.47, .07, .2); ctx.fillStyle = isDark ? '#26354b' : '#91b29b'; ctx.fill(); ctx.restore();
@@ -557,7 +546,6 @@
         hg.addColorStop(0, isDark ? 'rgba(150,180,205,.05)' : 'rgba(255,245,220,.20)'); hg.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.fillStyle = hg; ctx.fillRect(0, height * .54, width, height * .2);
       }
-      
       function drawWater() {
         const top = height * .68;
         const g = ctx.createLinearGradient(0, top, 0, height);
@@ -574,7 +562,6 @@
           ctx.lineWidth = 1; ctx.stroke();
         }
       }
-      
       function drawWindmill() {
         const x = width * .20 + (mouse.x - .5) * 28, y = height * .43 + (mouse.y - .5) * 6;
         ctx.save(); ctx.translate(x, y);
@@ -586,7 +573,6 @@
         for (let i = 0; i < 4; i++) { ctx.rotate(Math.PI / 2); ctx.fillStyle = isDark ? '#9c949b' : '#f8f1e7'; ctx.beginPath(); ctx.moveTo(-2, -7); ctx.lineTo(3, -7); ctx.lineTo(9, -76); ctx.lineTo(-8, -66); ctx.closePath(); ctx.fill(); }
         ctx.restore();
       }
-      
       function drawVegetation() {
         reeds.forEach(r => { const x = r.x * width + (mouse.x - .5) * 18, y = r.y * height, s = Math.sin(time * .001 + r.p) * 4; ctx.strokeStyle = isDark ? `rgba(70,105,76,${r.a})` : `rgba(47,104,67,${r.a})`; ctx.lineWidth = 1.25; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + s, y - r.h * .45, x + s * 1.4, y - r.h); ctx.stroke(); });
         flowers.forEach(f => {
@@ -603,15 +589,10 @@
           ctx.restore();
         });
       }
-      
       function drawButterflies() { if (isDark) return; butterflies.forEach(b => { b.p += .012; b.x += b.vx + Math.sin(time * .0009 + b.p) * .00008; b.y += b.vy + Math.cos(time * .0012 + b.p) * .00005; if (b.x < .03 || b.x > .97) b.vx *= -1; if (b.y < .34 || b.y > .70) b.vy *= -1; const x = b.x * width + (mouse.x - .5) * 30, y = b.y * height + (mouse.y - .5) * 14, flap = .72 + .28 * Math.sin(time * .02 + b.p); ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(b.p) * .18); ctx.globalAlpha = .72; ctx.fillStyle = `hsl(${b.h},68%,76%)`; ctx.beginPath(); ctx.ellipse(-4, -3, 6, 4.5 * flap, -.35, 0, 6.28); ctx.ellipse(-4, 3.5, 5, 3.5 * flap, .35, 0, 6.28); ctx.ellipse(4, -3, 6, 4.5 * flap, .35, 0, 6.28); ctx.ellipse(4, 3.5, 5, 3.5 * flap, -.35, 0, 6.28); ctx.fill(); ctx.fillStyle = '#63545b'; ctx.fillRect(-1, -5, 2, 10); ctx.restore(); }); }
-      
       function drawFireflies() { if (!isDark) return; fireflies.forEach(f => { f.x += f.vx + Math.sin(time * .0005 + f.p) * .00008; f.y += f.vy + Math.cos(time * .0008 + f.p) * .00005; if (f.x < .01 || f.x > .99) f.vx *= -1; if (f.y < .43 || f.y > .93) f.vy *= -1; const glow = .25 + .75 * (.5 + .5 * Math.sin(time * .0027 + f.p)), x = f.x * width, y = f.y * height; ctx.shadowColor = 'rgba(205,255,172,.8)'; ctx.shadowBlur = 15; ctx.fillStyle = `rgba(219,255,177,${.18 + .72 * glow})`; ctx.beginPath(); ctx.arc(x, y, f.r * (.65 + glow * .55), 0, 6.28); ctx.fill(); ctx.shadowBlur = 0; }); }
-      
       function drawMeteors() { if (!isDark) return; meteors.forEach(m => { if (!m.active && Math.random() < .0012) { m.active = true; m.x = rand(.15, .9) * width; m.y = rand(.02, .30) * height; m.vx = rand(7, 13); m.vy = rand(3, 6); m.life = 0; m.max = rand(28, 55); } if (m.active) { m.x += m.vx; m.y += m.vy; m.life++; const a = 1 - m.life / m.max; ctx.save(); ctx.globalAlpha = Math.max(0, a); const grad = ctx.createLinearGradient(m.x - m.vx * 7, m.y - m.vy * 7, m.x, m.y); grad.addColorStop(0, 'rgba(255,255,255,0)'); grad.addColorStop(.75, 'rgba(255,246,210,.35)'); grad.addColorStop(1, 'rgba(255,255,255,1)'); ctx.strokeStyle = grad; ctx.shadowColor = '#fff'; ctx.shadowBlur = 16; ctx.lineWidth = 1.7; ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x - m.vx * 6, m.y - m.vy * 6); ctx.stroke(); ctx.restore(); if (m.life > m.max) m.active = false; } }); }
-      
       function draw() { mouse.x = lerp(mouse.x, mouse.tx, .045); mouse.y = lerp(mouse.y, mouse.ty, .045); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height); drawSky(); drawLandscape(); drawWater(); drawWindmill(); drawVegetation(); drawButterflies(); drawFireflies(); drawMeteors(); time += 16; raf = requestAnimationFrame(draw); }
-      
       addEventListener('pointermove', e => { mouse.tx = e.clientX / width; mouse.ty = e.clientY / height; }, { passive: true });
       addEventListener('resize', resize);
       const observer = new MutationObserver(() => { const d = document.body.classList.contains('dark'); if (d !== isDark) { isDark = d; init(); } });
