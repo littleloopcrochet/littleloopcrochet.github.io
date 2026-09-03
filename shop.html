@@ -155,7 +155,7 @@
     .tap-to-open { font-family: 'Caveat', cursive; font-size: 20px; color: #f2a6b8; opacity: 0.4; margin-top: 20px; cursor: pointer; transition: opacity 0.3s, transform 0.3s; }
     .tap-to-open:hover { opacity: 1; transform: scale(1.1); }
 
-    .diary-page { background: var(--page-bg); background-image: repeating-linear-gradient(transparent, transparent 27px, var(--page-line) 28px); padding: 30px 25px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; position: relative; overflow: visible; }
+    .diary-page { background: var(--page-bg); background-image: repeating-linear-gradient(transparent, transparent 27px, var(--page-line) 28px); padding: 20px 25px 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; position: relative; overflow: visible; }
     .doodle { position: absolute; color: var(--doodle-color); z-index: 5; pointer-events: none; font-size: 22px; opacity: 0.7; }
     .doodle-1 { top: 18px; left: 20px; transform: rotate(-20deg); font-size: 20px; }
     .doodle-2 { top: 25px; right: 25px; transform: rotate(30deg); font-size: 16px; }
@@ -170,15 +170,15 @@
     .photo-pop { position: absolute; pointer-events: none; z-index: 15; object-fit: contain; }
     
     /* FIXED: Force photo container and frame to fill page width */
-    .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; max-height: 65%; margin-top: 15px; z-index: 10; }
+    .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; max-height: 65%; margin-top: 10px; z-index: 10; }
     .photo-frame { background: var(--frame-bg); padding: 8px 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid var(--frame-border); width: 100%; max-width: 100%; transition: transform 0.3s, box-shadow 0.3s; }
     .photo-frame:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px var(--glow-color); }
-    .photo-frame img { width: 100%; height: auto; max-height: 320px; object-fit: cover; display: block; }
+    .photo-frame img { width: 100%; height: auto; max-height: 280px; object-fit: cover; display: block; }
     
     .name-sticker { position: absolute; bottom: -12px; right: -12px; background: var(--sticker-bg); color: var(--sticker-text); padding: 8px 15px; border: 2px solid white; border-radius: 8px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); z-index: 10; transform: rotate(-12deg); transition: transform 0.3s, box-shadow 0.3s; }
     .name-sticker:hover { transform: rotate(-12deg) translateY(-3px) scale(1.05); box-shadow: 2px 2px 8px rgba(0,0,0,0.4), 0 0 15px var(--glow-color); }
     .name-sticker h3 { margin: 0; font-size: 15px; font-weight: bold; }
-    .diary-text { background: var(--text-sticker-bg); border: 2px solid var(--text-sticker-border); border-radius: 10px; padding: 10px 15px; font-family: 'Caveat', cursive; font-size: 18px; color: var(--text-soft); text-align: center; max-width: 85%; margin-top: 15px; transform: rotate(2deg); z-index: 10; transition: transform 0.3s, box-shadow 0.3s; }
+    .diary-text { background: var(--text-sticker-bg); border: 2px solid var(--text-sticker-border); border-radius: 10px; padding: 8px 12px; font-family: 'Caveat', cursive; font-size: 16px; color: var(--text-soft); text-align: center; max-width: 85%; margin-top: 10px; transform: rotate(2deg); z-index: 10; transition: transform 0.3s, box-shadow 0.3s; }
     .diary-text:hover { transform: rotate(2deg) translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
     .add-to-cart-page-btn { background: var(--accent); color: white; border: none; border-radius: 50px; padding: 8px 20px; font-family: inherit; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.3s, transform 0.3s; }
@@ -336,7 +336,7 @@
     window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }); };
     function launchConfetti(pageElement) { const existing = pageElement.querySelector('.confetti-container'); if (existing) existing.remove(); const container = document.createElement('div'); container.className = 'confetti-container'; pageElement.appendChild(container); const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4']; const pieces = 180; for (let i = 0; i < pieces; i++) { const confetti = document.createElement('span'); confetti.className = 'confetti-piece'; confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; confetti.style.left = (5 + Math.random() * 90) + '%'; confetti.style.width = (6 + Math.random() * 8) + 'px'; confetti.style.height = (6 + Math.random() * 8) + 'px'; confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px'; confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's'; confetti.style.animationDelay = (Math.random() * 0.5) + 's'; container.appendChild(confetti); } setTimeout(() => { if (container.parentNode) container.remove(); }, 5000); }
 
-    // ===== FLIPBOOK (ROBUST - DO NOT TOUCH) =====
+    // ===== FLIPBOOK (ROBUST - DO NOT TOUCH EXCEPT pageHeight) =====
     const defaultPages = [
       { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
       { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, hand-knitted.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -362,8 +362,9 @@
       const flipbookDiv = document.getElementById('flipbook');
       const container = document.getElementById('flipbook-container');
       
-      let pageWidth = 500; let pageHeight = 700;
-      if (window.innerWidth <= 750) { pageWidth = 300; pageHeight = 720; }
+      // FIXED: Increased page heights to fit content
+      let pageWidth = 500; let pageHeight = 800; // Desktop: 800px tall
+      if (window.innerWidth <= 750) { pageWidth = 300; pageHeight = 540; } // Mobile: 540px tall
 
       flipbookDiv.innerHTML = '';
       flipbookDiv.style.transform = 'none';
@@ -404,7 +405,6 @@
 
     function createCoverPage(isFront, title) { const page = document.createElement('div'); page.className = 'page cover'; if (isFront) { page.innerHTML = `<div class="cover-text"><h1>${title}</h1></div><div class="tap-to-open" onclick="openBook()">tap to open</div>`; } else { page.innerHTML = `<div class="cover-text"><h1>Thank You</h1><p style="margin-top:5px;">For browsing</p></div>`; } return page; }
 
-    // ===== FLIPBOOK CONTENT (FIXED GIFS AND PHOTOS) =====
     const totalGifs = 15;
     const gifStyles = { 1: { top: '-95px', left: '20%', width: '80px', transform: 'translateX(-50%)' }, 2: { top: '-90px', left: '50%', width: '200px', transform: 'translateX(-50%) rotate(10deg)' }, 3: { top: '-120px', left: '15%', width: '200px', transform: 'translateX(-50%)' }, 4: { top: '-90px', left: '55%', width: '90px', transform: 'translateX(-50%) rotate(-5deg)' }, 5: { top: '-100px', left: '55%', width: '85px', transform: 'translateX(-50%)' }, 6: { top: '-80px', left: '80%', width: '75px', transform: 'translateX(-50%) rotate(15deg)' }, 7: { top: '-110px', left: '45%', width: '155px', transform: 'translateX(-50%)' }, 8: { top: '-100px', left: '50%', width: '100px', transform: 'translateX(-50%) rotate(-10deg)' }, 9: { top: '-130px', left: '45%', width: '100px', transform: 'translateX(-50%)' }, 10:{ top: '-100px', left: '55%', width: '70px', transform: 'translateX(-50%) rotate(5deg)' }, 11:{ top: '-120px', left: '60%', width: '90px', transform: 'translateX(-50%)' }, 12:{ top: '-150px', left: '40%', width: '85px', transform: 'translateX(-50%) rotate(-15deg)' }, 13:{ top: '-80px', left: '50%', width: '75px', transform: 'translateX(-50%)' }, 14:{ top: '-110px', left: '45%', width: '95px', transform: 'translateX(-50%) rotate(10deg)' }, 15:{ top: '-140px', left: '55%', width: '80px', transform: 'translateX(-50%)' } };
     const defaultGifStyle = { top: '-150px', left: '50%', width: '80px', transform: 'translateX(-50%)' };
@@ -415,13 +415,11 @@
       const angle = (Math.random() * 10 - 5).toFixed(1);
       const imgSrc = pageInfo.image || '';
       const productId = pageInfo.id || `item-${idx}`;
-      
       const gifNum = (idx % totalGifs) + 1;
       const gifSrc = gifNum === 1 ? 'photo-pop.gif' : `photo-pop${gifNum}.gif`;
       const style = gifStyles[gifNum] || defaultGifStyle;
       const inlineStyle = `top: ${style.top}; left: ${style.left}; width: ${style.width}; transform: ${style.transform};`;
 
-      // Added onerror handlers so broken gifs or images don't leave broken icons
       page.innerHTML = `
         <div class="diary-page">
           <span class="party-popper">🎉</span><div class="confetti-container" style="display:none;"></div>
@@ -511,7 +509,6 @@
 
 <script>
   (function() {
-    // ===== AUDIO MANAGER =====
     const audioManager = {
       muted: false, currentTheme: null, audioElements: [], config: null, started: false,
       defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.5 }, { src: 's2d.mp3', volume: 0.3 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.5 }, { src: 's2n.mp3', volume: 0.5 }]}},
