@@ -137,15 +137,15 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 720px;
-      overflow: hidden;
+      height: auto; /* changed from 720px to auto */
+      overflow: visible; /* changed from hidden to visible */
       transition: transform 0.4s, box-shadow 0.4s;
     }
     #flipbook-container.book-hover {
       transform: translateY(-10px) scale(1.02);
       box-shadow: 0 20px 60px var(--shadow), 0 0 40px var(--glow-color);
     }
-    #flipbook { position: relative; }
+    #flipbook { position: relative; transform-origin: center center; transition: transform 0.3s ease; }
 
     .page { background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: visible; }
     .cover { background-image: url('logo.png'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; position: relative; }
@@ -192,7 +192,7 @@
       .shop-banner{padding: 20px; margin-bottom: 40px;}
       .shop-banner h1{font-size: 1.8rem;}
       .shop-banner p{font-size: 1rem;}
-      #flipbook-container { height: auto; max-width: 100%; width: 100%; margin: 0 auto; overflow: hidden; padding: 0 10px; box-sizing: border-box; }
+      #flipbook-container { height: auto; max-width: 100%; width: 100%; margin: 0 auto; padding: 0 10px; box-sizing: border-box; }
     }
 
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
@@ -332,7 +332,7 @@
     window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }); };
     function launchConfetti(pageElement) { const existing = pageElement.querySelector('.confetti-container'); if (existing) existing.remove(); const container = document.createElement('div'); container.className = 'confetti-container'; pageElement.appendChild(container); const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4']; const pieces = 180; for (let i = 0; i < pieces; i++) { const confetti = document.createElement('span'); confetti.className = 'confetti-piece'; confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; confetti.style.left = (5 + Math.random() * 90) + '%'; confetti.style.width = (6 + Math.random() * 8) + 'px'; confetti.style.height = (6 + Math.random() * 8) + 'px'; confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px'; confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's'; confetti.style.animationDelay = (Math.random() * 0.5) + 's'; container.appendChild(confetti); } setTimeout(() => { if (container.parentNode) container.remove(); }, 5000); }
 
-    // ===== FLIPBOOK (DETERMINISTIC SIZING - NO RACE) =====
+    // ===== FLIPBOOK (ROBUST FIX) =====
     const defaultPages = [
       { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
       { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, hand-knitted.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -344,6 +344,7 @@
 
     let pagesData = [];
     let flipbook = null;
+    let isInitialized = false; // Guard against double init
 
     async function loadFlipbook() {
       try { const response = await fetch('pages.json'); if (!response.ok) throw new Error('Not found'); const data = await response.json(); pagesData = data.pages || defaultPages; } catch (e) { pagesData = defaultPages; }
@@ -351,39 +352,34 @@
     }
 
     function initFlipbook(pages) {
+      if (isInitialized) {
+        // Destroy existing before re-init
+        if (flipbook) flipbook.destroy();
+      }
+      isInitialized = true;
+
       const flipbookDiv = document.getElementById('flipbook');
       const container = document.getElementById('flipbook-container');
-      const containerWidth = container.clientWidth || window.innerWidth;
       
-      // Deterministic page sizing (no post-render measurement)
-      let pageWidth, pageHeight;
+      // Fixed base page sizes (we'll scale later if needed)
+      let pageWidth = 500;
+      let pageHeight = 700;
+      
       if (window.innerWidth <= 750) {
-        // Mobile: two pages side by side must fit in container width
-        pageWidth = Math.min(340, Math.floor((containerWidth - 20) / 2));
-        if (pageWidth < 150) pageWidth = 150; // minimum
-        pageHeight = Math.round(pageWidth * 1.4);
-      } else {
-        // Desktop: allow comfortable two-page spread
-        pageWidth = Math.min(500, Math.floor((containerWidth - 40) / 2));
-        if (pageWidth < 260) pageWidth = 260;
-        pageHeight = Math.round(pageWidth * 1.4);
+        pageWidth = 300;
+        pageHeight = 420;
       }
 
-      // Clear previous transform / content
-      flipbookDiv.style.transform = 'none';
+      // Clear container
       flipbookDiv.innerHTML = '';
+      flipbookDiv.style.transform = 'none'; // Reset any previous scale
 
-      // Build pages
       const pageElements = [];
       pageElements.push(createCoverPage(true, 'Our Handmade Collection'));
       pages.forEach((pageInfo, idx) => { pageElements.push(createContentPage(pageInfo, idx)); });
       pageElements.push(createCoverPage(false));
       pageElements.forEach(page => flipbookDiv.appendChild(page));
 
-      // Destroy previous flipbook if exists
-      if (flipbook) flipbook.destroy();
-
-      // Initialize PageFlip with deterministic dimensions
       try {
         flipbook = new St.PageFlip(flipbookDiv, {
           width: pageWidth,
@@ -398,9 +394,21 @@
         });
         flipbook.loadFromHTML(pageElements);
 
-        // No manual width/height on flipbookDiv – PageFlip handles it.
-        // Set container height to page height so no extra space remains.
-        container.style.height = pageHeight + 'px';
+        // After the book is fully rendered, scale it to fit the container
+        // Use a delay to ensure layout is complete
+        setTimeout(() => {
+          const bookWidth = flipbookDiv.scrollWidth || flipbookDiv.offsetWidth;
+          const bookHeight = flipbookDiv.scrollHeight || flipbookDiv.offsetHeight;
+          const availW = container.clientWidth;
+          const availH = container.clientHeight || 720; // fallback height
+          if (bookWidth > 0 && bookHeight > 0) {
+            const scale = Math.min(availW / bookWidth, availH / bookHeight, 1);
+            flipbookDiv.style.transformOrigin = 'center center';
+            flipbookDiv.style.transform = `scale(${scale})`;
+            // Adjust container height to match scaled book
+            container.style.height = (bookHeight * scale) + 'px';
+          }
+        }, 300); // Delay 300ms to avoid race
       } catch (e) {
         console.error("Flipbook failed, using Grid Fallback:", e);
         renderGridFallback();
@@ -452,12 +460,19 @@
 
     window.openBook = function() { if (flipbook) flipbook.flipNext(); };
 
+    // Load on DOM ready
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', loadFlipbook); } else { loadFlipbook(); }
 
-    let resizeTimeout;
-    window.addEventListener('resize', function() { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(function() { if (typeof pagesData !== 'undefined') initFlipbook(pagesData); }, 300); });
+    // Minimal resize handling: only re-init if width changes significantly
+    let lastWidth = window.innerWidth;
+    window.addEventListener('resize', function() {
+      if (Math.abs(window.innerWidth - lastWidth) > 50) {
+        lastWidth = window.innerWidth;
+        if (typeof pagesData !== 'undefined') initFlipbook(pagesData);
+      }
+    });
 
-    // Magic particles
+    // Magic particles & hearts (same as before)
     let particleInterval = null, activeMagicElement = null;
     const magicContainer = document.createElement('div'); magicContainer.className = 'magic-particles'; document.body.appendChild(magicContainer);
     function randomNumber(min, max) { return Math.random() * (max - min) + min; }
