@@ -145,7 +145,7 @@
       transform: translateY(-10px) scale(1.02);
       box-shadow: 0 20px 60px var(--shadow), 0 0 40px var(--glow-color);
     }
-    #flipbook { position: relative; transform-origin: center center; transition: none; } /* transition: none for initial load */
+    #flipbook { position: relative; }
 
     .page { background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: visible; }
     .cover { background-image: url('logo.png'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; position: relative; }
@@ -308,24 +308,20 @@
     window.finishLoading = finishLoading;
     setTimeout(finishLoading, 6000);
 
-    // Theme toggle
     const toggle = document.getElementById('themeToggle');
     const icon = document.getElementById('themeIcon');
     const savedTheme = localStorage.getItem('theme');
     if(savedTheme==='dark'){ document.body.classList.add('dark'); icon.textContent='🌙'; }
     toggle.addEventListener('click', function(){ document.body.classList.toggle('dark'); const isDark=document.body.classList.contains('dark'); icon.textContent=isDark?'🌙':'☀️'; localStorage.setItem('theme',isDark?'dark':'light'); if(window.aboutArt) window.aboutArt.updateTheme(isDark); });
 
-    // Hamburger
     window.toggleMenu = function() { const navRight = document.getElementById('navRight'); const hamburger = document.querySelector('.hamburger'); navRight.classList.toggle('open'); hamburger.classList.toggle('active'); };
 
-    // Auth
     let currentUser = null;
     auth.onAuthStateChanged(function(user) { currentUser = user; const authButtonText = document.getElementById('authButtonText'); const logoutBtn = document.getElementById('logoutBtn'); if (user) { authButtonText.textContent = user.displayName || user.phoneNumber || 'Account'; logoutBtn.style.display = 'inline-flex'; loadCartData(); } else { authButtonText.textContent = 'Sign In'; logoutBtn.style.display = 'none'; resetCartButtons(); } });
     window.openAuthModal = function() { if (currentUser) return; document.getElementById('loginModal').classList.add('show'); switchTab('signin'); };
     window.logout = function() { auth.signOut().then(function() { window.location.href = 'index.html'; }); };
     window.switchTab = function(tab) { const signInForm = document.getElementById('signInForm'); const signUpForm = document.getElementById('signUpForm'); const phoneForm = document.getElementById('phoneForm'); const modalTitle = document.getElementById('modalTitle'); const signInTab = document.getElementById('signInTab'); const signUpTab = document.getElementById('signUpTab'); const phoneTab = document.getElementById('phoneTab'); if (tab === 'signin') { signInForm.style.display = 'block'; signUpForm.style.display = 'none'; phoneForm.style.display = 'none'; modalTitle.textContent = 'Welcome back'; signInTab.classList.add('active'); signUpTab.classList.remove('active'); phoneTab.classList.remove('active'); } else if (tab === 'phone') { signInForm.style.display = 'none'; signUpForm.style.display = 'none'; phoneForm.style.display = 'block'; modalTitle.textContent = 'Sign in with Phone'; phoneTab.classList.add('active'); signInTab.classList.remove('active'); signUpTab.classList.remove('active'); } else { signInForm.style.display = 'none'; signUpForm.style.display = 'block'; phoneForm.style.display = 'none'; modalTitle.textContent = 'Create your account'; signUpTab.classList.add('active'); signInTab.classList.remove('active'); phoneTab.classList.remove('active'); } };
 
-    // Cart Logic
     function loadCartData() { if (!currentUser) return; db.collection('users').doc(currentUser.uid).collection('cart').get().then(function(snapshot) { const cartMap = {}; snapshot.forEach(function(doc) { cartMap[doc.id] = doc.data().quantity || 1; }); document.querySelectorAll('.add-to-cart-page-btn').forEach(function(btn) { const productId = btn.dataset.productId; if (cartMap[productId]) { updateButtonToCounter(btn, cartMap[productId]); } }); }); }
     function resetCartButtons() { document.querySelectorAll('.add-to-cart-page-btn').forEach(function(btn) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; }); }
     function updateButtonToCounter(btn, quantity) { btn.innerHTML = `<button class="cart-minus" onclick="handleMinus(this, event)">−</button><span>${quantity}</span><button class="cart-plus" onclick="handlePlus(this, event)">+</button>`; btn.classList.add('cart-counter'); btn.style.display = 'inline-flex'; btn.dataset.quantity = quantity; btn.dataset.processing = 'false'; }
@@ -336,7 +332,7 @@
     window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }); };
     function launchConfetti(pageElement) { const existing = pageElement.querySelector('.confetti-container'); if (existing) existing.remove(); const container = document.createElement('div'); container.className = 'confetti-container'; pageElement.appendChild(container); const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4']; const pieces = 180; for (let i = 0; i < pieces; i++) { const confetti = document.createElement('span'); confetti.className = 'confetti-piece'; confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; confetti.style.left = (5 + Math.random() * 90) + '%'; confetti.style.width = (6 + Math.random() * 8) + 'px'; confetti.style.height = (6 + Math.random() * 8) + 'px'; confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px'; confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's'; confetti.style.animationDelay = (Math.random() * 0.5) + 's'; container.appendChild(confetti); } setTimeout(() => { if (container.parentNode) container.remove(); }, 5000); }
 
-    // ===== FLIPBOOK WITH SCALING FIX =====
+    // ===== FLIPBOOK (DETERMINISTIC SIZING - NO RACE) =====
     const defaultPages = [
       { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
       { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, hand-knitted.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -354,53 +350,57 @@
       setTimeout(() => initFlipbook(pagesData), 200);
     }
 
-    function fitBookToContainer() {
-      const container = document.getElementById('flipbook-container');
-      const flipbookDiv = document.getElementById('flipbook');
-      flipbookDiv.style.transform = 'scale(1)';
-      const bookWidth = flipbookDiv.scrollWidth || flipbookDiv.offsetWidth;
-      const bookHeight = flipbookDiv.scrollHeight || flipbookDiv.offsetHeight;
-      if (!bookWidth || !bookHeight) return;
-      const availW = container.clientWidth;
-      const availH = container.clientHeight;
-      const scale = Math.min(availW / bookWidth, availH / bookHeight, 1);
-      flipbookDiv.style.transformOrigin = 'center center';
-      flipbookDiv.style.transform = `scale(${scale})`;
-      // Adjust container height to match scaled book (prevents extra whitespace on mobile)
-      container.style.height = (bookHeight * scale) + 'px';
-    }
-
     function initFlipbook(pages) {
       const flipbookDiv = document.getElementById('flipbook');
-      flipbookDiv.innerHTML = '';
+      const container = document.getElementById('flipbook-container');
+      const containerWidth = container.clientWidth || window.innerWidth;
+      
+      // Deterministic page sizing (no post-render measurement)
+      let pageWidth, pageHeight;
+      if (window.innerWidth <= 750) {
+        // Mobile: two pages side by side must fit in container width
+        pageWidth = Math.min(340, Math.floor((containerWidth - 20) / 2));
+        if (pageWidth < 150) pageWidth = 150; // minimum
+        pageHeight = Math.round(pageWidth * 1.4);
+      } else {
+        // Desktop: allow comfortable two-page spread
+        pageWidth = Math.min(500, Math.floor((containerWidth - 40) / 2));
+        if (pageWidth < 260) pageWidth = 260;
+        pageHeight = Math.round(pageWidth * 1.4);
+      }
+
+      // Clear previous transform / content
       flipbookDiv.style.transform = 'none';
+      flipbookDiv.innerHTML = '';
+
+      // Build pages
       const pageElements = [];
       pageElements.push(createCoverPage(true, 'Our Handmade Collection'));
       pages.forEach((pageInfo, idx) => { pageElements.push(createContentPage(pageInfo, idx)); });
       pageElements.push(createCoverPage(false));
       pageElements.forEach(page => flipbookDiv.appendChild(page));
 
+      // Destroy previous flipbook if exists
       if (flipbook) flipbook.destroy();
 
-      let pageWidth = 500;
-      let pageHeight = 700;
-      const container = document.getElementById('flipbook-container');
-      const containerWidth = container && container.clientWidth > 0 ? container.clientWidth : window.innerWidth;
-
-      if (window.innerWidth <= 750) {
-        pageWidth = Math.min(340, containerWidth - 20);
-        if (pageWidth < 200) pageWidth = Math.max(200, window.innerWidth - 40);
-        pageHeight = Math.round(pageWidth * 1.4);
-      } else {
-        pageWidth = Math.min(500, Math.max(260, containerWidth / 2 - 20));
-        pageHeight = Math.round(pageWidth * 1.4);
-      }
-
+      // Initialize PageFlip with deterministic dimensions
       try {
-        flipbook = new St.PageFlip(flipbookDiv, { width: pageWidth, height: pageHeight, size: 'fixed', showCover: true, usePortrait: false, maxShadowOpacity: 0.5, mobileScrollSupport: false, drawShadow: true, flippingTime: 600 });
+        flipbook = new St.PageFlip(flipbookDiv, {
+          width: pageWidth,
+          height: pageHeight,
+          size: 'fixed',
+          showCover: true,
+          usePortrait: false,
+          maxShadowOpacity: 0.5,
+          mobileScrollSupport: false,
+          drawShadow: true,
+          flippingTime: 600
+        });
         flipbook.loadFromHTML(pageElements);
-        // No manual width/height on flipbookDiv – let PageFlip size it naturally.
-        requestAnimationFrame(() => requestAnimationFrame(fitBookToContainer));
+
+        // No manual width/height on flipbookDiv – PageFlip handles it.
+        // Set container height to page height so no extra space remains.
+        container.style.height = pageHeight + 'px';
       } catch (e) {
         console.error("Flipbook failed, using Grid Fallback:", e);
         renderGridFallback();
@@ -606,7 +606,7 @@
 
 <script>
   (function() {
-    // ===== Audio Manager =====
+    // ===== AUDIO MANAGER =====
     const audioManager = {
       muted: false, currentTheme: null, audioElements: [], config: null, started: false,
       defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.5 }, { src: 's2d.mp3', volume: 0.3 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.5 }, { src: 's2n.mp3', volume: 0.5 }]}},
