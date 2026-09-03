@@ -52,16 +52,26 @@
       --cover-tap-size: 20px;
       --cover-tap-color: #f2a6b8;
       --cover-bg-opacity: 0.5;
+      --cover-logo-size: cover;
     }
 
+    /* ===== MOBILE OVERRIDES ===== */
     @media(max-width:750px){
       :root {
         --content-padding-top: 55px;
         --photo-max-height: 220px;
         --desc-font-size: 8px;
         --sticker-font-size: 8px;
+        --cover-title-size: 24px;
+        --cover-tap-size: 12px;
+        --cover-logo-size: contain;
       }
     }
+
+    /* ============================================================
+       ============================================================
+       ===== END OF ADJUSTABLE PARAMETERS ==========================
+       ============================================================ */
 
     body.dark {
       --bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd;
@@ -206,7 +216,7 @@
     
     .cover { 
       background-image: url('logo.png'); 
-      background-size: cover; 
+      background-size: var(--cover-logo-size); 
       background-position: center; 
       display: flex; 
       flex-direction: column; 
@@ -274,20 +284,21 @@
     
     .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; max-height: 65%; margin-top: 10px; z-index: 10; }
     
-    /* ===== FIXED: Borders added to match mobile ===== */
+    /* ===== FIXED: Photo frame now hugs the image with uniform padding ===== */
     .photo-frame { 
       background: var(--frame-bg); 
-      padding: 8px 8px 20px; 
+      padding: 8px; /* uniform 8px padding on all sides */
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
       border: 1px solid var(--frame-border); 
-      width: 100%; 
+      display: inline-block; /* hugs content */
       max-width: 100%; 
       transition: transform 0.3s, box-shadow 0.3s; 
     }
     .photo-frame:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px var(--glow-color); }
     .photo-frame img { 
-      width: 100%; 
+      width: auto; 
       height: auto; 
+      max-width: 100%; 
       max-height: var(--photo-max-height); 
       object-fit: contain; 
       display: block; 
