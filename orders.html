@@ -24,6 +24,9 @@
     .logo{font-size:1.35rem;font-weight:700;color:var(--text);transition:transform .3s ease,color .3s ease;white-space:nowrap} 
     .logo:hover{transform:translateY(-2px);color:var(--accent)} 
     
+    /* Nav Actions (outside hamburger) */
+    .nav-actions{display:flex;align-items:center;gap:12px;}
+    
     .nav-right{display:flex;align-items:center;gap:28px} 
     .nav-links{display:flex;gap:30px;list-style:none;font-size:.9rem} 
     .nav-links a{display:inline-block;transition:color .3s ease,transform .3s ease} 
@@ -52,7 +55,7 @@
       background:none;
       border:none;
       cursor:pointer;
-      z-index: 1001;
+      z-index: 10001;
     }
     .hamburger span{
       display:block;
@@ -67,14 +70,14 @@
     @media(max-width:750px){
       nav{padding:15px 4%;}
       .hamburger{display:flex;}
-      .nav-right{flex-direction:column;align-items:flex-end;gap:15px;position:fixed;top:0;right:-100%;width:75%;height:100vh;background:var(--surface);padding:80px 20px;box-shadow:-5px 0 20px rgba(0,0,0,0.2);transition:right .4s ease;z-index:1000;}
+      .nav-right{flex-direction:column;align-items:flex-end;gap:15px;position:fixed;top:0;right:-100%;width:70%;height:100vh;background:var(--surface);padding:80px 20px;box-shadow:-5px 0 20px rgba(0,0,0,0.2);transition:right .4s ease;z-index:10000;}
       .nav-right.open{right:0;}
       .nav-links{flex-direction:column;gap:20px;width:100%;text-align:center;}
       .nav-links li{width:100%;}
       .nav-links a{display:block;width:100%;padding:10px;color:var(--text);font-size:1.1rem;}
-      .theme-wrapper, .mute-wrapper, .signin-btn, #logoutBtn{margin-top:10px;}
-      .theme-wrapper{width:100%;display:flex;justify-content:center;}
-      .mute-wrapper{width:100%;display:flex;justify-content:center;}
+      .nav-actions{margin-left:auto;display:flex;gap:5px;}
+      .theme-wrapper, .mute-wrapper{display:flex;justify-content:center;}
+      .theme-toggle,.mute-toggle{width:34px;height:34px;font-size:1rem;}
     }
 
     .orders-page { min-height: 90vh; padding: 100px 7%; max-width: 1100px; margin: 0 auto; } 
@@ -135,7 +138,7 @@
     .page-loader.loaded{opacity:0;visibility:hidden;pointer-events:none} 
     .loader-backdrop{position:absolute;inset:0;background:rgba(255,253,251,.58);backdrop-filter:blur(3px);transition:background .6s ease} 
     body.dark .loader-backdrop{background:rgba(7,4,11,.64)} 
-    .loader-card{position:relative;width:min(390px,calc(100vw - 38px));padding:28px;border:1px solid rgba(190,150,175,.18);border-radius:30px;background:rgba(255,255,255,.88);box-shadow:0 25px 80px rgba(80,55,75,.18);backdrop-filter:blur(20px);text-align:center;animation:loaderCardFloat 4s ease-in-out infinite} 
+    .loader-card{position:relative;width:min(390px,calc(100vw - 38px));max-height:85vh;overflow:auto;padding:28px;border:1px solid rgba(190,150,175,.18);border-radius:30px;background:rgba(255,255,255,.88);box-shadow:0 25px 80px rgba(80,55,75,.18);backdrop-filter:blur(20px);text-align:center;animation:loaderCardFloat 4s ease-in-out infinite} 
     body.dark .loader-card{background:rgba(24,16,32,.92);border-color:rgba(190,120,255,.22);box-shadow:0 25px 90px rgba(0,0,0,.55)} 
     @keyframes loaderCardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}} 
     .loader-copy{margin-bottom:22px}.loader-title{color:var(--text);font-size:1rem;font-weight:700}.loader-subtitle{color:var(--muted);font-size:.7rem} 
@@ -171,6 +174,7 @@
       .orders-page{padding: 50px 6%;}
       .orders-title{font-size: 1.8rem}
       .order-actions{width:100%;justify-content:flex-end}
+      .loader-card{width:90vw;padding:20px;max-height:90vh;}
     }
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
@@ -201,6 +205,10 @@
     <button id="logoutBtn" class="logout-btn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text);" onclick="logout()" title="Logout">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
     </button>
+  </div>
+  
+  <!-- Theme & Mute Buttons (Always visible, outside hamburger) -->
+  <div class="nav-actions">
     <div class="mute-wrapper magic-hover"><button class="mute-toggle" id="muteToggle" aria-label="Toggle sound" title="Mute / Unmute"><span class="mute-icon" id="muteIcon">🔊</span></button></div>
     <div class="theme-wrapper magic-hover"><button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme"><span class="theme-icon" id="themeIcon">☀️</span></button></div>
   </div>
