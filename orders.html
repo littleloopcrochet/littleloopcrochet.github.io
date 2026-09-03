@@ -70,8 +70,27 @@
     @media(max-width:750px){
       nav{padding:15px 4%;}
       .hamburger{display:flex;}
-      .nav-right{flex-direction:column;align-items:flex-end;gap:15px;position:fixed;top:0;right:-100%;width:70%;height:100vh;background:var(--surface);padding:80px 20px;box-shadow:-5px 0 20px rgba(0,0,0,0.2);transition:right .4s ease;z-index:10001;}
-      .nav-right.open{right:0;}
+      /* FIX: Use transform instead of right, bump z-index to 10050 */
+      .nav-right{
+        display:flex;
+        flex-direction:column;
+        align-items:flex-end;
+        gap:15px;
+        position:fixed;
+        top:0;
+        right:0;
+        width:70%;
+        height:100vh;
+        height:100dvh; /* dynamic viewport height for mobile */
+        background:var(--surface);
+        padding:80px 20px;
+        box-shadow:-5px 0 20px rgba(0,0,0,0.2);
+        transform:translateX(100%);
+        transition:transform .4s ease;
+        z-index:10050;
+        will-change:transform;
+      }
+      .nav-right.open{ transform:translateX(0); }
       .nav-links{flex-direction:column;gap:20px;width:100%;text-align:center;}
       .nav-links li{width:100%;}
       .nav-links a{display:block;width:100%;padding:10px;color:var(--text);font-size:1.1rem;}
@@ -133,6 +152,7 @@
     .step-label { font-size: 0.8rem; color: var(--muted); } 
     .step.active .step-label { color: var(--accent); font-weight: bold; }
     
+    /* Loading screen (keep as is – already working) */
     body.is-loading{overflow:hidden} 
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease} 
     .page-loader.loaded{opacity:0;visibility:hidden;pointer-events:none} 
