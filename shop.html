@@ -17,13 +17,65 @@
   <script src="https://unpkg.com/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 
   <style>
+    /* ============================================================
+       ===== ALL ADJUSTABLE PARAMETERS ARE HERE (TOP OF CSS) ======
+       ============================================================ */
     :root {
-      --bg:#fffdfb; --surface:#ffffff; --card:#fff9f8; --text:#000000; --text-soft:#222222; --muted:#444444; --accent:#d795a7; --accent-hover:#c98296; --pink:#f8dce4; --green:#dfeee5; --yellow:#f8edcc; --blue:#dceaf3; --nav-bg: transparent; --shadow:rgba(90,70,70,.10); --icon-glow:rgba(130,110,110,.18); --page-bg:#fff9f0; --page-line:#e0d5c5; --frame-bg:#ffffff; --frame-border:#ddd; --text-sticker-bg:#fdf6e3; --text-sticker-border:#d4a574; --sticker-bg:#f2a6b8; --sticker-text:#ffffff; --doodle-color:#f2a6b8; --glow-color: rgba(215,149,167,0.4);
-      /* ADJUST THIS VALUE TO MOVE CONTENT DOWN (e.g. 50px or 100px) */
+      /* ----- General Colors ----- */
+      --bg:#fffdfb; --surface:#ffffff; --card:#fff9f8; --text:#000000;
+      --text-soft:#222222; --muted:#444444; --accent:#d795a7; --accent-hover:#c98296;
+      --pink:#f8dce4; --green:#dfeee5; --yellow:#f8edcc; --blue:#dceaf3;
+      --nav-bg: transparent; --shadow:rgba(90,70,70,.10); --icon-glow:rgba(130,110,110,.18);
+
+      /* ----- Page Background (Diary) ----- */
+      --page-bg:#fff9f0; --page-line:#e0d5c5;
+
+      /* ----- Sticker & Frame Colors ----- */
+      --frame-bg:#ffffff; --frame-border:#ddd;
+      --text-sticker-bg:#fdf6e3; --text-sticker-border:#d4a574;
+      --sticker-bg:#f2a6b8; --sticker-text:#ffffff;
+      --doodle-color:#f2a6b8; --glow-color: rgba(215,149,167,0.4);
+
+      /* ===== CONTENT / LAYOUT PARAMETERS ===== */
+      /* Move content down/up on every page (increase to push down) */
       --content-padding-top: 90px; 
+
+      /* Image height on desktop (smaller = more room for text) */
+      --photo-max-height: 280px;
+
+      /* Text sizes - Desktop */
+      --desc-font-size: 18px;  /* Description text */
+      --sticker-font-size: 18px; /* Name sticker text */
     }
+
+    /* ===== MOBILE OVERRIDES ===== */
+    @media(max-width:750px){
+      :root {
+        /* Mobile specific values */
+        --content-padding-top: 90px;  /* Keep same or adjust separately */
+        
+        /* Smaller image on mobile */
+        --photo-max-height: 220px;
+
+        /* Text sizes - Mobile */
+        --desc-font-size: 14px;
+        --sticker-font-size: 14px;
+      }
+    }
+
+    /* ============================================================
+       ============================================================
+       ===== END OF ADJUSTABLE PARAMETERS ==========================
+       ============================================================ */
+
     body.dark {
-      --bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd; --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff; --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75); --page-bg:#1a1420; --page-line:#2e2438; --frame-bg:#241d2c; --frame-border:#3a2f45; --text-sticker-bg:#2e2438; --text-sticker-border:#5b4a6b; --sticker-bg:#bd7cff; --sticker-text:#ffffff; --doodle-color:#bd7cff; --glow-color: rgba(189,124,255,0.5);
+      --bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd;
+      --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff;
+      --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a;
+      --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75);
+      --page-bg:#1a1420; --page-line:#2e2438; --frame-bg:#241d2c; --frame-border:#3a2f45;
+      --text-sticker-bg:#2e2438; --text-sticker-border:#5b4a6b; --sticker-bg:#bd7cff;
+      --sticker-text:#ffffff; --doodle-color:#bd7cff; --glow-color: rgba(189,124,255,0.5);
     }
     *{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:auto; overflow-x:hidden;}
@@ -193,12 +245,12 @@
     .diary-photo-container { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100%; max-height: 65%; margin-top: 10px; z-index: 10; }
     .photo-frame { background: var(--frame-bg); padding: 8px 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid var(--frame-border); width: 100%; max-width: 100%; transition: transform 0.3s, box-shadow 0.3s; }
     .photo-frame:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px var(--glow-color); }
-    .photo-frame img { width: 100%; height: auto; max-height: 280px; object-fit: cover; display: block; }
+    .photo-frame img { width: 100%; height: auto; max-height: var(--photo-max-height); object-fit: cover; display: block; }
     
     .name-sticker { position: absolute; bottom: -12px; right: -12px; background: var(--sticker-bg); color: var(--sticker-text); padding: 8px 15px; border: 2px solid white; border-radius: 8px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); z-index: 10; transform: rotate(-12deg); transition: transform 0.3s, box-shadow 0.3s; }
     .name-sticker:hover { transform: rotate(-12deg) translateY(-3px) scale(1.05); box-shadow: 2px 2px 8px rgba(0,0,0,0.4), 0 0 15px var(--glow-color); }
-    .name-sticker h3 { margin: 0; font-size: 15px; font-weight: bold; }
-    .diary-text { background: var(--text-sticker-bg); border: 2px solid var(--text-sticker-border); border-radius: 10px; padding: 8px 12px; font-family: 'Caveat', cursive; font-size: 10px; color: var(--text-soft); text-align: center; max-width: 85%; margin-top: 10px; transform: rotate(2deg); z-index: 10; transition: transform 0.3s, box-shadow 0.3s; }
+    .name-sticker h3 { margin: 0; font-size: var(--sticker-font-size); font-weight: bold; }
+    .diary-text { background: var(--text-sticker-bg); border: 2px solid var(--text-sticker-border); border-radius: 10px; padding: 8px 12px; font-family: 'Caveat', cursive; font-size: var(--desc-font-size); color: var(--text-soft); text-align: center; max-width: 85%; margin-top: 10px; transform: rotate(2deg); z-index: 10; transition: transform 0.3s, box-shadow 0.3s; }
     .diary-text:hover { transform: rotate(2deg) translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
     .add-to-cart-page-btn { background: var(--accent); color: white; border: none; border-radius: 50px; padding: 8px 20px; font-family: inherit; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.3s, transform 0.3s; }
@@ -340,6 +392,16 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  // ============================================================
+  // ===== ALL FLIPBOOK PARAMETERS ARE HERE (TOP OF SCRIPT) =====
+  // ============================================================
+  const BOOK_CONFIG = {
+    desktop: { width: 500, height: 700 },
+    mobile: { width: 175, height: 740 }
+  };
+  // ============================================================
+  // ============================================================
+
   (function() {
     'use strict';
     const pageLoader = document.getElementById('pageLoader');
@@ -425,9 +487,10 @@
       const flipbookDiv = document.getElementById('flipbook');
       const container = document.getElementById('flipbook-container');
       
-      // DESKTOP: 500x700, MOBILE: 300x740
-      let pageWidth = 500; let pageHeight = 700; 
-      if (window.innerWidth <= 750) { pageWidth = 175; pageHeight = 740; }
+      // Use the consolidated config
+      const useMobile = window.innerWidth <= 750;
+      const config = useMobile ? BOOK_CONFIG.mobile : BOOK_CONFIG.desktop;
+      let pageWidth = config.width; let pageHeight = config.height;
 
       flipbookDiv.innerHTML = '';
       flipbookDiv.style.transform = 'none';
@@ -475,9 +538,10 @@
       const style = gifStyles[gifNum] || defaultGifStyle;
       const inlineStyle = `top: ${style.top}; left: ${style.left}; width: ${style.width}; transform: ${style.transform};`;
 
+      // NOTE: Party popper removed
       page.innerHTML = `
         <div class="diary-page">
-          <span class="party-popper">🎉</span><div class="confetti-container" style="display:none;"></div>
+          <div class="confetti-container" style="display:none;"></div>
           <span class="doodle doodle-1">✧</span><span class="doodle doodle-2">♡</span><span class="doodle doodle-3">★</span><span class="doodle doodle-4">✦</span>
           <span class="deco yarn">🧶</span><span class="deco star">⭐</span><span class="deco cat">🐱</span>
           <div class="diary-photo-container" style="transform: rotate(${angle}deg);">
