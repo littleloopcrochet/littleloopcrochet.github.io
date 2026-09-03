@@ -18,14 +18,15 @@
     body.dark{--bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd; --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff; --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75);}
     *{margin:0;padding:0;box-sizing:border-box} html{scroll-behavior:smooth} body{font-family:"Comfortaa",sans-serif;background:transparent;color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden;width:100%} a{color:inherit;text-decoration:none}
     
-    nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:10000;transition:background .5s ease} 
+    /* FIX: Z-INDEX BUMPED TO 10080 to stay above the mobile menu */
+    nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:10080;transition:background .5s ease} 
     nav a, nav .logo, .nav-links a { text-shadow: 0 1px 3px rgba(255,255,255,0.6); } 
     body.dark nav a, body.dark nav .logo, body.dark .nav-links a { text-shadow: 0 1px 4px rgba(0,0,0,0.9); } 
     .logo{font-size:1.35rem;font-weight:700;color:var(--text);transition:transform .3s ease,color .3s ease;white-space:nowrap} 
     .logo:hover{transform:translateY(-2px);color:var(--accent)} 
     
     /* Nav Actions (always visible) */
-    .nav-actions{display:flex;align-items:center;gap:10px;margin-left:auto;}
+    .nav-actions{display:flex;align-items:center;gap:10px;margin-left:auto; position: relative; z-index: 10080;}
     
     .nav-right{display:flex;align-items:center;gap:28px} 
     .nav-links{display:flex;gap:30px;list-style:none;font-size:.9rem} 
@@ -55,8 +56,7 @@
       background:none;
       border:none;
       cursor:pointer;
-      /* FIXED: increased z-index to stay on top of nav-right */
-      z-index: 10070;
+      z-index: 10080;
       transition: all .3s ease;
       position: relative;
     }
@@ -95,7 +95,7 @@
         width:70%;
         height:100vh;
         height:100dvh; /* dynamic viewport height for mobile */
-        background:var(--surface);
+        background: var(--surface); /* FIX: Solid background */
         padding:80px 20px;
         box-shadow:-5px 0 20px rgba(0,0,0,0.2);
         transform:translateX(100%);
@@ -110,32 +110,6 @@
       .nav-actions{margin-left:auto;display:flex;gap:5px;align-items:center;}
       .theme-wrapper, .mute-wrapper{display:flex;justify-content:center;}
       .theme-toggle,.mute-toggle{width:34px;height:34px;font-size:1rem;}
-    }
-
-    /* ===== CLOSE MENU BUTTON (Mobile only) ===== */
-    .close-menu-btn {
-      display: none;
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: none;
-      border: none;
-      font-size: 28px;
-      color: var(--text);
-      cursor: pointer;
-      z-index: 10071;
-      line-height: 1;
-      padding: 5px;
-      transition: color .3s ease, transform .3s ease;
-    }
-    .close-menu-btn:hover {
-      color: var(--accent);
-      transform: scale(1.1);
-    }
-    @media(max-width:750px){
-      .close-menu-btn {
-        display: block;
-      }
     }
 
     .orders-page { min-height: 90vh; padding: 100px 7%; max-width: 1100px; margin: 0 auto; } 
@@ -191,7 +165,7 @@
     .step-label { font-size: 0.8rem; color: var(--muted); } 
     .step.active .step-label { color: var(--accent); font-weight: bold; }
     
-    /* Loading screen (keep as is – already working) */
+    /* Loading screen */
     body.is-loading{overflow:hidden} 
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease} 
     .page-loader.loaded{opacity:0;visibility:hidden;pointer-events:none} 
@@ -255,10 +229,6 @@
   </div>
   
   <div class="nav-right" id="navRight">
-    <!-- NEW: close menu button at top of sidebar -->
-    <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">
-      <span>&times;</span>
-    </button>
     <ul class="nav-links">
       <li><a href="index.html" class="magic-hover">Home</a></li>
       <li><a href="shop.html" class="magic-hover">Shop</a></li>
@@ -293,7 +263,6 @@
   const ticker = setInterval(function() { if(finished) return; if(progress < 95) { setProgress(progress + Math.max(0.5, (95 - progress) * 0.04)); } }, 80);
   function finishLoading() { if(finished) return; finished = true; const wait = Math.max(0, MIN_LOAD_TIME - (performance.now() - startTime)); setTimeout(function(){ clearInterval(ticker); setProgress(100); setTimeout(function(){ pageLoader.classList.add('loaded'); document.body.classList.remove('is-loading'); setTimeout(() => pageLoader.remove(), 750); }, 400); }, wait); }
   
-  // Loader finishes only when orders are loaded (or user not signed in)
   window.finishLoading = finishLoading;
 
   // ===== HAMBURGER MENU LOGIC =====
