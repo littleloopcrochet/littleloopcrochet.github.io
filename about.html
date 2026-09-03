@@ -172,14 +172,14 @@
     .auth-loading.show { display: flex; }
     .auth-loading span { font-size: 1rem; color: var(--accent); font-weight: 600; }
 
-    /* ===== LOADER (Optimized exactly like Orders page) ===== */
+    /* ===== LOADER (EXACTLY like Orders page) ===== */
     body.is-loading{overflow:hidden}
     body.is-loading > *:not(#pageLoader){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
     .page-loader.loaded{opacity:0;visibility:hidden;pointer-events:none}
     .loader-backdrop{position:absolute;inset:0;background:rgba(255,253,251,.58);backdrop-filter:blur(3px);transition:background .6s ease}
     body.dark .loader-backdrop{background:rgba(7,4,11,.64)}
-    .loader-card{position:relative;width:min(350px, calc(100vw - 38px));max-width:390px;max-height:80vh;overflow:auto;padding:24px;border:1px solid rgba(190,150,175,.18);border-radius:30px;background:rgba(255,255,255,.88);box-shadow:0 25px 80px rgba(80,55,75,.18);backdrop-filter:blur(20px);text-align:center;animation:loaderCardFloat 4s ease-in-out infinite;transition:background .6s ease,border-color .6s ease,box-shadow .6s ease}
+    .loader-card{position:relative;width:min(350px, 90vw);max-width:390px;max-height:80vh;overflow:auto;padding:24px;border:1px solid rgba(190,150,175,.18);border-radius:30px;background:rgba(255,255,255,.88);box-shadow:0 25px 80px rgba(80,55,75,.18);backdrop-filter:blur(20px);text-align:center;animation:loaderCardFloat 4s ease-in-out infinite;transition:background .6s ease,border-color .6s ease,box-shadow .6s ease}
     body.dark .loader-card{background:rgba(24,16,32,.92);border-color:rgba(190,120,255,.22);box-shadow:0 25px 90px rgba(0,0,0,.55),0 0 50px rgba(150,75,255,.10)}
     @keyframes loaderCardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
     .loader-copy{margin-bottom:22px}.loader-title{color:var(--text);font-size:1rem;font-weight:700}.loader-subtitle{color:var(--muted);font-size:.7rem}
@@ -225,12 +225,15 @@
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
 
-<!-- Loader (identical to Orders page) -->
+<!-- Loader (EXACTLY same as Orders page - no cat, perfectly centered) -->
 <div id="pageLoader" class="page-loader" role="status" aria-label="Loading Little Loop">
   <div class="loader-backdrop"></div>
   <div class="loader-card">
-    <div class="loader-copy"><span class="loader-title">A little stitch of magic...</span><span class="loader-subtitle">Preparing something cozy for you</span></div>
-    <div class="yarn-loader"><div class="yarn-track"><div class="yarn-progress"></div></div><div class="yarn-ends"><span>🧶</span><span>🧶</span></div></div>
+    <div class="loader-copy"><span class="loader-title">A little stitch of magic...</span></div>
+    <div class="yarn-loader">
+      <div class="yarn-track"><div class="yarn-progress"></div></div>
+      <div class="yarn-ends"><span>🧶</span><span>🧶</span></div>
+    </div>
     <div class="loader-percent" id="loaderPercent">0%</div>
   </div>
 </div>
@@ -420,13 +423,13 @@
   (function() {
     'use strict';
 
-    // ===== Loader (same as orders) =====
+    // ===== Loader (EXACTLY like Orders page) =====
     const pageLoader = document.getElementById('pageLoader');
     const progressBar = document.querySelector('.yarn-progress');
     const percentDisplay = document.getElementById('loaderPercent');
     let progress = 0, finished = false;
     const startTime = performance.now();
-    const MIN_LOAD_TIME = 500; // reduced to speed up
+    const MIN_LOAD_TIME = 500;
     function setProgress(value) {
       progress = Math.max(progress, Math.min(100, value));
       progressBar.style.width = progress + '%';
@@ -452,9 +455,7 @@
         }, 400);
       }, wait);
     }
-    // Fallback: auto-finish after 6 seconds max
     setTimeout(finishLoading, 6000);
-    // Finish when all images are loaded (if any)
     const imagePromises = Array.from(document.images).map(img => img.complete ? Promise.resolve() : new Promise(resolve => { img.addEventListener('load', resolve, {once:true}); img.addEventListener('error', resolve, {once:true}); }));
     const fontPromise = document.fonts ? document.fonts.ready : Promise.resolve();
     Promise.all([...imagePromises, fontPromise]).then(finishLoading).catch(() => finishLoading());
