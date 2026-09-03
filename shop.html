@@ -24,7 +24,7 @@
       --bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd; --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff; --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75); --page-bg:#1a1420; --page-line:#2e2438; --frame-bg:#241d2c; --frame-border:#3a2f45; --text-sticker-bg:#2e2438; --text-sticker-border:#5b4a6b; --sticker-bg:#bd7cff; --sticker-text:#ffffff; --doodle-color:#bd7cff; --glow-color: rgba(189,124,255,0.5);
     }
     *{margin:0;padding:0;box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    html{scroll-behavior:auto; overflow-x:hidden;}
     body{font-family:"Comfortaa",sans-serif;background:transparent;color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden}
     a{color:inherit;text-decoration:none}
 
@@ -138,7 +138,7 @@
       justify-content: center;
       align-items: center;
       height: auto;
-      overflow: visible;
+      overflow: hidden; /* FIXED: Prevents sliders */
       transition: transform 0.4s, box-shadow 0.4s;
     }
     #flipbook-container.book-hover {
@@ -147,7 +147,6 @@
     }
     #flipbook { position: relative; transform-origin: center center; transition: transform 0.3s ease; }
 
-    /* FIXED: transparent page background so diary-page shows through */
     .page { background: transparent; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: visible; }
     .cover { background-image: url('logo.png'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; position: relative; }
     .cover-text { background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px; font-family: 'Caveat', cursive; color: #f2a6b8; }
@@ -336,7 +335,7 @@
     window.decreaseCart = function(productId, event, btn) { if (event) event.stopPropagation(); if (!currentUser) return; if (!btn) btn = document.querySelector(`.add-to-cart-page-btn[data-product-id="${productId}"]`); if (btn && btn.dataset.processing === 'true') return; if (btn) btn.dataset.processing = 'true'; const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(productId); db.runTransaction(function(transaction) { return transaction.get(cartRef).then(function(doc) { if (!doc.exists) return 0; const currentQty = doc.data().quantity; if (currentQty <= 1) { transaction.delete(cartRef); return 0; } else { const newQty = currentQty - 1; transaction.update(cartRef, { quantity: newQty }); return newQty; } }); }).then(function(newQty) { if (btn) { if (newQty === 0) { btn.innerHTML = 'Add to Cart'; btn.classList.remove('cart-counter'); btn.style.display = 'inline-block'; btn.dataset.processing = 'false'; } else { updateButtonToCounter(btn, newQty); } } }); };
     function launchConfetti(pageElement) { const existing = pageElement.querySelector('.confetti-container'); if (existing) existing.remove(); const container = document.createElement('div'); container.className = 'confetti-container'; pageElement.appendChild(container); const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4']; const pieces = 180; for (let i = 0; i < pieces; i++) { const confetti = document.createElement('span'); confetti.className = 'confetti-piece'; confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; confetti.style.left = (5 + Math.random() * 90) + '%'; confetti.style.width = (6 + Math.random() * 8) + 'px'; confetti.style.height = (6 + Math.random() * 8) + 'px'; confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px'; confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's'; confetti.style.animationDelay = (Math.random() * 0.5) + 's'; container.appendChild(confetti); } setTimeout(() => { if (container.parentNode) container.remove(); }, 5000); }
 
-    // ===== FLIPBOOK (ROBUST) =====
+    // ===== FLIPBOOK =====
     const defaultPages = [
       { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
       { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, hand-knitted.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -362,8 +361,9 @@
       const flipbookDiv = document.getElementById('flipbook');
       const container = document.getElementById('flipbook-container');
       
-      let pageWidth = 500; let pageHeight = 740; // increased height for content
-      if (window.innerWidth <= 750) { pageWidth = 300; pageHeight = 740; }
+      // FIXED: Desktop original size, Mobile 540
+      let pageWidth = 500; let pageHeight = 700; // Original Desktop
+      if (window.innerWidth <= 750) { pageWidth = 300; pageHeight = 540; }
 
       flipbookDiv.innerHTML = '';
       flipbookDiv.style.transform = 'none';
@@ -382,23 +382,22 @@
         });
         flipbook.loadFromHTML(pageElements);
 
-        // Scale book to fit container + add padding to avoid white space
+        // Scale book to fit container + no extra padding (prevents sliders/scroll)
         setTimeout(() => {
           const bookWidth = flipbookDiv.scrollWidth || flipbookDiv.offsetWidth;
           const bookHeight = flipbookDiv.scrollHeight || flipbookDiv.offsetHeight;
           const availW = container.clientWidth;
-          const availH = container.clientHeight || 740;
+          const availH = container.clientHeight || 700;
           if (bookWidth > 0 && bookHeight > 0) {
             const scale = Math.min(availW / bookWidth, availH / bookHeight, 1);
             flipbookDiv.style.transformOrigin = 'center center';
             flipbookDiv.style.transform = `scale(${scale})`;
-            // Add extra 20px for flip animation
-            container.style.height = (bookHeight * scale) + 20 + 'px';
+            container.style.height = (bookHeight * scale) + 'px'; // NO extra 20px (fixes sliders)
           }
         }, 300);
       } catch (e) { console.error("Flipbook failed, using Grid Fallback:", e); renderGridFallback(); }
 
-      // NEW: Override click behavior to flip based on tap side, but allow buttons
+      // Click override for flip
       setupClickOverride();
 
       if (currentUser) loadCartData();
@@ -407,15 +406,12 @@
 
     function setupClickOverride() {
       const container = document.getElementById('flipbook-container');
-      // Remove any old listeners
       container.removeEventListener('click', handleClick);
       container.addEventListener('click', handleClick, true);
     }
 
     function handleClick(e) {
-      // If clicked on a button or interactive element, let it work normally
       if (e.target.closest('button') || e.target.closest('a')) return;
-      // Flip based on which half of the container is clicked
       const rect = document.getElementById('flipbook-container').getBoundingClientRect();
       const x = e.clientX - rect.left;
       const half = rect.width / 2;
