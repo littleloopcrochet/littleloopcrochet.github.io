@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Added: Firebase SDK -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -16,70 +16,132 @@
   <style>
     /* ===== Common Styles ===== */
     :root{
-      --bg:#fffdfb;
-      --surface:#ffffff;
-      --card:#fff9f8;
-      --text:#000000;
-      --text-soft:#222222;
-      --muted:#444444;
-      --accent:#d795a7;
-      --accent-hover:#c98296;
-      --pink:#f8dce4;
-      --green:#dfeee5;
-      --yellow:#f8edcc;
-      --blue:#dceaf3;
-      --nav-bg: transparent;
-      --shadow:rgba(90,70,70,.10);
-      --icon-glow:rgba(130,110,110,.18);
+      --bg:#fffdfb; --surface:#ffffff; --card:#fff9f8; --text:#000000; --text-soft:#222222; --muted:#444444; --accent:#d795a7; --accent-hover:#c98296; --pink:#f8dce4; --green:#dfeee5; --yellow:#f8edcc; --blue:#dceaf3; --nav-bg: transparent; --shadow:rgba(90,70,70,.10); --icon-glow:rgba(130,110,110,.18);
     }
-
     body.dark{
-      --bg:#09070d;
-      --surface:#110d17;
-      --card:#17111f;
-      --text:#f7effd;
-      --text-soft:#c8b9d1;
-      --muted:#9989a4;
-      --accent:#bd7cff;
-      --accent-hover:#d19cff;
-      --pink:#352039;
-      --green:#1b3028;
-      --yellow:#342b18;
-      --blue:#20243a;
-      --nav-bg: transparent;
-      --shadow:rgba(0,0,0,.45);
-      --icon-glow:rgba(174,92,255,.75);
+      --bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd; --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff; --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75);
     }
-
     *{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{
-      font-family:"Comfortaa",sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      line-height:1.6;
-      transition:background .5s ease,color .5s ease;
-      overflow-x:hidden;
-    }
+    body{font-family:"Comfortaa",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden}
     a{color:inherit;text-decoration:none}
 
-    /* Navigation */
-    nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:1000;transition:background .5s ease}
+    /* Navigation (updated to match Orders page) */
+    nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:10080;transition:background .5s ease}
     nav a, nav .logo, .nav-links a { text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
     body.dark nav a, body.dark nav .logo, body.dark .nav-links a { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
-    .logo{font-size:1.35rem;font-weight:700;color:var(--text);transition:transform .3s ease,color .3s ease}
+    .logo{font-size:1.35rem;font-weight:700;color:var(--text);transition:transform .3s ease,color .3s ease;white-space:nowrap}
     .logo:hover{transform:translateY(-2px);color:var(--accent)}
+
+    /* Nav Actions (always visible) */
+    .nav-actions{display:flex;align-items:center;gap:10px;margin-left:auto;}
+    
     .nav-right{display:flex;align-items:center;gap:28px}
     .nav-links{display:flex;gap:30px;list-style:none;font-size:.9rem}
     .nav-links a{display:inline-block;transition:color .3s ease,transform .3s ease}
     .nav-links a:hover{color:var(--accent);transform:translateY(-2px)}
+    
     .signin-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;background:var(--accent);color:#fff;font-size:.85rem;font-weight:600;border:none;cursor:pointer;transition:background .3s ease, transform .3s ease, box-shadow .3s ease;text-shadow:none;box-shadow:0 8px 20px rgba(215,149,167,.3)}
     .signin-btn:hover{background:var(--accent-hover);transform:translateY(-3px);box-shadow:0 12px 25px rgba(215,149,167,.4)}
-    .theme-wrapper{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center}
+
+    .theme-wrapper{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;z-index:10000}
     .theme-toggle{width:46px;height:46px;border:1px solid rgba(120,100,120,.12);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem;position:relative;z-index:5;transition:transform .4s ease,background .5s ease,color .5s ease,box-shadow .5s ease}
     .theme-toggle:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 0 20px var(--icon-glow)}
 
-    /* Modal */
+    .mute-wrapper{position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;z-index:10000}
+    .mute-toggle{width:38px;height:38px;border:1px solid rgba(120,100,120,.12);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;position:relative;z-index:5;transition:transform .4s ease,background .5s ease,color .5s ease,box-shadow .5s ease}
+    .mute-toggle:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 0 20px var(--icon-glow)}
+    body.dark .mute-toggle{border-color:rgba(194,130,255,.3);}
+    body.dark .mute-toggle:hover{border-color:rgba(194,130,255,.45);box-shadow:0 0 12px rgba(180,100,255,.45);}
+
+    /* Hamburger menu (mobile) */
+    .hamburger{
+      display:none;
+      flex-direction:column;
+      justify-content:space-between;
+      width:30px;
+      height:22px;
+      background:none;
+      border:none;
+      cursor:pointer;
+      z-index:10080;
+      transition:all .3s ease;
+      position:relative;
+    }
+    .hamburger span{
+      display:block;
+      width:100%;
+      height:3px;
+      background:var(--text);
+      border-radius:3px;
+      transition:all .3s ease;
+    }
+    .hamburger.active span:nth-child(1){
+      transform:translateY(10px) rotate(45deg);
+    }
+    .hamburger.active span:nth-child(2){
+      opacity:0;
+    }
+    .hamburger.active span:nth-child(3){
+      transform:translateY(-10px) rotate(-45deg);
+    }
+
+    /* Mobile Menu Panel */
+    @media(max-width:750px){
+      nav{padding:15px 4%;}
+      .hamburger{display:flex;}
+      .nav-right{
+        display:flex;
+        flex-direction:column;
+        align-items:flex-end;
+        gap:15px;
+        position:fixed;
+        top:0;
+        right:0;
+        width:70%;
+        height:100vh;
+        height:100dvh;
+        background:var(--surface);
+        padding:80px 20px;
+        box-shadow:-5px 0 20px rgba(0,0,0,0.2);
+        transform:translateX(100%);
+        transition:transform .4s ease;
+        z-index:10050;
+        will-change:transform;
+      }
+      .nav-right.open{transform:translateX(0);}
+      .nav-links{flex-direction:column;gap:20px;width:100%;text-align:center;}
+      .nav-links li{width:100%;}
+      .nav-links a{display:block;width:100%;padding:10px;color:var(--text);font-size:1.1rem;}
+      .nav-actions{margin-left:auto;display:flex;gap:5px;align-items:center;}
+      .theme-wrapper,.mute-wrapper{display:flex;justify-content:center;}
+      .theme-toggle,.mute-toggle{width:34px;height:34px;font-size:1rem;}
+    }
+
+    /* ===== About Page Styles ===== */
+    .about-page { min-height: 80vh; padding: 100px 7%; }
+    .about-story { display: flex; flex-wrap: wrap; align-items: center; gap: 50px; margin-bottom: 80px; }
+    .about-img { flex: 1; min-width: 300px; background: linear-gradient(135deg, var(--pink), var(--green)); border-radius: 35px; padding: 50px; text-align: center; font-size: 8rem; box-shadow: 0 20px 60px var(--shadow); border: 1px solid rgba(255,255,255,0.4); }
+    .about-text { flex: 1; min-width: 300px; }
+    .about-text h2 { font-size: 3rem; margin-bottom: 20px; color: var(--text); text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
+    body.dark .about-text h2 { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
+    .about-text p { font-size: 1.1rem; color: var(--text-soft); line-height: 1.8; }
+    .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: var(--text); text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
+    body.dark .section-title { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
+    .values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 80px; }
+    .value-card { padding: 40px; border-radius: 25px; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    body.dark .value-card { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
+    .value-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px var(--shadow); }
+    .value-card .icon { font-size: 3rem; margin-bottom: 20px; }
+    .value-card h3 { color: var(--text); margin-bottom: 15px; font-size: 1.5rem; }
+    .value-card p { color: var(--text-soft); }
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+    .team-card { text-align: center; padding: 30px; background: var(--card); border-radius: 25px; border: 1px solid rgba(120,100,120,.08); }
+    .team-img { width: 100px; height: 100px; border-radius: 50%; background: var(--pink); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 3rem; }
+    .team-card h4 { color: var(--text); margin-bottom: 5px; }
+    .team-card p { color: var(--muted); font-size: 0.9rem; }
+
+    /* Modal (login) – identical to orders */
     .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
     .modal.show { display: flex; align-items: center; justify-content: center; }
     .modal-content { background-color: var(--surface); padding: 40px; border-radius: 30px; width: 90%; max-width: 400px; box-shadow: 0 25px 80px rgba(0,0,0,0.3); position: relative; animation: modalSlideIn .3s ease; border: 1px solid rgba(255,255,255,0.2); }
@@ -110,7 +172,7 @@
     .auth-loading.show { display: flex; }
     .auth-loading span { font-size: 1rem; color: var(--accent); font-weight: 600; }
 
-    /* Loader */
+    /* Loader (same as Orders) */
     body.is-loading{overflow:hidden}
     body.is-loading > *:not(#pageLoader){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
@@ -139,42 +201,8 @@
     body{position:relative;isolation:isolate}
     #aboutCanvas{position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;z-index:-2 !important;pointer-events:none !important;display:block}
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))}
-    nav,.hero,.products-section,.about,footer{position:relative;z-index:2}
+    .about-page,footer{position:relative;z-index:2}  /* Removed nav from this line */
 
-    /* ====== ABOUT PAGE SPECIFIC STYLES ====== */
-    .about-page { min-height: 80vh; padding: 100px 7%; }
-    
-    .about-story { display: flex; flex-wrap: wrap; align-items: center; gap: 50px; margin-bottom: 80px; }
-    .about-img { flex: 1; min-width: 300px; background: linear-gradient(135deg, var(--pink), var(--green)); border-radius: 35px; padding: 50px; text-align: center; font-size: 8rem; box-shadow: 0 20px 60px var(--shadow); border: 1px solid rgba(255,255,255,0.4); }
-    .about-text { flex: 1; min-width: 300px; }
-    .about-text h2 { font-size: 3rem; margin-bottom: 20px; color: var(--text); text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
-    body.dark .about-text h2 { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
-    .about-text p { font-size: 1.1rem; color: var(--text-soft); line-height: 1.8; }
-
-    .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: var(--text); text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
-    body.dark .section-title { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
-
-    .values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 80px; }
-    .value-card { padding: 40px; border-radius: 25px; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    body.dark .value-card { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
-    .value-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px var(--shadow); }
-    .value-card .icon { font-size: 3rem; margin-bottom: 20px; }
-    .value-card h3 { color: var(--text); margin-bottom: 15px; font-size: 1.5rem; }
-    .value-card p { color: var(--text-soft); }
-
-    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-    .team-card { text-align: center; padding: 30px; background: var(--card); border-radius: 25px; border: 1px solid rgba(120,100,120,.08); }
-    .team-img { width: 100px; height: 100px; border-radius: 50%; background: var(--pink); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 3rem; }
-    .team-card h4 { color: var(--text); margin-bottom: 5px; }
-    .team-card p { color: var(--muted); font-size: 0.9rem; }
-
-    /* Footer */
-    footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem}
-
-    @media(max-width:750px){
-      nav{padding:20px 6%}.nav-right{gap:15px}.nav-links{gap:15px;font-size:.75rem}
-      .about-page{padding: 60px 6%}
-    }
     /* Magic Particles & Hearts */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
     .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s cubic-bezier(.25,.65,.35,1) forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
@@ -190,11 +218,13 @@
     body.dark .magic-hover:hover{filter:drop-shadow(0 0 7px rgba(189,124,255,.5));}
     .heart-bubble{position:fixed;pointer-events:none;z-index:10000;font-size:13px;opacity:0;animation:heartBubble 1.25s cubic-bezier(.2,.7,.3,1) forwards;}
     @keyframes heartBubble{0%{opacity:0;transform:translate(0,5px) scale(.25) rotate(-12deg)}15%{opacity:1;transform:translate(0,0) scale(.85) rotate(5deg)}45%{transform:translate(var(--heart-x),-24px) scale(1) rotate(-8deg)}75%{opacity:.85;transform:translate(calc(var(--heart-x) * .7),-45px) scale(.85) rotate(9deg)}100%{opacity:0;transform:translate(calc(var(--heart-x) * 1.4),-70px) scale(.05) rotate(-15deg)}}
-    .mute-wrapper{position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;}
-    .mute-toggle{width:38px;height:38px;border:1px solid rgba(120,100,120,.12);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;position:relative;z-index:5;transition:transform .4s ease,background .5s ease,color .5s ease,box-shadow .5s ease;}
-    .mute-toggle:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 0 20px var(--icon-glow);}
-    body.dark .mute-toggle{border-color:rgba(194,130,255,.3);}
-    body.dark .mute-toggle:hover{border-color:rgba(194,130,255,.45);box-shadow:0 0 12px rgba(180,100,255,.45);}
+
+    footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem;position:relative;z-index:2}
+
+    @media(max-width:750px){
+      nav{padding:20px 6%}
+      .about-page{padding: 60px 6%}
+    }
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 </head>
@@ -202,7 +232,7 @@
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
 
-<!-- Login Modal -->
+<!-- Login Modal (same as before) -->
 <div id="loginModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
@@ -258,21 +288,17 @@
       </button>
       <div class="modal-alt"><span>Already have an account? <a onclick="switchTab('signin')">Sign In</a></span></div>
     </form>
-            <!-- Phone Sign In Form -->
+
     <form id="phoneForm" style="display:none">
       <div class="form-group">
         <label for="phoneNumber">Phone Number</label>
         <input type="tel" id="phoneNumber" placeholder="+91 9876543210" required>
       </div>
-      
-      <!-- This div is required for Google reCAPTCHA -->
       <div id="recaptcha-container"></div>
-    
       <div class="form-group" style="margin-top: 15px;">
         <label for="otpCode">OTP Code</label>
         <input type="text" id="otpCode" placeholder="Enter 6-digit code" required>
       </div>
-    
       <button type="button" class="login-submit" id="sendOtpBtn" style="margin-top: 10px;">Send Code</button>
       <button type="button" class="login-submit" id="verifyOtpBtn" style="background: var(--green); color: var(--text);">Verify & Sign In</button>
       <div class="modal-alt"><span>Need help? <a onclick="switchTab('signin')">Back to Email Sign In</a></span></div>
@@ -294,10 +320,19 @@
   </div>
 </div>
 
-<!-- Navigation -->
+<!-- Navigation (updated to match Orders page) -->
 <nav>
   <a href="index.html" class="logo magic-hover">♡ Little Loop</a>
-  <div class="nav-right">
+  
+  <div class="nav-actions">
+    <div class="mute-wrapper magic-hover"><button class="mute-toggle" id="muteToggle" aria-label="Toggle sound" title="Mute / Unmute"><span class="mute-icon" id="muteIcon">🔊</span></button></div>
+    <div class="theme-wrapper magic-hover"><button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme"><span class="theme-icon" id="themeIcon">☀️</span></button></div>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="nav-right" id="navRight">
     <ul class="nav-links">
       <li><a href="index.html" class="magic-hover">Home</a></li>
       <li><a href="shop.html" class="magic-hover">Shop</a></li>
@@ -306,8 +341,6 @@
       <li><a href="about.html" class="magic-hover">About</a></li>
       <li><a href="contact.html" class="magic-hover">Contact</a></li>
     </ul>
-    
-    <!-- Auth Button (Shows Name when logged in) -->
     <button class="signin-btn" id="authButton" onclick="openAuthModal()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -315,8 +348,6 @@
       </svg>
       <span id="authButtonText">Sign In</span>
     </button>
-
-    <!-- Separate Logout Icon -->
     <button id="logoutBtn" class="logout-btn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text);" onclick="logout()" title="Logout">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -324,17 +355,6 @@
         <line x1="21" y1="12" x2="9" y2="12"></line>
       </svg>
     </button>
-    <div class="mute-wrapper magic-hover">
-      <button class="mute-toggle" id="muteToggle" aria-label="Toggle sound" title="Mute / Unmute">
-        <span class="mute-icon" id="muteIcon">🔊</span>
-      </button>
-    </div>
-
-    <div class="theme-wrapper magic-hover">
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
-        <span class="theme-icon" id="themeIcon">☀️</span>
-      </button>
-    </div>
   </div>
 </nav>
 
@@ -383,7 +403,7 @@
     <div class="team-card magic-hover">
       <div class="team-img">👩‍💻</div>
       <h4>Mayank</h4>
-      <p>Tech and Mangement</p>
+      <p>Tech and Management</p>
     </div>
   </div>
 </section>
@@ -394,22 +414,16 @@
 </footer>
 
 <script>
-  // =======================================================
-  // ===== UNIFIED SCRIPT (LOADER, MAGIC, FIREBASE AUTH) ===
-  // =======================================================
-
-  // ===== PASTE YOUR FIREBASE CONFIG HERE =====
+  // ===== Firebase Config =====
   const firebaseConfig = {
     apiKey: "AIzaSyCeiXIZhofwxkUrWkowZuiMSHyRcsfeHE0",
-  authDomain: "littleloopcrochet-2dcdf.firebaseapp.com",
-  projectId: "littleloopcrochet-2dcdf",
-  storageBucket: "littleloopcrochet-2dcdf.firebasestorage.app",
-  messagingSenderId: "837032344744",
-  appId: "1:837032344744:web:41f17ab83bb6071240969d",
-  measurementId: "G-1F2GVL84HC"
+    authDomain: "littleloopcrochet-2dcdf.firebaseapp.com",
+    projectId: "littleloopcrochet-2dcdf",
+    storageBucket: "littleloopcrochet-2dcdf.firebasestorage.app",
+    messagingSenderId: "837032344744",
+    appId: "1:837032344744:web:41f17ab83bb6071240969d",
+    measurementId: "G-1F2GVL84HC"
   };
-  // ============================================
-
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
@@ -453,9 +467,7 @@
       if (element.classList.contains('heart-hover')) return;
       activeMagicElement = element;
       if (particleInterval !== null) return;
-      // Spawn 3 at the start
       for (let i = 0; i < 3; i++) { createMagicParticle(element); }
-      // Spawn 3 every 300 milliseconds
       particleInterval = setInterval(function() {
         if (activeMagicElement) {
           for (let i = 0; i < 3; i++) { createMagicParticle(activeMagicElement); }
@@ -474,7 +486,7 @@
     function stopHeartMagic(){activeHeartElement=null;if(heartInterval!==null){clearInterval(heartInterval);heartInterval=null;}}
     document.querySelectorAll('.heart-hover').forEach(function(heart){heart.addEventListener('mouseenter',function(){startHeartMagic(heart);});heart.addEventListener('mouseleave',stopHeartMagic);});
 
-    // ===== AUTH LOGIC =====
+    // ===== Auth Logic =====
     let currentUser = null;
     const authButton = document.getElementById('authButton');
     const authButtonText = document.getElementById('authButtonText');
@@ -586,41 +598,40 @@
         .catch(function(error) { alert('Google sign-in failed: ' + error.message); })
         .finally(function() { authLoading.classList.remove('show'); });
     };
-          // Initialize reCAPTCHA verifier (Must be called once on page load)
-const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-  'size': 'normal',
-  'callback': (response) => { /* reCAPTCHA solved, allow sending */ }
-});
 
-// Send OTP
-document.getElementById('sendOtpBtn').addEventListener('click', function() {
-  const phoneNumber = document.getElementById('phoneNumber').value;
-  authLoading.classList.add('show');
-  auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
-    .then(function(confirmationResult) {
-      window.confirmationResult = confirmationResult; // SAVE globally
-      alert("OTP sent to " + phoneNumber);
-    })
-    .catch(function(error) {
-      alert("Error sending OTP: " + error.message);
-    })
-    .finally(function() { authLoading.classList.remove('show'); });
-});
+    // Initialize reCAPTCHA verifier
+    const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'normal',
+      'callback': (response) => { /* reCAPTCHA solved, allow sending */ }
+    });
 
-// Verify OTP
-document.getElementById('verifyOtpBtn').addEventListener('click', function() {
-  const code = document.getElementById('otpCode').value;
-  authLoading.classList.add('show');
-  window.confirmationResult.confirm(code)
-    .then(function(result) {
-      alert("Login successful!");
-      closeModal(); // Close the modal
-    })
-    .catch(function(error) {
-      alert("Invalid OTP. Try again.");
-    })
-    .finally(function() { authLoading.classList.remove('show'); });
-});
+    document.getElementById('sendOtpBtn').addEventListener('click', function() {
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      authLoading.classList.add('show');
+      auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
+        .then(function(confirmationResult) {
+          window.confirmationResult = confirmationResult;
+          alert("OTP sent to " + phoneNumber);
+        })
+        .catch(function(error) {
+          alert("Error sending OTP: " + error.message);
+        })
+        .finally(function() { authLoading.classList.remove('show'); });
+    });
+
+    document.getElementById('verifyOtpBtn').addEventListener('click', function() {
+      const code = document.getElementById('otpCode').value;
+      authLoading.classList.add('show');
+      window.confirmationResult.confirm(code)
+        .then(function(result) {
+          alert("Login successful!");
+          closeModal();
+        })
+        .catch(function(error) {
+          alert("Invalid OTP. Try again.");
+        })
+        .finally(function() { authLoading.classList.remove('show'); });
+    });
 
     window.forgotPassword = function() {
       const email = document.getElementById('email').value;
@@ -635,7 +646,15 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
     function setError(id, msg) { document.getElementById(id).textContent = msg; }
     function clearErrors() { ['emailError', 'passwordError', 'nameError', 'signupEmailError', 'signupPasswordError'].forEach(function(id) { document.getElementById(id).textContent = ''; }); }
 
-    // ===== FULL-SITE IMMERSIVE LANDSCAPE (Complete JS) =====
+    // ===== Hamburger Menu Toggle =====
+    window.toggleMenu = function() {
+      const navRight = document.getElementById('navRight');
+      const hamburger = document.querySelector('.hamburger');
+      navRight.classList.toggle('open');
+      hamburger.classList.toggle('active');
+    };
+
+    // ===== Full-site immersive landscape (same as orders) =====
     (function() {
       const canvas=document.getElementById('aboutCanvas'); if(!canvas)return;
       const ctx=canvas.getContext('2d',{alpha:true});
@@ -732,60 +751,26 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
 
   })();
 </script>
+
 <script>
 (function() {
-  // ===== Audio Manager =====
+  // ===== Audio Manager (same as Orders) =====
   const audioManager = {
-    muted: false,
-    currentTheme: null,
-    audioElements: [],
-    config: null,
-    started: false,
-
-    // Default fallback (if JSON fails)
-    defaultConfig: {
-      day: { tracks: [
-        { src: 's1d.mp3', volume: 0.5 },
-        { src: 's2d.mp3', volume: 0.3 }
-      ]},
-      night: { tracks: [
-        { src: 's1n.mp3', volume: 0.5 },
-        { src: 's2n.mp3', volume: 0.5 }
-      ]}
-    },
-
+    muted: false, currentTheme: null, audioElements: [], config: null, started: false,
+    defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.5 }, { src: 's2d.mp3', volume: 0.3 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.5 }, { src: 's2n.mp3', volume: 0.5 }]}},
     async init() {
-      // Try to fetch from multiple paths
       const paths = ['sound-config.json', './sound-config.json', '/sound-config.json'];
       for (const path of paths) {
         try {
           const res = await fetch(path, { cache: 'no-store' });
-          if (res.ok) {
-            this.config = await res.json();
-            console.log(`✅ Loaded config from ${path}`);
-            break;
-          } else {
-            console.warn(`❌ ${path} returned status ${res.status}`);
-          }
-        } catch (e) {
-          console.warn(`❌ Failed to fetch ${path}: ${e.message}`);
-        }
+          if (res.ok) { this.config = await res.json(); console.log(`✅ Loaded config from ${path}`); break; }
+          else console.warn(`❌ ${path} returned status ${res.status}`);
+        } catch (e) { console.warn(`❌ Failed to fetch ${path}: ${e.message}`); }
       }
-
-      // If no config loaded, use fallback
-      if (!this.config) {
-        console.warn('⚠️ Using fallback config – edit volumes below.');
-        this.config = this.defaultConfig;
-      }
-
-      // Determine theme
+      if (!this.config) { console.warn('⚠️ Using fallback config – edit volumes below.'); this.config = this.defaultConfig; }
       this.currentTheme = document.body.classList.contains('dark') ? 'night' : 'day';
-      this.setupMuteButton();
-      this.loadMuteState();
-      this.armStart();
-      this.bindThemeChange();
+      this.setupMuteButton(); this.loadMuteState(); this.armStart(); this.bindThemeChange();
     },
-
     armStart() {
       const startAudio = () => {
         if (this.started) return;
@@ -805,74 +790,52 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
       const muteBtn = document.getElementById('muteToggle');
       const muteIcon = document.getElementById('muteIcon');
       if (!muteBtn) return;
-      muteBtn.addEventListener('click', () => {
-        this.toggleMute();
-      });
+      muteBtn.addEventListener('click', () => this.toggleMute());
     },
-
     toggleMute() {
       this.muted = !this.muted;
       const icon = document.getElementById('muteIcon');
       if (icon) icon.textContent = this.muted ? '🔇' : '🔊';
-      this.audioElements.forEach(audio => {
-        audio.muted = this.muted;
-      });
+      this.audioElements.forEach(audio => { audio.muted = this.muted; });
       localStorage.setItem('audioMuted', this.muted ? '1' : '0');
     },
-
     loadMuteState() {
       const saved = localStorage.getItem('audioMuted');
       this.muted = saved === '1';
       const icon = document.getElementById('muteIcon');
       if (icon) icon.textContent = this.muted ? '🔇' : '🔊';
     },
-
     bindThemeChange() {
       const toggle = document.getElementById('themeToggle');
       if (!toggle) return;
-      toggle.addEventListener('click', () => {
-        this.switchTheme(document.body.classList.contains('dark') ? 'night' : 'day');
-      });
+      toggle.addEventListener('click', () => this.switchTheme(document.body.classList.contains('dark') ? 'night' : 'day'));
     },
-
     switchTheme(newTheme) {
       if (this.currentTheme === newTheme) return;
       const oldTheme = this.currentTheme;
       this.currentTheme = newTheme;
       if (this.started) this.crossfade(oldTheme, newTheme);
     },
-
     startThemeAudio(theme) {
       const tracks = this.config[theme].tracks;
-      this.audioElements = tracks.map((track, i) => {
+      this.audioElements = tracks.map((track) => {
         const audio = new Audio(track.src);
-        audio.loop = true;
-        audio.volume = track.volume;
-        audio.muted = this.muted;
-        audio.play().then(() => {
-          console.log(`🎵 Playing ${track.src} (vol ${track.volume})`);
-        }).catch(err => {
-          console.warn(`🔇 Could not play ${track.src}: ${err.message}`);
-        });
+        audio.loop = true; audio.volume = track.volume; audio.muted = this.muted;
+        audio.play().then(() => console.log(`🎵 Playing ${track.src}`)).catch(err => console.warn(`🔇 Could not play ${track.src}`));
         return audio;
       });
     },
-
     crossfade(oldTheme, newTheme) {
       const oldTracks = this.audioElements;
       const newTracks = this.config[newTheme].tracks;
       const fadeTime = 1.5;
-
       const newAudioElements = newTracks.map((track) => {
         const audio = new Audio(track.src);
-        audio.loop = true;
-        audio.volume = 0;
-        audio.muted = this.muted;
+        audio.loop = true; audio.volume = 0; audio.muted = this.muted;
         audio.play().catch(err => console.warn('🔇 New track blocked:', err));
         setTimeout(() => { audio.volume = track.volume; }, fadeTime * 1000);
         return audio;
       });
-
       oldTracks.forEach((audio, index) => {
         if (!audio) return;
         const oldVol = this.config[oldTheme].tracks[index]?.volume || 0;
@@ -880,21 +843,13 @@ document.getElementById('verifyOtpBtn').addEventListener('click', function() {
         const step = oldVol / steps;
         let currentVol = oldVol;
         const fadeInterval = setInterval(() => {
-          if (currentVol <= 0.01) {
-            clearInterval(fadeInterval);
-            audio.pause();
-            audio.src = '';
-          } else {
-            currentVol -= step;
-            audio.volume = currentVol;
-          }
+          if (currentVol <= 0.01) { clearInterval(fadeInterval); audio.pause(); audio.src = ''; }
+          else { currentVol -= step; audio.volume = currentVol; }
         }, 1000 / 60);
       });
-
       this.audioElements = newAudioElements;
     }
   };
-
   document.addEventListener('DOMContentLoaded', () => audioManager.init());
 })();
 </script>
