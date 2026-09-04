@@ -53,6 +53,7 @@
       --cover-tap-color: #f2a6b8;
       --cover-bg-opacity: 0.5;
       --cover-logo-size: cover;
+      --cover-bg-color: #1a0d2e;  /* NEW: Dark purple background to match logo */
     }
 
     /* ===== MOBILE OVERRIDES ===== */
@@ -79,6 +80,7 @@
       --cover-title-color: #bd7cff;
       --cover-tap-color: #bd7cff;
       --cover-bg-opacity: 0.5;
+      --cover-bg-color: #1a0d2e; /* Same in dark mode */
     }
     *{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:auto; overflow-x:hidden;}
@@ -209,12 +211,13 @@
 
     .page { background: transparent; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: visible; }
     
-    /* FIXED: Added background-repeat to stop repeated logo */
+    /* FIXED: Added background color to seamlessly blend with the logo */
     .cover { 
       background-image: url('logo.png'); 
       background-size: var(--cover-logo-size); 
       background-position: center center; 
       background-repeat: no-repeat;
+      background-color: var(--cover-bg-color);
       display: flex; 
       flex-direction: column; 
       align-items: center; 
@@ -471,15 +474,7 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // ============================================================
-  // ===== ALL FLIPBOOK PARAMETERS ARE HERE (TOP OF SCRIPT) =====
-  // ============================================================
-  const BOOK_CONFIG = {
-    desktop: { width: 500, height: 700 },
-    mobile: { width: 175, height: 450 }
-  };
-  // ============================================================
-  // ============================================================
+  const BOOK_CONFIG = { desktop: { width: 500, height: 700 }, mobile: { width: 175, height: 450 } };
 
   (function() {
     'use strict';
@@ -540,7 +535,6 @@
       setTimeout(() => { if (container.parentNode) container.remove(); }, 5000);
     }
 
-    // ===== FLIPBOOK =====
     const defaultPages = [
       { image: '', name: 'Cozy Teddy', description: 'A tiny handmade friend.', price: 799, id: 'cozy-teddy', emoji: '🧸' },
       { image: '', name: 'Scarlet Scarf', description: 'Warm, soft, hand-knitted.', price: 1199, id: 'scarlet-scarf', emoji: '🧣' },
@@ -586,11 +580,8 @@
           drawShadow: true, flippingTime: 600
         });
         flipbook.loadFromHTML(pageElements);
-
         flipbookDiv.style.width = pageWidth + 'px';
         flipbookDiv.style.height = pageHeight + 'px';
-        
-        // Restore original native flip logic by NOT overriding clicks
       } catch (e) { console.error("Flipbook failed, using Grid Fallback:", e); renderGridFallback(); }
 
       if (currentUser) loadCartData();
@@ -604,12 +595,8 @@
     const totalGifs = 15;
     const gifStyles = { 1: { top: '-95px', left: '20%', width: '80px', transform: 'translateX(-50%)' }, 2: { top: '-90px', left: '50%', width: '200px', transform: 'translateX(-50%) rotate(10deg)' }, 3: { top: '-120px', left: '15%', width: '200px', transform: 'translateX(-50%)' }, 4: { top: '-90px', left: '55%', width: '90px', transform: 'translateX(-50%) rotate(-5deg)' }, 5: { top: '-100px', left: '55%', width: '85px', transform: 'translateX(-50%)' }, 6: { top: '-80px', left: '80%', width: '75px', transform: 'translateX(-50%) rotate(15deg)' }, 7: { top: '-110px', left: '45%', width: '155px', transform: 'translateX(-50%)' }, 8: { top: '-100px', left: '50%', width: '100px', transform: 'translateX(-50%) rotate(-10deg)' }, 9: { top: '-130px', left: '45%', width: '100px', transform: 'translateX(-50%)' }, 10:{ top: '-100px', left: '55%', width: '70px', transform: 'translateX(-50%) rotate(5deg)' }, 11:{ top: '-120px', left: '60%', width: '90px', transform: 'translateX(-50%)' }, 12:{ top: '-150px', left: '40%', width: '85px', transform: 'translateX(-50%) rotate(-15deg)' }, 13:{ top: '-80px', left: '50%', width: '75px', transform: 'translateX(-50%)' }, 14:{ top: '-110px', left: '45%', width: '95px', transform: 'translateX(-50%) rotate(10deg)' }, 15:{ top: '-140px', left: '55%', width: '80px', transform: 'translateX(-50%)' } };
     const defaultGifStyle = { top: '-150px', left: '50%', width: '80px', transform: 'translateX(-50%)' };
-    // ADD THIS TO SHRINK GIFS ON MOBILE
     if (window.innerWidth <= 750) {
-        Object.keys(gifStyles).forEach(key => {
-            gifStyles[key].width = '40px'; // Change '55px' to 40px or 50px for smaller gifs
-            gifStyles[key].top = '-50px'; // Adjust top if needed so they don't overlap too much
-        });
+        Object.keys(gifStyles).forEach(key => { gifStyles[key].width = '40px'; gifStyles[key].top = '-50px'; });
         defaultGifStyle.width = '55px';
         defaultGifStyle.top = '-100px';
     }
@@ -625,7 +612,6 @@
       const style = gifStyles[gifNum] || defaultGifStyle;
       const inlineStyle = `top: ${style.top}; left: ${style.left}; width: ${style.width}; transform: ${style.transform};`;
 
-      // NOTE: Party popper removed
       page.innerHTML = `
         <div class="diary-page">
           <div class="confetti-container" style="display:none;"></div>
@@ -646,16 +632,9 @@
     }
 
     window.openBook = function() { if (flipbook) flipbook.flipNext(); };
-
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', loadFlipbook); } else { loadFlipbook(); }
-
     let lastWidth = window.innerWidth;
-    window.addEventListener('resize', function() {
-      if (Math.abs(window.innerWidth - lastWidth) > 50) {
-        lastWidth = window.innerWidth;
-        if (typeof pagesData !== 'undefined') initFlipbook(pagesData);
-      }
-    });
+    window.addEventListener('resize', function() { if (Math.abs(window.innerWidth - lastWidth) > 50) { lastWidth = window.innerWidth; if (typeof pagesData !== 'undefined') initFlipbook(pagesData); } });
 
     // Magic particles & hearts
     let particleInterval = null, activeMagicElement = null;
@@ -675,7 +654,6 @@
     document.addEventListener('mouseover', function(e) { const elem = e.target.closest('.magic-hover'); if (elem && !elem._magicActive) { elem._magicActive = true; startMagic(elem); } });
     document.addEventListener('mouseout', function(e) { const elem = e.target.closest('.magic-hover'); if (elem && elem._magicActive) { elem._magicActive = false; stopMagic(); } });
 
-    // Hearts
     function getHeartColour(text) { if (text.includes('🤍')) return '🤍'; if (text.includes('🖤')) return '🖤'; if (text.includes('💜')) return '💜'; if (text.includes('❤️') || text.includes('♥')) return '♥'; return '♥'; }
     document.querySelectorAll('*').forEach(function(element) { const directText = Array.from(element.childNodes).filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join(''); if (directText.includes('♡') || directText.includes('♥') || directText.includes('❤️') || directText.includes('🤍') || directText.includes('🖤') || directText.includes('💜')) { element.classList.add('heart-hover'); element.classList.remove('magic-hover'); } });
     let heartInterval = null, activeHeartElement = null;
