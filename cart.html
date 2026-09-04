@@ -188,7 +188,6 @@
 
     /* Loader (optimized like Orders/About) */
     body.is-loading{overflow:hidden}
-    /* FIX: exclude nav from blur/transform */
     body.is-loading > *:not(#pageLoader):not(nav){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
     .page-loader.loaded{opacity:0;visibility:hidden;pointer-events:none}
@@ -763,7 +762,7 @@
       const orderResponse = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: total, currency: 'INR', receipt: orderDoc.id })
+        body: JSON.stringify({ items: items, currency: 'INR', receipt: orderDoc.id }) // SENDS ITEMS ONLY, NOT AMOUNT
       });
       const orderData = await orderResponse.json();
 
