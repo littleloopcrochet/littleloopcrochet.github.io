@@ -434,142 +434,198 @@
           total += item.price * item.quantity;
         });
 
-        let itemsHTML = '<div class="cart-items">';
+        // Build the items container safely
+        const itemsDiv = document.createElement('div');
+        itemsDiv.className = 'cart-items';
+
         items.forEach(function(item) {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'cart-item';
+
+          // Image / Emoji
+          const imgDiv = document.createElement('div');
+          imgDiv.className = 'cart-item-img';
           const imgPath = productMap[item.id] || '';
-          const imgHTML = imgPath 
-            ? `<img src="${imgPath}" alt="${item.name}">` 
-            : `<span style="font-size:3rem;">${item.image || '🧸'}</span>`;
-          itemsHTML += `
-            <div class="cart-item">
-              <div class="cart-item-img">${imgHTML}</div>
-              <div class="cart-item-details">
-                <h3>${item.name}</h3>
-                <p>Price: ₹${item.price}</p>
-              </div>
-              <div class="cart-item-controls">
-                <div class="cart-item-price">₹${item.price * item.quantity}</div>
-                <div class="qty-controls">
-                  <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
-                  <span class="qty-display">${item.quantity}</span>
-                  <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
-                </div>
-                <button class="remove-btn" onclick="removeItem('${item.id}')">Remove</button>
-              </div>
-            </div>`;
+          if (imgPath) {
+            const img = document.createElement('img');
+            img.src = imgPath;
+            img.alt = item.name;
+            imgDiv.appendChild(img);
+          } else {
+            imgDiv.textContent = item.image || '🧸'; // safe
+          }
+
+          // Details
+          const detailsDiv = document.createElement('div');
+          detailsDiv.className = 'cart-item-details';
+          
+          const nameH = document.createElement('h3');
+          nameH.textContent = item.name; // SAFE! No innerHTML
+          detailsDiv.appendChild(nameH);
+          
+          const priceP = document.createElement('p');
+          priceP.textContent = `Price: ₹${item.price}`;
+          detailsDiv.appendChild(priceP);
+
+          // Controls
+          const controlsDiv = document.createElement('div');
+          controlsDiv.className = 'cart-item-controls';
+
+          const itemPriceDiv = document.createElement('div');
+          itemPriceDiv.className = 'cart-item-price';
+          itemPriceDiv.textContent = `₹${item.price * item.quantity}`;
+          controlsDiv.appendChild(itemPriceDiv);
+
+          const qtyDiv = document.createElement('div');
+          qtyDiv.className = 'qty-controls';
+
+          const minusBtn = document.createElement('button');
+          minusBtn.className = 'qty-btn';
+          minusBtn.textContent = '-';
+          minusBtn.onclick = function() { changeQty(item.id, -1); };
+          qtyDiv.appendChild(minusBtn);
+
+          const qtySpan = document.createElement('span');
+          qtySpan.className = 'qty-display';
+          qtySpan.textContent = item.quantity;
+          qtyDiv.appendChild(qtySpan);
+
+          const plusBtn = document.createElement('button');
+          plusBtn.className = 'qty-btn';
+          plusBtn.textContent = '+';
+          plusBtn.onclick = function() { changeQty(item.id, 1); };
+          qtyDiv.appendChild(plusBtn);
+
+          controlsDiv.appendChild(qtyDiv);
+
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-btn';
+          removeBtn.textContent = 'Remove';
+          removeBtn.onclick = function() { removeItem(item.id); };
+          controlsDiv.appendChild(removeBtn);
+
+          itemDiv.appendChild(imgDiv);
+          itemDiv.appendChild(detailsDiv);
+          itemDiv.appendChild(controlsDiv);
+
+          itemsDiv.appendChild(itemDiv);
         });
-        itemsHTML += '</div>';
+
+        cartContent.appendChild(itemsDiv);
+
+        // Build the summary section safely (the rest is static)
+        const summaryDiv = document.createElement('div');
+        summaryDiv.className = 'cart-summary';
+        summaryDiv.id = 'cartSummary';
 
         const summaryHTML = `
-          <div class="cart-summary" id="cartSummary">
-            <div class="confetti-container" id="cartConfetti" style="display:none;"></div>
-            <h2 class="summary-title">Order Summary</h2>
-            <div class="summary-row"><span>Subtotal</span><span>₹${total}</span></div>
-            <div class="summary-row"><span>Shipping</span><span>Free</span></div>
-            <div class="summary-row total"><span>Total</span><span>₹${total}</span></div>
-            
-            <div class="checkout-form">
-              <h3>Checkout Details</h3>
-              
-              <div class="name-grid">
-                <div class="form-group">
-                  <label>First Name *</label>
-                  <input type="text" id="checkoutFirstName" placeholder="John" required>
-                </div>
-                <div class="form-group">
-                  <label>Middle Name</label>
-                  <input type="text" id="checkoutMiddleName" placeholder="Optional">
-                </div>
-                <div class="form-group">
-                  <label>Last Name *</label>
-                  <input type="text" id="checkoutLastName" placeholder="Doe" required>
-                </div>
-              </div>
-
-              <!-- Fixed Phone Grid with nowrap labels -->
-              <div class="phone-grid">
-                <div class="form-group">
-                  <label>Country Code</label>
-                  <select id="checkoutCountryCode">
-                    <option value="+91" selected>+91</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Phone Number *</label>
-                  <input type="tel" id="checkoutPhone" placeholder="98765 43210" maxlength="10" pattern="[0-9]{10}" required>
-                </div>
-              </div>
-
+          <div class="confetti-container" id="cartConfetti" style="display:none;"></div>
+          <h2 class="summary-title">Order Summary</h2>
+          <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal"></span></div>
+          <div class="summary-row"><span>Shipping</span><span>Free</span></div>
+          <div class="summary-row total"><span>Total</span><span id="summaryTotal"></span></div>
+          
+          <div class="checkout-form">
+            <h3>Checkout Details</h3>
+            <div class="name-grid">
               <div class="form-group">
-                <label>Email Address *</label>
-                <input type="email" id="checkoutEmail" placeholder="you@example.com" required>
-              </div>
-
-              <h3 style="margin-top: 10px;">Delivery Address</h3>
-              <div class="form-group">
-                <label>House / Flat / Building No. *</label>
-                <input type="text" id="checkoutHouse" placeholder="Flat 201, Green Residency" required>
+                <label>First Name *</label>
+                <input type="text" id="checkoutFirstName" placeholder="John" required>
               </div>
               <div class="form-group">
-                <label>Street / Road Name *</label>
-                <input type="text" id="checkoutStreet" placeholder="MG Road" required>
+                <label>Middle Name</label>
+                <input type="text" id="checkoutMiddleName" placeholder="Optional">
               </div>
               <div class="form-group">
-                <label>Area / Locality *</label>
-                <input type="text" id="checkoutArea" placeholder="Sector 14" required>
+                <label>Last Name *</label>
+                <input type="text" id="checkoutLastName" placeholder="Doe" required>
               </div>
-              <div class="form-group">
-                <label>PIN Code *</label>
-                <input type="text" id="checkoutPincode" placeholder="110001" maxlength="6" pattern="[0-9]{6}" required>
-              </div>
-              <div class="address-grid">
-                <div class="form-group">
-                  <label>City / Town *</label>
-                  <input type="text" id="checkoutCity" placeholder="City" required>
-                </div>
-                <div class="form-group">
-                  <label>State *</label>
-                  <input type="text" id="checkoutState" placeholder="State" required>
-                </div>
-              </div>
-
-              <div class="gift-option">
-                <div class="gift-checkbox">
-                  <input type="checkbox" id="checkoutGift">
-                  <label for="checkoutGift">Send it as a gift 🎁</label>
-                </div>
-                <div class="gift-fields" id="giftFields">
-                  <div class="form-group">
-                    <label>Recipient's Name</label>
-                    <input type="text" id="checkoutRecipientName" placeholder="Recipient's name">
-                  </div>
-                  <!-- Fixed Recipient Phone Grid with nowrap labels -->
-                  <div class="phone-grid">
-                    <div class="form-group">
-                      <label>Recipient Code</label>
-                      <select id="checkoutRecipientCode">
-                        <option value="+91" selected>+91</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Recipient Phone</label>
-                      <input type="tel" id="checkoutRecipientPhone" placeholder="10-digit number" maxlength="10" pattern="[0-9]{10}">
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Gift Message</label>
-                    <textarea id="checkoutGiftMessage" rows="3" placeholder="Write a heartfelt message..."></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <button class="checkout-btn magic-hover" onclick="placeOrder()">Place Order</button>
-              <a href="shop.html" class="continue-shopping magic-hover">Continue Shopping</a>
             </div>
-          </div>`;
 
-        cartContent.innerHTML = itemsHTML + summaryHTML;
+            <div class="phone-grid">
+              <div class="form-group">
+                <label>Country Code</label>
+                <select id="checkoutCountryCode"><option value="+91" selected>+91</option></select>
+              </div>
+              <div class="form-group">
+                <label>Phone Number *</label>
+                <input type="tel" id="checkoutPhone" placeholder="98765 43210" maxlength="10" pattern="[0-9]{10}" required>
+              </div>
+            </div>
 
+            <div class="form-group">
+              <label>Email Address *</label>
+              <input type="email" id="checkoutEmail" placeholder="you@example.com" required>
+            </div>
+
+            <h3 style="margin-top: 10px;">Delivery Address</h3>
+            <div class="form-group">
+              <label>House / Flat / Building No. *</label>
+              <input type="text" id="checkoutHouse" placeholder="Flat 201, Green Residency" required>
+            </div>
+            <div class="form-group">
+              <label>Street / Road Name *</label>
+              <input type="text" id="checkoutStreet" placeholder="MG Road" required>
+            </div>
+            <div class="form-group">
+              <label>Area / Locality *</label>
+              <input type="text" id="checkoutArea" placeholder="Sector 14" required>
+            </div>
+            <div class="form-group">
+              <label>PIN Code *</label>
+              <input type="text" id="checkoutPincode" placeholder="110001" maxlength="6" pattern="[0-9]{6}" required>
+            </div>
+            <div class="address-grid">
+              <div class="form-group">
+                <label>City / Town *</label>
+                <input type="text" id="checkoutCity" placeholder="City" required>
+              </div>
+              <div class="form-group">
+                <label>State *</label>
+                <input type="text" id="checkoutState" placeholder="State" required>
+              </div>
+            </div>
+
+            <div class="gift-option">
+              <div class="gift-checkbox">
+                <input type="checkbox" id="checkoutGift">
+                <label for="checkoutGift">Send it as a gift 🎁</label>
+              </div>
+              <div class="gift-fields" id="giftFields">
+                <div class="form-group">
+                  <label>Recipient's Name</label>
+                  <input type="text" id="checkoutRecipientName" placeholder="Recipient's name">
+                </div>
+                <div class="phone-grid">
+                  <div class="form-group">
+                    <label>Recipient Code</label>
+                    <select id="checkoutRecipientCode"><option value="+91" selected>+91</option></select>
+                  </div>
+                  <div class="form-group">
+                    <label>Recipient Phone</label>
+                    <input type="tel" id="checkoutRecipientPhone" placeholder="10-digit number" maxlength="10" pattern="[0-9]{10}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Gift Message</label>
+                  <textarea id="checkoutGiftMessage" rows="3" placeholder="Write a heartfelt message..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <button class="checkout-btn magic-hover" onclick="placeOrder()">Place Order</button>
+            <a href="shop.html" class="continue-shopping magic-hover">Continue Shopping</a>
+          </div>
+        `;
+        summaryDiv.innerHTML = summaryHTML; // static HTML, safe
+
+        // Now set the totals safely using textContent
+        summaryDiv.querySelector('#summarySubtotal').textContent = `₹${total}`;
+        summaryDiv.querySelector('#summaryTotal').textContent = `₹${total}`;
+
+        cartContent.appendChild(summaryDiv);
+
+        // Attach event listeners (same as before)
         document.getElementById('checkoutPincode').addEventListener('input', async function() {
           const pincode = this.value.trim();
           if (pincode.length === 6 && /^[0-9]{6}$/.test(pincode)) {
@@ -730,17 +786,7 @@
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              orderId: orderDoc.id,
-              email,
-              name: fullName,
-              total,
-              items,
-              phone: phoneCode + phone,
-              address: `${house}, ${street}, ${area}, ${city}, ${state} - ${pincode}`,
-              isGift,
-              recipientName,
-              recipientPhone: recipientCode + recipientPhone,
-              giftMessage
+              orderId: orderDoc.id // Only this! No total, items, or email from frontend!
             })
           });
           const verifyData = await verifyResponse.json();
