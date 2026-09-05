@@ -58,8 +58,8 @@
     .hamburger.active span:nth-child(2){opacity:0;}
     .hamburger.active span:nth-child(3){transform:translateY(-10px) rotate(-45deg);}
 
-    /* Mobile & Tablet Breakpoint (Fixed to 1024px) */
-    @media(max-width:1024px){
+    /* Mobile & Tablet Breakpoint (FIXED to 1366px to cover all tablets) */
+    @media(max-width:1366px){
       nav{padding:15px 4%;}
       .hamburger{display:flex;}
       .nav-right{display:flex;flex-direction:column;align-items:flex-end;gap:15px;position:fixed;top:0;right:0;width:70%;height:100vh;height:100dvh;background:var(--surface);padding:80px 20px;box-shadow:-5px 0 20px rgba(0,0,0,0.2);transform:translateX(100%);visibility:hidden;pointer-events:none;transition:transform .4s ease, visibility .4s ease;z-index:10050;will-change:transform;}
@@ -189,8 +189,8 @@
     body.dark .gallery-orbit{border-color:rgba(176,194,255,.13)}
     body.dark .gallery-orbit:before,body.dark .gallery-orbit:after{box-shadow:0 0 12px 4px rgba(151,179,255,.45)}
 
-    /* Mobile & Tablet Adjustments - FIXED to 1024px */
-    @media(max-width:1024px){
+    /* Mobile & Tablet Adjustments - FIXED to 1366px */
+    @media(max-width:1366px){
       .hero{grid-template-columns:1fr;gap:40px;text-align:center;}
       .hero-gallery{height:420px;width:100%;margin-left:0;}
       .memory-card{width:160px;top:58%;padding:8px 8px 28px;}
@@ -230,7 +230,7 @@
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem;transition:background .5s ease;}
 
     /* Mobile & Tablet padding adjustments */
-    @media(max-width:1024px){
+    @media(max-width:1366px){
       nav{padding:20px 6%;}
       .about{padding:75px 6%;}
       .why-us-section{padding:75px 6%;}
@@ -499,8 +499,8 @@
     function focusMemory(index) {
       memoryIndex = (index + 7) % 7;
       
-      // FIX: Detect mobile AND tablet widths (<= 1024px)
-      const isTabletOrMobile = window.innerWidth <= 1024;
+      // FIX: Detect mobile AND tablet widths (<= 1366px)
+      const isTabletOrMobile = window.innerWidth <= 1366;
       const offsetsDesktop = [
         [-345, 67, -11, 0.7, 0.68, 2],
         [-240, -37, -6, 0.8, 0.82, 4],
