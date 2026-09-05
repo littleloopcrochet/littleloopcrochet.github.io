@@ -126,6 +126,8 @@
   let currentUser = null;
   let selectedCustomerId = null;
   let unsubscribeChat = null;
+  let unsubscribeOrders = null; // For real-time orders
+  let unsubscribeCustomers = null; // For real-time customers
 
   auth.onAuthStateChanged(function(user) {
     if (user && (user.email === ADMIN_EMAIL || user.uid === ADMIN_UID)) {
@@ -145,7 +147,12 @@
     }
   });
 
-  function logoutAdmin() { auth.signOut().then(function() { window.location.href = 'index.html'; }); }
+  function logoutAdmin() { 
+    if(unsubscribeOrders) unsubscribeOrders();
+    if(unsubscribeCustomers) unsubscribeCustomers();
+    if(unsubscribeChat) unsubscribeChat();
+    auth.signOut().then(function() { window.location.href = 'index.html'; }); 
+  }
 
   window.switchTab = function(tab) {
     document.getElementById('tabOrders').classList.toggle('active', tab === 'orders');
@@ -156,13 +163,21 @@
     if (tab === 'chats') loadCustomers();
   };
 
-  // ===== ORDERS MANAGEMENT =====
+  // ===== ORDERS MANAGEMENT (UPDATED TO REAL-TIME onSnapshot) =====
   function loadOrders() {
     const list = document.getElementById('allOrdersList');
-    list.innerHTML = 'Loading...';
-    db.collection('orders').orderBy('createdAt', 'desc').get().then(function(querySnapshot) {
+
+    // Unsubscribe previous listener if it exists
+    if (unsubscribeOrders) unsubscribeOrders();
+
+    // Start real-time listener
+    unsubscribeOrders = db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(querySnapshot) {
       list.innerHTML = '';
-      if (querySnapshot.empty) { list.innerHTML = '<p style="color:var(--muted);">No orders yet.</p>'; return; }
+      if (querySnapshot.empty) { 
+        list.innerHTML = '<p style="color:var(--muted);">No orders yet.</p>'; 
+        return; 
+      }
+
       querySnapshot.forEach(function(doc) {
         const order = doc.data();
         const orderId = doc.id;
@@ -173,13 +188,17 @@
         const phone = order.phone || 'N/A';
         const address = order.address || 'N/A';
         const total = order.total || 0;
+        
+        // NOTE: Address is an object in your database, so we use a safe stringify
+        const addressStr = typeof address === 'object' ? JSON.stringify(address) : address;
+
         const cardHTML = `
           <div class="order-admin-card" id="order-${orderId}" data-email="${email}" data-name="${name}" data-total="${total}">
             <h4>Order #${orderId.slice(-6).toUpperCase()} (${name})</h4>
             <p>Date: ${order.createdAt ? order.createdAt.toDate().toLocaleDateString('en-IN') : 'N/A'}</p>
             <p><strong>Phone:</strong> ${phone}</p>
             <p><strong>Email:</strong> ${email || 'N/A'}</p>
-            <p><strong>Address:</strong> ${address}</p>
+            <p><strong>Address:</strong> ${addressStr}</p>
             <div class="order-items-admin">${itemsHTML}</div>
             <p><strong>Total: ₹${total}</strong></p>
             <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
@@ -197,13 +216,20 @@
           </div>`;
         list.innerHTML += cardHTML;
       });
-    }).catch(function(err) { console.error("Error loading orders: ", err); list.innerHTML = '<p style="color:red;">Error loading orders.</p>'; });
+    }, function(err) { 
+      console.error("Error loading orders: ", err); 
+      list.innerHTML = '<p style="color:red;">Error loading orders.</p>'; 
+    });
   }
 
   // SECURE STATUS CHANGE - Calls the Worker to trigger Email and Refund
   window.changeOrderStatus = async function(orderId, newStatus) {
     const confirmMessage = newStatus === 'cancelled' ? "Change status to Cancelled and initiate refund?" : "Change status to " + newStatus + " and send email?";
-    if (!confirm(confirmMessage)) { loadOrders(); return; }
+    if (!confirm(confirmMessage)) { 
+      // Revert dropdown immediately because we are returning
+      loadOrders(); 
+      return; 
+    }
     
     const idToken = await currentUser.getIdToken();
     const card = document.getElementById(`order-${orderId}`);
@@ -231,7 +257,7 @@
       console.error("Error updating status:", err);
       alert("Failed to update status.");
     }
-    loadOrders();
+    // The onSnapshot listener will automatically reload the orders list!
   };
 
   // SECURE EMAIL SENDING - Uses Firebase ID Token, NOT hardcoded secret
@@ -280,13 +306,21 @@
     } catch (err) { console.error(err); alert("Failed to fetch details."); }
   };
 
-  // ===== CHATS MANAGEMENT =====
+  // ===== CHATS MANAGEMENT (UPDATED TO REAL-TIME onSnapshot for Customers) =====
   function loadCustomers() {
     const customerList = document.getElementById('customerList');
-    customerList.innerHTML = 'Loading...';
-    db.collection('chats').get().then(function(querySnapshot) {
+
+    // Unsubscribe previous listener
+    if (unsubscribeCustomers) unsubscribeCustomers();
+
+    // Start real-time listener
+    unsubscribeCustomers = db.collection('chats').onSnapshot(function(querySnapshot) {
       customerList.innerHTML = '';
-      if (querySnapshot.empty) { customerList.innerHTML = '<p style="color:var(--muted);">No customers yet.</p>'; return; }
+      if (querySnapshot.empty) { 
+        customerList.innerHTML = '<p style="color:var(--muted);">No customers yet.</p>'; 
+        return; 
+      }
+
       querySnapshot.forEach(function(userDoc) {
         const userId = userDoc.id;
         const data = userDoc.data();
@@ -296,10 +330,21 @@
         const item = document.createElement('div');
         item.className = 'customer-item';
         item.innerHTML = `<h4>${displayName}</h4><p>${displayEmail}</p>`;
-        item.addEventListener('click', function() { selectCustomer(userId, item); });
+        
+        // Highlight if this is the currently selected customer
+        if (userId === selectedCustomerId) {
+          item.classList.add('active');
+        }
+
+        item.addEventListener('click', function() { 
+          selectCustomer(userId, item); 
+        });
         customerList.appendChild(item);
       });
-    }).catch(function(err) { console.error("Error loading customers: ", err); customerList.innerHTML = '<p style="color:red;">Error loading customers.</p>'; });
+    }, function(err) { 
+      console.error("Error loading customers: ", err); 
+      customerList.innerHTML = '<p style="color:red;">Error loading customers.</p>'; 
+    });
   }
 
   function selectCustomer(userId, element) {
