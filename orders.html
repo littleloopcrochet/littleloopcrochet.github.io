@@ -25,7 +25,6 @@
     .logo{font-size:1.35rem;font-weight:700;color:var(--text);transition:transform .3s ease,color .3s ease;white-space:nowrap} 
     .logo:hover{transform:translateY(-2px);color:var(--accent)} 
     
-    /* Nav Actions (always visible) */
     .nav-actions{display:flex;align-items:center;gap:10px;margin-left:auto;}
     
     .nav-right{display:flex;align-items:center;gap:28px} 
@@ -46,7 +45,6 @@
     body.dark .mute-toggle { border-color: rgba(194,130,255,.3); }
     body.dark .mute-toggle:hover { border-color: rgba(194,130,255,.45); box-shadow: 0 0 12px rgba(180,100,255,.45); }
 
-    /* ===== HAMBURGER MENU (Mobile Only) ===== */
     .hamburger{
       display:none;
       flex-direction:column;
@@ -68,19 +66,10 @@
       border-radius:3px;
       transition: all .3s ease;
     }
+    .hamburger.active span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
     
-    /* Hamburger active state (X) */
-    .hamburger.active span:nth-child(1) {
-      transform: translateY(10px) rotate(45deg);
-    }
-    .hamburger.active span:nth-child(2) {
-      opacity: 0;
-    }
-    .hamburger.active span:nth-child(3) {
-      transform: translateY(-10px) rotate(-45deg);
-    }
-    
-    /* ===== RESPONSIVE NAVIGATION (Mobile) ===== */
     @media(max-width:750px){
       nav{padding:15px 4%;}
       .hamburger{display:flex;}
@@ -127,6 +116,7 @@
     .order-status.shipped { background: var(--blue); color: #1e4e6a; } 
     .order-status.delivered { background: var(--pink); color: #9d4a5f; } 
     .order-status.cancelled { background: var(--muted); color: white; } 
+    .order-status.refunded { background: var(--blue); color: #1e4e6a; }
     .order-date { font-size: .85rem; color: var(--muted); } 
     .order-items { margin-bottom: 20px; } 
     .order-items h4 { font-size: 1rem; margin-bottom: 15px; color: var(--text-soft); } 
@@ -152,7 +142,6 @@
     .empty-orders p { color: var(--muted); margin-bottom: 30px; } 
     .shop-btn { padding: 15px 30px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; display: inline-block; } 
     .shop-btn:hover { background: var(--accent-hover); } 
-    .order-status.refunded { background: var(--blue); color: #1e4e6a; }
     
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center; } 
     .modal-box { background: var(--card); padding: 30px; border-radius: 20px; max-width: 500px; width: 90%; position: relative; text-align: center; } 
@@ -292,9 +281,9 @@
   document.querySelectorAll('.heart-hover').forEach(function(heart){heart.addEventListener('mouseenter',function(){startHeartMagic(heart);});heart.addEventListener('mouseleave',stopHeartMagic);});
 
   const authButtonText = document.getElementById('authButtonText');
+  const logoutBtn = document.getElementById('logoutBtn');
   let currentUser = null;
 
-  // Time windows
   const CANCEL_WINDOW_MS = 24 * 60 * 60 * 1000;
   const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -302,9 +291,11 @@
     currentUser = user;
     if (user) {
       authButtonText.textContent = user.displayName || user.phoneNumber || 'Account';
+      logoutBtn.style.display = 'inline-flex';
       loadOrders();
     } else {
       authButtonText.textContent = 'Sign In';
+      logoutBtn.style.display = 'none';
       document.getElementById('ordersContainer').innerHTML = `<div class="empty-orders" style="width:100%;"><h2>Please Sign In</h2><p>You need to sign in to view your orders.</p><a href="index.html" class="shop-btn">Go to Sign In</a></div>`;
       window.finishLoading();
     }
@@ -369,25 +360,28 @@
     }).catch(function(err) { console.error("Error loading orders: ", err); container.innerHTML = `<div class="empty-orders" style="width:100%;"><h2>Error loading orders</h2><p>Please refresh the page.</p></div>`; window.finishLoading(); });
   }
 
+  // SECURE CANCELLATION: Sends to worker for auth, refund, and email instead of direct DB update
   window.cancelOrder = async function(orderId) {
-    if (!confirm('Are you sure you want to cancel this order?')) return;
-    db.collection('orders').doc(orderId).update({ status: 'cancelled' }).then(async () => {
-      alert('Order cancelled successfully.');
-      loadOrders();
-      const orderDoc = await db.collection('orders').doc(orderId).get();
-      const order = orderDoc.data();
-      const email = order.email || '';
-      if (email) {
-        fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/send-status-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId: orderId, status: 'cancelled', customerUid: currentUser.uid, email: email, name: order.userName || 'Customer', total: order.total || 0 })
-        }).catch(err => console.error("Auto email failed:", err));
+    if (!confirm('Are you sure you want to cancel this order? A refund will be initiated.')) return;
+    
+    try {
+      const idToken = await currentUser.getIdToken();
+      const response = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/send-status-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: orderId, status: "cancelled", idToken: idToken })
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert("Order cancelled successfully! Refund is being processed.");
+        loadOrders(); 
+      } else {
+        alert("Error: " + data.error);
       }
-    }).catch(function(error) {
-      console.error("Error cancelling order: ", error);
-      alert('Could not cancel order. Please contact support.');
-    });
+    } catch (err) {
+      console.error("Cancel error:", err);
+      alert("Failed to cancel order. Please try again.");
+    }
   };
 
   window.openEditModal = function(orderId) {
