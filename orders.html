@@ -137,6 +137,8 @@
     .order-actions .cancel-btn:hover { background: #e55353; } 
     .order-actions .edit-btn { background: var(--blue); color: white; } 
     .order-actions .edit-btn:hover { background: var(--blue); opacity: 0.8; } 
+    .order-actions .pay-btn { background: var(--green); color: white; } 
+    .order-actions .pay-btn:hover { background: var(--green); opacity: 0.8; } 
     .empty-orders { text-align: center; padding: 80px 20px; } 
     .empty-orders h2 { font-size: 1.8rem; margin-bottom: 15px; color: var(--text); } 
     .empty-orders p { color: var(--muted); margin-bottom: 30px; } 
@@ -340,7 +342,6 @@
         const timeDiff = now - createdDate;
 
         let cancelBtn = '';
-        // UPDATED: Added status !== 'shipped' so buttons disappear when shipped
         if (timeDiff < CANCEL_WINDOW_MS && status !== 'cancelled' && status !== 'delivered' && status !== 'refunded' && status !== 'shipped') {
           cancelBtn = `<button onclick="cancelOrder('${orderId}')" class="cancel-btn">Cancel</button>`;
         }
@@ -351,19 +352,97 @@
         }
 
         let editBtn = '';
-        // UPDATED: Added status !== 'shipped' so buttons disappear when shipped
         if (timeDiff < EDIT_WINDOW_MS && status !== 'cancelled' && status !== 'delivered' && status !== 'refunded' && status !== 'shipped') {
           editBtn = `<button onclick="openEditModal('${orderId}')" class="edit-btn">Edit Order Details</button>`;
         }
+
+        let payBtn = '';
+        if (status === 'pending') {
+          payBtn = `<button onclick="payNow('${orderId}')" class="pay-btn">Pay Now</button>`;
+        }
         
-        const cardHTML = `<div class="order-card"><div class="order-header"><h3>Order #${orderId.slice(-6).toUpperCase()}</h3><span class="order-status ${statusClass}">${status}</span><span class="order-date">${dateStr}</span></div><div class="order-items"><h4>Items</h4>${itemsHTML}</div><div class="order-summary"><div><span class="order-total-label">Total</span><div class="order-total-amount">₹${order.total || 0}</div></div><div class="order-actions">${trackBtn}${cancelBtn}${editBtn}<a href="shop.html">Shop</a></div></div></div>`;
+        const cardHTML = `<div class="order-card"><div class="order-header"><h3>Order #${orderId.slice(-6).toUpperCase()}</h3><span class="order-status ${statusClass}">${status}</span><span class="order-date">${dateStr}</span></div><div class="order-items"><h4>Items</h4>${itemsHTML}</div><div class="order-summary"><div><span class="order-total-label">Total</span><div class="order-total-amount">₹${order.total || 0}</div></div><div class="order-actions">${payBtn}${trackBtn}${cancelBtn}${editBtn}<a href="shop.html">Shop</a></div></div></div>`;
         container.innerHTML += cardHTML;
       });
       window.finishLoading();
     }).catch(function(err) { console.error("Error loading orders: ", err); container.innerHTML = `<div class="empty-orders" style="width:100%;"><h2>Error loading orders</h2><p>Please refresh the page.</p></div>`; window.finishLoading(); });
   }
 
-  // SECURE CANCELLATION: Sends to worker for auth, refund, and email instead of direct DB update
+  // NEW: Pay Now for Pending Orders
+  window.payNow = async function(orderId) {
+    try {
+      const orderDoc = await db.collection('orders').doc(orderId).get();
+      if (!orderDoc.exists) {
+        alert("Order not found.");
+        return;
+      }
+      const order = orderDoc.data();
+      const items = order.items || [];
+      const coupon = order.coupon || ""; // If a coupon was used originally
+
+      if (items.length === 0) {
+        alert("This order has no items.");
+        return;
+      }
+
+      // Call the Worker to create a fresh Razorpay order
+      const orderResponse = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          items: items, 
+          currency: 'INR', 
+          receipt: orderId, // Use the existing order ID as receipt
+          coupon: coupon
+        })
+      });
+      const orderData = await orderResponse.json();
+
+      if (!orderData.id) {
+        throw new Error(orderData.error || "Failed to create payment order");
+      }
+
+      const options = {
+        key: 'rzp_test_TYLpLID3tKkx0o', // Make sure this is your key
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Little Loop',
+        description: 'Pending Order Payment',
+        order_id: orderData.id,
+        handler: async function(response) {
+          const verifyResponse = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId: orderId // Use the same order ID for verification
+            })
+          });
+          const verifyData = await verifyResponse.json();
+
+          if (verifyData.success) {
+            alert("Payment successful! Your order is now confirmed.");
+            loadOrders(); // Refresh order list
+          } else {
+            alert("Payment verification failed. Please contact support.");
+          }
+        },
+        modal: { ondismiss: function() { /* Do nothing */ } },
+        theme: { color: '#d795a7' }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+
+    } catch (err) {
+      console.error("Pay Now error:", err);
+      alert("Failed to initiate payment. Please try again.");
+    }
+  };
+
+  // SECURE CANCELLATION
   window.cancelOrder = async function(orderId) {
     if (!confirm('Are you sure you want to cancel this order? A refund will be initiated.')) return;
     
