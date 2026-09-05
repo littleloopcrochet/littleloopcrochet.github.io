@@ -10,7 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   
-  <!-- Chart.js for Dashboard -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,35 +37,49 @@
     .admin-container{padding:30px 7%;display:none;}
     .admin-container.active{display:block;}
 
-    /* Dashboard Styles */
+    /* Dashboard Sub-Tabs */
+    .dash-sub-tabs{display:flex;gap:15px;margin-bottom:30px;border-bottom:2px solid var(--pink);padding-bottom:10px;}
+    .sub-tab{padding:10px 20px;cursor:pointer;font-weight:600;color:var(--muted);border-radius:20px;}
+    .sub-tab.active{background:var(--accent);color:white;}
+
     .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
     .dash-card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); border-left: 5px solid var(--accent); }
     .dash-card h4 { color: var(--muted); font-size: 0.9rem; }
     .dash-card p { font-size: 2rem; font-weight: bold; color: var(--text); }
     .chart-container { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 20px; }
-    .top-products { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: var(--shadow); }
-    .top-products ul { list-style: none; margin-top: 10px; }
-    .top-products li { padding: 10px 0; border-bottom: 1px solid var(--pink); display: flex; justify-content: space-between; }
 
-    /* Search & Filter Styles */
-    .filter-bar { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
-    .filter-bar input, .filter-bar select { padding: 12px; border-radius: 30px; border: 1px solid var(--muted); background: var(--surface); color: var(--text); outline: none; }
+    /* Order Card Styles */
+    .order-admin-card{background:var(--surface);border-radius:15px;padding:20px;margin-bottom:15px;box-shadow:0 5px 15px var(--shadow);border-left:4px solid var(--accent);}
+    .order-admin-card h4{color:var(--text);font-size:1rem;margin-bottom:5px;}
+    .order-admin-card p{font-size:0.85rem;color:var(--muted);margin-bottom:5px;}
+    .order-items-admin{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;margin-top:10px;}
+    .order-item-admin{background:var(--pink);padding:5px 10px;border-radius:10px;font-size:0.8rem;}
+
+    /* Status Button Colors */
+    .status-select{padding:10px 15px;border-radius:50px;border:none;font-family:inherit;font-weight:700;cursor:pointer;margin-right:10px;outline:none;}
+    .status-select.pending{background:var(--yellow);color:#8a6d1e;}
+    .status-select.paid{background:var(--green);color:#2d6a4f;}
+    .status-select.shipped{background:var(--blue);color:#1e4e6a;}
+    .status-select.delivered{background:var(--pink);color:#9d4a5f;}
+    .status-select.cancelled{background:#ff6b6b;color:white;}
+    .status-select.refunded{background:#9c27b0;color:white;}
+
     .btn { padding: 10px 20px; border-radius: 30px; background: var(--accent); color: white; cursor: pointer; border: none; font-weight: bold; transition: 0.3s; }
     .btn:hover { background: var(--accent-hover); }
     .btn-secondary { background: var(--muted); }
-    
+
+    /* Chats */
+    .customer-item{padding:15px;border-radius:15px;margin-bottom:10px;cursor:pointer;background:var(--surface);transition:all 0.3s ease;}
+    .customer-item:hover,.customer-item.active{background:var(--pink);}
+
     /* Modal */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; }
     .modal-box { background: var(--card); padding: 30px; border-radius: 20px; max-width: 700px; width: 95%; position: relative; max-height: 90vh; overflow-y: auto; }
     .close-modal { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 24px; color: var(--muted); }
 
-    /* Placeholder */
+    /* Coming Soon */
     .coming-soon { display: flex; justify-content: center; align-items: center; height: 60vh; flex-direction: column; text-align: center; }
     .coming-soon h2 { margin-bottom: 20px; color: var(--accent); }
-
-    .order-admin-card{background:var(--surface);border-radius:15px;padding:20px;margin-bottom:15px;box-shadow:0 5px 15px var(--shadow);border-left:4px solid var(--accent);}
-    .customer-item{padding:15px;border-radius:15px;margin-bottom:10px;cursor:pointer;background:var(--surface);transition:all 0.3s ease;}
-    .customer-item:hover,.customer-item.active{background:var(--pink);}
   </style>
 </head>
 <body>
@@ -87,28 +101,54 @@
 
   <!-- Dashboard -->
   <div class="admin-container" id="dashboardContainer">
-    <h2 style="margin-bottom:20px;">Business Overview</h2>
-    <div class="dash-cards">
-      <div class="dash-card"><h4>Total Revenue</h4><p id="totalRevenue">₹0</p></div>
-      <div class="dash-card"><h4>Total Orders</h4><p id="totalOrders">0</p></div>
-      <div class="dash-card"><h4>Pending Orders</h4><p id="pendingOrders">0</p></div>
-      <div class="dash-card"><h4>Refunded Amount</h4><p id="refundedAmount">₹0</p></div>
+    <div class="dash-sub-tabs">
+      <div class="sub-tab active" id="dashTabOverview" onclick="switchDashTab('overview')">📈 Overview</div>
+      <div class="sub-tab" id="dashTabProducts" onclick="switchDashTab('products')">📦 Product Analytics</div>
     </div>
-    <div class="chart-container">
-      <h3>Sales (Last 7 Days)</h3>
-      <canvas id="salesChart" height="100"></canvas>
+
+    <!-- Overview Sub-Tab -->
+    <div id="dashOverviewContent">
+      <div class="dash-cards">
+        <div class="dash-card"><h4>Total Revenue</h4><p id="totalRevenue">₹0</p></div>
+        <div class="dash-card"><h4>Total Orders</h4><p id="totalOrders">0</p></div>
+        <div class="dash-card"><h4>Avg Order Value</h4><p id="avgOrderValue">₹0</p></div>
+        <div class="dash-card"><h4>Total Units Sold</h4><p id="totalUnits">0</p></div>
+        <div class="dash-card"><h4>Pending Orders</h4><p id="pendingOrders">0</p></div>
+        <div class="dash-card"><h4>Refunded Amount</h4><p id="refundedAmount">₹0</p></div>
+      </div>
+      <div class="chart-container">
+        <h3>Sales (Last 7 Days)</h3>
+        <canvas id="salesChart" height="100"></canvas>
+      </div>
     </div>
-    <div class="top-products">
-      <h3>Top Products</h3>
-      <ul id="topProductsList"></ul>
+
+    <!-- Product Analytics Sub-Tab -->
+    <div id="dashProductsContent" style="display:none;">
+      <div class="chart-container">
+        <h3>Top 5 Products by Revenue</h3>
+        <canvas id="topProductsPieChart" height="100"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Quantity Sold per Product</h3>
+        <canvas id="productBarChart" height="100"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Detailed Product Data</h3>
+        <div style="overflow-x:auto;">
+          <table width="100%" cellpadding="10" style="border-collapse:collapse;">
+            <thead><tr style="background:var(--pink);"><th>Product</th><th>Price</th><th>Qty Sold</th><th>Revenue</th></tr></thead>
+            <tbody id="productDataTable"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Orders -->
   <div class="admin-container active" id="ordersContainer">
-    <div class="filter-bar">
-      <input type="text" id="searchInput" placeholder="🔍 Search Name, Email, Phone..." oninput="filterOrders()">
-      <select id="statusFilter" onchange="filterOrders()">
+    <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px;">
+      <input type="text" id="searchInput" placeholder="🔍 Search Name, Email, Phone..." oninput="filterOrders()" style="padding: 12px; border-radius: 30px; border: 1px solid var(--muted); background: var(--surface); color: var(--text);">
+      <select id="statusFilter" onchange="filterOrders()" style="padding: 12px; border-radius: 30px; border: 1px solid var(--muted); background: var(--surface); color: var(--text);">
         <option value="all">All Status</option>
         <option value="pending">Pending</option>
         <option value="paid">Paid</option>
@@ -117,7 +157,7 @@
         <option value="cancelled">Cancelled</option>
         <option value="refunded">Refunded</option>
       </select>
-      <input type="date" id="dateFilter" onchange="filterOrders()">
+      <input type="date" id="dateFilter" onchange="filterOrders()" style="padding: 12px; border-radius: 30px; border: 1px solid var(--muted); background: var(--surface); color: var(--text);">
       <button class="btn btn-secondary" onclick="exportCSV()">⬇️ Export CSV</button>
     </div>
     <div id="allOrdersList"></div>
@@ -125,7 +165,7 @@
 
   <!-- Chats -->
   <div class="admin-container" id="chatsContainer">
-    <div style="display:flex; gap:20px;">
+    <div style="display: flex; gap: 20px;">
       <div class="customer-list" id="customerList" style="width:300px;"></div>
       <div class="admin-chat" style="flex:1;">
         <div class="chat-window" id="adminChatWindow" style="height:400px; overflow-y:auto; background:var(--surface); padding:20px; border-radius:20px;"></div>
@@ -137,39 +177,14 @@
     </div>
   </div>
 
-  <!-- Inventory Placeholder -->
-  <div class="admin-container" id="inventoryContainer">
-    <div class="coming-soon">
-      <h2>🛍️ Inventory Management</h2>
-      <p>This feature is ready to be activated. Please request the backend code to make this live.</p>
-    </div>
-  </div>
-
-  <!-- Coupons Placeholder -->
-  <div class="admin-container" id="couponsContainer">
-    <div class="coming-soon">
-      <h2>🎟️ Coupon Management</h2>
-      <p>This feature is ready to be activated. Please request the backend code to make this live.</p>
-    </div>
-  </div>
-
-  <!-- Shipping Placeholder -->
-  <div class="admin-container" id="shippingContainer">
-    <div class="coming-soon">
-      <h2>🚚 Shipping & Logistics</h2>
-      <p>This feature is ready to be activated. Please request the backend code to make this live.</p>
-    </div>
-  </div>
+  <!-- Placeholders -->
+  <div class="admin-container" id="inventoryContainer"><div class="coming-soon"><h2>🛍️ Inventory Management</h2><p>Coming soon. Request backend code to activate.</p></div></div>
+  <div class="admin-container" id="couponsContainer"><div class="coming-soon"><h2>🎟️ Coupon Management</h2><p>Coming soon. Request backend code to activate.</p></div></div>
+  <div class="admin-container" id="shippingContainer"><div class="coming-soon"><h2>🚚 Shipping & Logistics</h2><p>Coming soon. Request backend code to activate.</p></div></div>
 </div>
 
-<!-- Customer Profile Modal -->
-<div id="customerModal" class="modal-overlay">
-  <div class="modal-box">
-    <span class="close-modal" onclick="closeCustomerModal()">&times;</span>
-    <h3 style="margin-bottom: 20px;">Customer Profile & History</h3>
-    <div id="customerModalContent">Loading...</div>
-  </div>
-</div>
+<!-- Customer Modal -->
+<div id="customerModal" class="modal-overlay"><div class="modal-box"><span class="close-modal" onclick="closeCustomerModal()">&times;</span><div id="customerModalContent">Loading...</div></div></div>
 
 <div class="admin-login-required" id="loginRequired">Loading Admin Panel... Please Log In.</div>
 
@@ -185,11 +200,14 @@
   let currentUser = null;
   let selectedCustomerId = null;
   let currentTab = 'orders';
+  let currentDashTab = 'overview';
   let unsubscribeChat = null;
   let unsubscribeOrders = null;
   let unsubscribeCustomers = null;
   let allOrders = [];
   let salesChart = null;
+  let pieChart = null;
+  let barChart = null;
 
   auth.onAuthStateChanged(function(user) {
     if (user && (user.email === ADMIN_EMAIL || user.uid === ADMIN_UID)) {
@@ -200,10 +218,10 @@
       loadCustomers();
     } else if (user) {
       document.getElementById('loginRequired').style.display = 'block';
-      document.getElementById('loginRequired').innerHTML = "Access Denied. You are not the Admin.";
+      document.getElementById('loginRequired').innerHTML = "Access Denied.";
     } else {
       document.getElementById('loginRequired').style.display = 'block';
-      document.getElementById('loginRequired').innerHTML = "Please <a href='index.html' style='color:var(--accent)'>Log In</a> to access.";
+      document.getElementById('loginRequired').innerHTML = "Please <a href='index.html' style='color:var(--accent)'>Log In</a>.";
     }
   });
 
@@ -218,63 +236,99 @@
     document.querySelectorAll('.admin-container').forEach(el => el.classList.remove('active'));
     document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
     document.getElementById(tab + 'Container').classList.add('active');
-    
     if (tab === 'dashboard') loadDashboardAndOrders();
     if (tab === 'orders') { document.getElementById('ordersBadge').style.display = 'none'; loadDashboardAndOrders(); }
     if (tab === 'chats') { document.getElementById('chatsBadge').style.display = 'none'; loadCustomers(); }
   };
 
-  // 1. DASHBOARD & ORDERS COMBINED
+  window.switchDashTab = function(tab) {
+    currentDashTab = tab;
+    document.getElementById('dashTabOverview').classList.toggle('active', tab === 'overview');
+    document.getElementById('dashTabProducts').classList.toggle('active', tab === 'products');
+    document.getElementById('dashOverviewContent').style.display = tab === 'overview' ? 'block' : 'none';
+    document.getElementById('dashProductsContent').style.display = tab === 'products' ? 'block' : 'none';
+  };
+
   function loadDashboardAndOrders() {
     if (unsubscribeOrders) unsubscribeOrders();
     unsubscribeOrders = db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
       allOrders = [];
       snapshot.forEach(doc => allOrders.push({ id: doc.id, ...doc.data() }));
 
-      // Dashboard Calculations
-      let revenue = 0, pending = 0, refunded = 0;
-      let productCount = {};
+      // DASHBOARD CALCULATIONS
+      let revenue = 0, pending = 0, refunded = 0, totalUnits = 0;
+      let productMap = {};
+      let orderDateSum = {};
+
       allOrders.forEach(order => {
-        if (order.status === 'paid' || order.status === 'delivered' || order.status === 'shipped') revenue += order.total || 0;
+        let oTotal = Number(order.total) || 0;
+        if (order.status === 'paid' || order.status === 'delivered' || order.status === 'shipped') revenue += oTotal;
         if (order.status === 'pending') pending++;
-        if (order.status === 'refunded') refunded += order.total || 0;
+        if (order.status === 'refunded') refunded += oTotal;
+        
         (order.items || []).forEach(item => {
-          productCount[item.name] = (productCount[item.name] || 0) + item.quantity;
+          let qty = Number(item.quantity) || 0;
+          totalUnits += qty;
+          if (!productMap[item.name]) productMap[item.name] = { price: Number(item.price) || 0, qty: 0, revenue: 0 };
+          productMap[item.name].qty += qty;
+          productMap[item.name].revenue += (Number(item.price) || 0) * qty;
         });
       });
+
+      // Update Main Dashboard
       document.getElementById('totalRevenue').textContent = '₹' + revenue;
       document.getElementById('totalOrders').textContent = allOrders.length;
+      document.getElementById('avgOrderValue').textContent = '₹' + (allOrders.length ? Math.round(revenue / allOrders.length) : 0);
+      document.getElementById('totalUnits').textContent = totalUnits;
       document.getElementById('pendingOrders').textContent = pending;
       document.getElementById('refundedAmount').textContent = '₹' + refunded;
-      
-      let sortedProducts = Object.entries(productCount).sort((a,b) => b[1] - a[1]).slice(0, 5);
-      document.getElementById('topProductsList').innerHTML = sortedProducts.map(p => `<li>${p[0]} <strong>x ${p[1]}</strong></li>`).join('') || '<li>No sales yet</li>';
-      
-      // Sales Chart (Last 7 days)
+
+      // Sales Chart
       let days = [], sales = [];
       for(let i=6; i>=0; i--) {
         let d = new Date(); d.setDate(d.getDate() - i);
         let dayStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
         let dayTotal = 0;
         allOrders.forEach(order => {
-          if(order.createdAt && order.createdAt.toDate().toDateString() === d.toDateString() && order.status !== 'cancelled') dayTotal += order.total || 0;
+          if(order.createdAt && order.createdAt.toDate().toDateString() === d.toDateString() && order.status !== 'cancelled') dayTotal += Number(order.total) || 0;
         });
         days.push(dayStr); sales.push(dayTotal);
       }
       if(salesChart) salesChart.destroy();
       salesChart = new Chart(document.getElementById('salesChart'), { type: 'bar', data: { labels: days, datasets: [{ label: 'Sales (₹)', data: sales, backgroundColor: '#d795a7' }] }, options: { responsive: true } });
+
+      // PRODUCT ANALYTICS CHARTS & TABLE
+      let sortedProducts = Object.entries(productMap).sort((a,b) => b[1].revenue - a[1].revenue);
       
-      // Orders List
+      // Table
+      document.getElementById('productDataTable').innerHTML = sortedProducts.map(p => 
+        `<tr><td>${p[0]}</td><td>₹${p[1].price}</td><td>${p[1].qty}</td><td>₹${p[1].revenue}</td></tr>`
+      ).join('') || '<tr><td colspan="4">No products sold yet.</td></tr>';
+
+      // Pie Chart (Top 5 by Revenue)
+      let top5 = sortedProducts.slice(0, 5);
+      if(pieChart) pieChart.destroy();
+      pieChart = new Chart(document.getElementById('topProductsPieChart'), {
+        type: 'pie', data: { labels: top5.map(p => p[0]), datasets: [{ data: top5.map(p => p[1].revenue), backgroundColor: ['#d795a7', '#c98296', '#b06ab3', '#8a6d1e', '#1e4e6a'] }] },
+        options: { responsive: true }
+      });
+
+      // Bar Chart (Quantity Sold)
+      if(barChart) barChart.destroy();
+      barChart = new Chart(document.getElementById('productBarChart'), {
+        type: 'bar', data: { labels: sortedProducts.map(p => p[0]), datasets: [{ label: 'Qty Sold', data: sortedProducts.map(p => p[1].qty), backgroundColor: '#1e4e6a' }] },
+        options: { responsive: true }
+      });
+
+      // ORDERS LIST
       renderOrders();
     });
   }
 
-  // 2. SEARCH & FILTERS
   function filterOrders() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const status = document.getElementById('statusFilter').value;
     const date = document.getElementById('dateFilter').value;
-    
     let filtered = allOrders.filter(order => {
       let name = (order.userName || '').toLowerCase();
       let email = (order.email || '').toLowerCase();
@@ -287,33 +341,46 @@
     renderOrders(filtered);
   }
 
-  // 3. RENDER ORDERS
   function renderOrders(data = allOrders) {
     const list = document.getElementById('allOrdersList');
     list.innerHTML = '';
     if(data.length === 0) { list.innerHTML = '<p style="color:var(--muted);">No orders found.</p>'; return; }
+    
     data.forEach(order => {
       const orderId = order.id;
       const status = order.status || 'pending';
+      const email = order.email || 'N/A';
+      const name = order.userName || 'Unknown';
+      const phone = order.phone || 'N/A';
+      const address = order.address || 'N/A';
+      const addressStr = typeof address === 'object' ? JSON.stringify(address) : address;
       const itemsHTML = (order.items || []).map(item => `<div class="order-item-admin">${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}</div>`).join('');
-      const addressStr = typeof order.address === 'object' ? JSON.stringify(order.address) : order.address;
-      
-      const cardHTML = `<div class="order-admin-card" id="order-${orderId}">
-        <h4>Order #${orderId.slice(-6).toUpperCase()} (${order.userName || 'Unknown'})</h4>
-        <p>Date: ${order.createdAt ? order.createdAt.toDate().toLocaleDateString('en-IN') : 'N/A'} | Status: <strong>${status.toUpperCase()}</strong></p>
-        <div class="order-items-admin">${itemsHTML}</div>
-        <p><strong>Total: ₹${order.total || 0}</strong></p>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-          <select class="status-select" style="padding:8px; border-radius:20px;" onchange="changeOrderStatus('${orderId}', this.value)">${['pending','paid','shipped','delivered','cancelled','refunded'].map(s => `<option value="${s}" ${status===s?'selected':''}>${s}</option>`).join('')}</select>
-          <button class="btn" onclick="manualRefund('${orderId}')">💸 Manual Refund</button>
-          <button class="btn btn-secondary" onclick="viewTransactionDetails('${orderId}')">🔍 Details</button>
-        </div>
-      </div>`;
+
+      // Color Coded Status Button
+      const statusClass = status; 
+      const statusOptions = ['pending','paid','shipped','delivered','cancelled','refunded'].map(s => 
+        `<option value="${s}" ${status===s?'selected':''}>${s.toUpperCase()}</option>`
+      ).join('');
+
+      const cardHTML = `
+        <div class="order-admin-card" id="order-${orderId}" data-email="${email}" data-name="${name}" data-total="${order.total}">
+          <h4>Order #${orderId.slice(-6).toUpperCase()} (${name})</h4>
+          <p><strong>Date:</strong> ${order.createdAt ? order.createdAt.toDate().toLocaleDateString('en-IN') : 'N/A'}</p>
+          <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Address:</strong> ${addressStr}</p>
+          <div class="order-items-admin">${itemsHTML}</div>
+          <p><strong>Total: ₹${order.total || 0}</strong></p>
+          <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
+            <select class="status-select ${statusClass}" onchange="changeOrderStatus('${orderId}', this.value)">${statusOptions}</select>
+            <button class="btn" onclick="manualRefund('${orderId}')">💸 Manual Refund</button>
+            <button class="btn btn-secondary" onclick="viewTransactionDetails('${orderId}')">🔍 Details</button>
+          </div>
+        </div>`;
       list.innerHTML += cardHTML;
     });
   }
 
-  // 4. CSV EXPORT
   function exportCSV() {
     let csv = 'Order ID,Name,Email,Total,Status,Date\n';
     allOrders.forEach(o => {
@@ -323,14 +390,10 @@
     let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'orders.csv'; a.click();
   }
 
-  // 5. MANUAL REFUND (No status change needed)
   window.manualRefund = async function(orderId) {
     if (!confirm('Manually refund this order? This is irreversible.')) return;
     const idToken = await currentUser.getIdToken();
-    const response = await fetch(`${WORKER_URL}/api/send-status-email`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId, status: 'refunded', idToken })
-    });
+    const response = await fetch(`${WORKER_URL}/api/send-status-email`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId, status: 'refunded', idToken }) });
     const data = await response.json();
     alert(data.success ? 'Refunded successfully!' : 'Error: ' + data.error);
   };
@@ -339,10 +402,7 @@
     if (!confirm('Confirm status change to ' + newStatus + '?')) { filterOrders(); return; }
     const idToken = await currentUser.getIdToken();
     const order = allOrders.find(o => o.id === orderId);
-    const response = await fetch(`${WORKER_URL}/api/send-status-email`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId, status: newStatus, idToken, email: order.email, name: order.userName, total: order.total })
-    });
+    const response = await fetch(`${WORKER_URL}/api/send-status-email`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId, status: newStatus, idToken, email: order.email, name: order.userName, total: order.total }) });
     const data = await response.json();
     if(!data.success) alert("Error: " + data.error);
   };
@@ -356,7 +416,6 @@
     } catch (e) { console.error(e); }
   };
 
-  // 6. CUSTOMER PROFILE & CHATS
   function loadCustomers() {
     if (unsubscribeCustomers) unsubscribeCustomers();
     unsubscribeCustomers = db.collection('chats').onSnapshot(snapshot => {
@@ -367,10 +426,7 @@
         const item = document.createElement('div');
         item.className = 'customer-item';
         item.innerHTML = `<h4>${data.userName || 'No name'}</h4><p>${data.userEmail || 'No email'}</p>`;
-        item.onclick = () => { 
-          selectCustomer(userDoc.id, item); 
-          openCustomerModal(userDoc.id); 
-        };
+        item.onclick = () => { selectCustomer(userDoc.id, item); openCustomerModal(userDoc.id); };
         list.appendChild(item);
       });
     });
@@ -421,22 +477,6 @@
     db.collection('chats').doc(selectedCustomerId).collection('messages').add({ sender: 'admin', text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
       .then(() => input.value = '').catch(err => console.error(err));
   }
-
-  // 7. BROWSER NOTIFICATIONS
-  function notify(title, body) {
-    if (!("Notification" in window)) return;
-    if (Notification.permission === "granted") new Notification(title, { body });
-    else if (Notification.permission !== "denied") Notification.requestPermission().then(p => { if (p === "granted") new Notification(title, { body }); });
-  }
-  // Trigger notification on new order (Detect from loadDashboardAndOrders)
-  let previousOrderCount = 0;
-  const originalLoad = loadDashboardAndOrders;
-  loadDashboardAndOrders = function() {
-    originalLoad.apply(this, arguments);
-  };
-  // Overriding inside the snapshot to detect new orders
-  // (For simplicity, this is handled by the global badge logic, but you can add browser alerts here)
-  
 </script>
 </body>
 </html>
