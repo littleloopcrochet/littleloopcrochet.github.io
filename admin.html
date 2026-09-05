@@ -279,16 +279,21 @@
       allOrders = [];
       snapshot.forEach(doc => allOrders.push({ id: doc.id, ...doc.data() }));
 
-      // DASHBOARD CALCULATIONS
+      // DASHBOARD CALCULATIONS (USES DISCOUNTED TOTAL)
       let revenue = 0, pending = 0, refunded = 0, totalUnits = 0;
       let productMap = {};
       let orderDateSum = {};
 
       allOrders.forEach(order => {
-        let oTotal = Number(order.total) || 0;
-        if (order.status === 'paid' || order.status === 'delivered' || order.status === 'shipped') revenue += oTotal;
+        // Calculate the actual paid amount. If discount exists, subtract it. Else use total.
+        let originalTotal = Number(order.total) || 0;
+        let discount = Number(order.discount) || 0;
+        let finalPaid = originalTotal - discount; // This is the ACTUAL revenue
+        if (finalPaid < 0) finalPaid = 0; // Ensure not negative
+
+        if (order.status === 'paid' || order.status === 'delivered' || order.status === 'shipped') revenue += finalPaid;
         if (order.status === 'pending') pending++;
-        if (order.status === 'refunded') refunded += oTotal;
+        if (order.status === 'refunded') refunded += finalPaid;
         
         (order.items || []).forEach(item => {
           let qty = Number(item.quantity) || 0;
@@ -314,14 +319,20 @@
         let dayStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
         let dayTotal = 0;
         allOrders.forEach(order => {
-          if(order.createdAt && order.createdAt.toDate().toDateString() === d.toDateString() && order.status !== 'cancelled') dayTotal += Number(order.total) || 0;
+          if(order.createdAt && order.createdAt.toDate().toDateString() === d.toDateString() && order.status !== 'cancelled') {
+            let originalTotal = Number(order.total) || 0;
+            let discount = Number(order.discount) || 0;
+            let finalPaid = originalTotal - discount;
+            if (finalPaid < 0) finalPaid = 0;
+            dayTotal += finalPaid;
+          }
         });
         days.push(dayStr); sales.push(dayTotal);
       }
       if(salesChart) salesChart.destroy();
       salesChart = new Chart(document.getElementById('salesChart'), { type: 'bar', data: { labels: days, datasets: [{ label: 'Sales (₹)', data: sales, backgroundColor: '#d795a7' }] }, options: { responsive: true } });
 
-      // PRODUCT ANALYTICS CHARTS & TABLE
+      // PRODUCT ANALYTICS CHARTS & TABLE (Keep using original item prices)
       let sortedProducts = Object.entries(productMap).sort((a,b) => b[1].revenue - a[1].revenue);
       
       document.getElementById('productDataTable').innerHTML = sortedProducts.map(p => 
@@ -376,20 +387,29 @@
       const addressStr = typeof address === 'object' ? JSON.stringify(address) : address;
       const itemsHTML = (order.items || []).map(item => `<div class="order-item-admin">${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}</div>`).join('');
 
+      // Pricing Logic with Discount
+      const originalTotal = Number(order.total) || 0;
+      const discount = Number(order.discount) || 0;
+      const couponUsed = order.coupon ? `<span style="background: var(--blue); padding: 2px 8px; border-radius: 5px; font-weight: bold;">Coupon: ${order.coupon}</span>` : '';
+      let finalPaid = originalTotal - discount;
+      if (finalPaid < 0) finalPaid = 0;
+
       const statusClass = status; 
       const statusOptions = ['pending','paid','shipped','delivered','cancelled','refunded'].map(s => 
         `<option value="${s}" ${status===s?'selected':''}>${s.toUpperCase()}</option>`
       ).join('');
 
       const cardHTML = `
-        <div class="order-admin-card" id="order-${orderId}" data-email="${email}" data-name="${name}" data-total="${order.total}">
-          <h4>Order #${orderId.slice(-6).toUpperCase()} (${name})</h4>
+        <div class="order-admin-card" id="order-${orderId}" data-email="${email}" data-name="${name}" data-total="${finalPaid}">
+          <h4>Order #${orderId.slice(-6).toUpperCase()} (${name}) ${couponUsed}</h4>
           <p><strong>Date:</strong> ${order.createdAt ? order.createdAt.toDate().toLocaleDateString('en-IN') : 'N/A'}</p>
           <p><strong>Phone:</strong> ${phone}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Address:</strong> ${addressStr}</p>
           <div class="order-items-admin">${itemsHTML}</div>
-          <p><strong>Total: ₹${order.total || 0}</strong></p>
+          <p><strong>Original Total: ₹${originalTotal}</strong></p>
+          ${discount > 0 ? `<p style="color: #ff6b6b;"><strong>Discount Applied: -₹${discount}</strong></p>` : ''}
+          <p style="font-size: 1.2rem;"><strong>Paid Amount: ₹${finalPaid}</strong></p>
           <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
             <select class="status-select ${statusClass}" onchange="changeOrderStatus('${orderId}', this.value)">${statusOptions}</select>
             <button class="btn" onclick="manualRefund('${orderId}')">💸 Manual Refund</button>
@@ -401,9 +421,13 @@
   }
 
   function exportCSV() {
-    let csv = 'Order ID,Name,Email,Total,Status,Date\n';
+    let csv = 'Order ID,Name,Email,Original Total,Discount,Paid Amount,Coupon Used,Status,Date\n';
     allOrders.forEach(o => {
-      csv += `"${o.id.slice(-6)}","${o.userName || ''}","${o.email || ''}","${o.total || 0}","${o.status || ''}","${o.createdAt ? o.createdAt.toDate().toLocaleDateString() : ''}"\n`;
+      let original = Number(o.total) || 0;
+      let discount = Number(o.discount) || 0;
+      let paid = original - discount;
+      if (paid < 0) paid = 0;
+      csv += `"${o.id.slice(-6)}","${o.userName || ''}","${o.email || ''}","${original}","${discount}","${paid}","${o.coupon || ''}","${o.status || ''}","${o.createdAt ? o.createdAt.toDate().toLocaleDateString() : ''}"\n`;
     });
     let blob = new Blob([csv], { type: 'text/csv' });
     let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'orders.csv'; a.click();
@@ -421,7 +445,12 @@
     if (!confirm('Confirm status change to ' + newStatus + '?')) { filterOrders(); return; }
     const idToken = await currentUser.getIdToken();
     const order = allOrders.find(o => o.id === orderId);
-    const response = await fetch(`${WORKER_URL}/api/send-status-email`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId, status: newStatus, idToken, email: order.email, name: order.userName, total: order.total }) });
+    // Send the actual paid amount to the worker for refunds
+    let original = Number(order.total) || 0;
+    let discount = Number(order.discount) || 0;
+    let paid = original - discount;
+    if (paid < 0) paid = 0;
+    const response = await fetch(`${WORKER_URL}/api/send-status-email`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId, status: newStatus, idToken, email: order.email, name: order.userName, total: paid }) });
     const data = await response.json();
     if(!data.success) alert("Error: " + data.error);
   };
@@ -458,7 +487,11 @@
     let html = '<h4>Order History</h4>';
     orders.forEach(doc => {
       const order = doc.data();
-      html += `<p style="margin-bottom:10px;">Order #${doc.id.slice(-6)} - ₹${order.total} - <strong>${order.status}</strong></p>`;
+      let original = Number(order.total) || 0;
+      let discount = Number(order.discount) || 0;
+      let paid = original - discount;
+      if (paid < 0) paid = 0;
+      html += `<p style="margin-bottom:10px;">Order #${doc.id.slice(-6)} - ₹${paid} - <strong>${order.status}</strong></p>`;
     });
     document.getElementById('customerModalContent').innerHTML = html;
   }
@@ -497,7 +530,7 @@
       .then(() => input.value = '').catch(err => console.error(err));
   }
 
-  // ===== NEW COUPON FUNCTIONS =====
+  // ===== COUPON FUNCTIONS =====
   function loadCoupons() {
     db.collection('coupons').get().then(snapshot => {
       const list = document.getElementById('couponsList');
@@ -525,7 +558,6 @@
       .then(() => { 
         alert('Coupon added!'); 
         loadCoupons(); 
-        // Clear the form
         document.getElementById('couponCodeInput').value = '';
         document.getElementById('couponValueInput').value = '';
       })
