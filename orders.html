@@ -345,8 +345,9 @@
         const timeDiff = now - createdDate;
 
         let cancelBtn = '';
+        // UPDATED: Passing status to cancelOrder
         if (timeDiff < CANCEL_WINDOW_MS && status !== 'cancelled' && status !== 'delivered' && status !== 'refunded' && status !== 'shipped') {
-          cancelBtn = `<button onclick="cancelOrder('${orderId}')" class="cancel-btn">Cancel</button>`;
+          cancelBtn = `<button onclick="cancelOrder('${orderId}', '${status}')" class="cancel-btn">Cancel</button>`;
         }
 
         let trackBtn = '';
@@ -446,8 +447,40 @@
   };
 
   // SECURE CANCELLATION
-  window.cancelOrder = async function(orderId) {
-    if (!confirm('Are you sure you want to cancel this order?')) return;
+  // SECURE CANCELLATION: Sends to worker for auth, refund, and email
+  window.cancelOrder = async function(orderId, orderStatus) {
+    // PENDING ORDER: Skip refund email, just cancel
+    if (orderStatus === 'pending') {
+      if (!confirm('Are you sure you want to cancel this pending order? No payment has been made.')) return;
+      
+      try {
+        const idToken = await currentUser.getIdToken();
+        const response = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/send-status-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            orderId: orderId, 
+            status: "cancelled", 
+            idToken: idToken,
+            skipEmail: true // ADDED: Tells Worker to skip email
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          alert("Order cancelled successfully.");
+          loadOrders(); 
+        } else {
+          alert("Error: " + data.error);
+        }
+      } catch (err) {
+        console.error("Cancel error:", err);
+        alert("Failed to cancel order. Please try again.");
+      }
+      return;
+    }
+
+    // PAID ORDER: Normal flow (Refund + Email)
+    if (!confirm('Are you sure you want to cancel this order? A refund will be initiated.')) return;
     
     try {
       const idToken = await currentUser.getIdToken();
