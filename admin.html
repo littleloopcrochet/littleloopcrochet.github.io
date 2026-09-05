@@ -26,8 +26,37 @@
     .admin-header button:hover{background:var(--accent-hover);transform:translateY(-2px);}
 
     .admin-tabs{display:flex;gap:20px;padding:20px 7%;background:transparent;}
-    .admin-tab{padding:10px 25px;border-radius:50px;background:var(--card);cursor:pointer;font-weight:600;color:var(--muted);transition:all .3s ease;box-shadow:0 2px 8px var(--shadow);}
+    .admin-tab{padding:10px 25px;border-radius:50px;background:var(--card);cursor:pointer;font-weight:600;color:var(--muted);transition:all .3s ease;box-shadow:0 2px 8px var(--shadow);display:flex;align-items:center;}
     .admin-tab.active{background:var(--accent);color:white;}
+    
+    /* Badges & Dots */
+    .badge {
+      display: inline-block;
+      background: #ff3b30;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      margin-left: 8px;
+      font-weight: bold;
+    }
+    .red-dot-ind {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ff3b30;
+      display: inline-block;
+      margin-left: 5px;
+    }
+    .blue-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #007aff;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
 
     .admin-container{padding:30px 7%;display:none;height:85vh;}
     .admin-container.active{display:flex;gap:30px;}
@@ -51,7 +80,7 @@
     .details-btn{background:var(--muted);}
 
     .customer-list{flex:1;background:var(--card);border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.3);overflow-y:auto;box-shadow:0 10px 30px var(--shadow);}
-    .customer-item{padding:15px;border-radius:15px;margin-bottom:10px;cursor:pointer;background:var(--surface);transition:all 0.3s ease;}
+    .customer-item{padding:15px;border-radius:15px;margin-bottom:10px;cursor:pointer;background:var(--surface);transition:all 0.3s ease;display:flex;align-items:center;justify-content:space-between;}
     .customer-item:hover,.customer-item.active{background:var(--pink);}
     .customer-item h4{margin-bottom:5px;font-size:1rem;color:var(--text);}
     .customer-item p{font-size:0.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -79,8 +108,12 @@
   </div>
   
   <div class="admin-tabs">
-    <div class="admin-tab active" id="tabOrders" onclick="switchTab('orders')">📦 Orders</div>
-    <div class="admin-tab" id="tabChats" onclick="switchTab('chats')">💬 Chats</div>
+    <div class="admin-tab active" id="tabOrders" onclick="switchTab('orders')">
+      📦 Orders <span id="ordersBadge" class="badge" style="display:none;">0</span>
+    </div>
+    <div class="admin-tab" id="tabChats" onclick="switchTab('chats')">
+      💬 Chats <span id="chatsBadge" class="badge" style="display:none;">0</span>
+    </div>
   </div>
 
   <div class="admin-container active" id="ordersContainer">
@@ -126,8 +159,29 @@
   let currentUser = null;
   let selectedCustomerId = null;
   let unsubscribeChat = null;
-  let unsubscribeOrders = null; // For real-time orders
-  let unsubscribeCustomers = null; // For real-time customers
+  let unsubscribeOrders = null;
+  let unsubscribeCustomers = null;
+  
+  // Notification Logic
+  let currentTab = 'orders';
+  let unseenOrders = 0;
+  let unseenChats = 0;
+  let ordersLoadedOnce = false;
+  let customersLoadedOnce = false;
+  let totalOrderCount = 0;
+  let totalCustomerCount = 0;
+  let lastMessageFromUser = {};
+  let modifiedOrders = {};
+
+  function updateBadge(id, count) {
+    const badge = document.getElementById(id);
+    if (count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 
   auth.onAuthStateChanged(function(user) {
     if (user && (user.email === ADMIN_EMAIL || user.uid === ADMIN_UID)) {
@@ -155,23 +209,49 @@
   }
 
   window.switchTab = function(tab) {
+    currentTab = tab;
     document.getElementById('tabOrders').classList.toggle('active', tab === 'orders');
     document.getElementById('tabChats').classList.toggle('active', tab === 'chats');
     document.getElementById('ordersContainer').classList.toggle('active', tab === 'orders');
     document.getElementById('chatsContainer').classList.toggle('active', tab === 'chats');
-    if (tab === 'orders') loadOrders();
-    if (tab === 'chats') loadCustomers();
+    
+    if (tab === 'orders') {
+      unseenOrders = 0;
+      updateBadge('ordersBadge', 0);
+      loadOrders();
+    }
+    if (tab === 'chats') {
+      unseenChats = 0;
+      updateBadge('chatsBadge', 0);
+      loadCustomers();
+    }
   };
 
-  // ===== ORDERS MANAGEMENT (UPDATED TO REAL-TIME onSnapshot) =====
+  // ===== ORDERS MANAGEMENT =====
   function loadOrders() {
-    const list = document.getElementById('allOrdersList');
-
-    // Unsubscribe previous listener if it exists
     if (unsubscribeOrders) unsubscribeOrders();
-
-    // Start real-time listener
     unsubscribeOrders = db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(querySnapshot) {
+      
+      // Check for new orders (Global Badge)
+      const newOrderCount = querySnapshot.size;
+      if (ordersLoadedOnce) {
+        if (newOrderCount > totalOrderCount && currentTab !== 'orders') {
+          unseenOrders += (newOrderCount - totalOrderCount);
+          updateBadge('ordersBadge', unseenOrders);
+        }
+      } else {
+        ordersLoadedOnce = true;
+      }
+      totalOrderCount = newOrderCount;
+
+      // Check for modified orders (Blue Dot)
+      querySnapshot.docChanges().forEach(change => {
+        if (change.type === 'modified') {
+          modifiedOrders[change.doc.id] = true;
+        }
+      });
+
+      const list = document.getElementById('allOrdersList');
       list.innerHTML = '';
       if (querySnapshot.empty) { 
         list.innerHTML = '<p style="color:var(--muted);">No orders yet.</p>'; 
@@ -188,13 +268,15 @@
         const phone = order.phone || 'N/A';
         const address = order.address || 'N/A';
         const total = order.total || 0;
-        
-        // NOTE: Address is an object in your database, so we use a safe stringify
         const addressStr = typeof address === 'object' ? JSON.stringify(address) : address;
+
+        // Blue Dot Logic
+        const isModified = modifiedOrders[orderId];
+        const blueDotHTML = isModified ? `<span class="blue-dot" title="Order has been updated"></span>` : '';
 
         const cardHTML = `
           <div class="order-admin-card" id="order-${orderId}" data-email="${email}" data-name="${name}" data-total="${total}">
-            <h4>Order #${orderId.slice(-6).toUpperCase()} (${name})</h4>
+            <h4>Order #${orderId.slice(-6).toUpperCase()} (${name}) ${blueDotHTML}</h4>
             <p>Date: ${order.createdAt ? order.createdAt.toDate().toLocaleDateString('en-IN') : 'N/A'}</p>
             <p><strong>Phone:</strong> ${phone}</p>
             <p><strong>Email:</strong> ${email || 'N/A'}</p>
@@ -222,14 +304,12 @@
     });
   }
 
-  // SECURE STATUS CHANGE - Calls the Worker to trigger Email and Refund
   window.changeOrderStatus = async function(orderId, newStatus) {
+    // Clear the blue dot on interaction
+    delete modifiedOrders[orderId];
+
     const confirmMessage = newStatus === 'cancelled' ? "Change status to Cancelled and initiate refund?" : "Change status to " + newStatus + " and send email?";
-    if (!confirm(confirmMessage)) { 
-      // Revert dropdown immediately because we are returning
-      loadOrders(); 
-      return; 
-    }
+    if (!confirm(confirmMessage)) { loadOrders(); return; }
     
     const idToken = await currentUser.getIdToken();
     const card = document.getElementById(`order-${orderId}`);
@@ -241,14 +321,7 @@
       const response = await fetch(`${WORKER_URL}/api/send-status-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId: orderId,
-          status: newStatus,
-          idToken: idToken,
-          email: email,
-          name: name,
-          total: total
-        })
+        body: JSON.stringify({ orderId, status: newStatus, idToken, email, name, total })
       });
       const data = await response.json();
       if (data.success) alert("Status updated and email sent!");
@@ -257,10 +330,8 @@
       console.error("Error updating status:", err);
       alert("Failed to update status.");
     }
-    // The onSnapshot listener will automatically reload the orders list!
   };
 
-  // SECURE EMAIL SENDING - Uses Firebase ID Token, NOT hardcoded secret
   window.sendStatusEmail = async function(orderId, status) {
     const btn = event.target; 
     const card = btn.closest('.order-admin-card');
@@ -288,8 +359,10 @@
     finally { btn.textContent = originalText; btn.disabled = false; }
   };
 
-  // SECURE DETAILS - Uses Firebase ID Token
   window.viewTransactionDetails = async function(orderId) {
+    // Clear the blue dot on interaction
+    delete modifiedOrders[orderId];
+
     try {
       const idToken = await currentUser.getIdToken();
       const response = await fetch(`${WORKER_URL}/api/admin/order-details`, {
@@ -306,20 +379,33 @@
     } catch (err) { console.error(err); alert("Failed to fetch details."); }
   };
 
-  // ===== CHATS MANAGEMENT (UPDATED TO REAL-TIME onSnapshot for Customers) =====
+  // ===== CHATS MANAGEMENT (Individual Chat Red Dots) =====
   function loadCustomers() {
     const customerList = document.getElementById('customerList');
-
-    // Unsubscribe previous listener
     if (unsubscribeCustomers) unsubscribeCustomers();
-
-    // Start real-time listener
+    
     unsubscribeCustomers = db.collection('chats').onSnapshot(function(querySnapshot) {
+      
+      // Global Badge Logic
+      const newCustomerCount = querySnapshot.size;
+      if (customersLoadedOnce) {
+        if (newCustomerCount > totalCustomerCount && currentTab !== 'chats') {
+          unseenChats += (newCustomerCount - totalCustomerCount);
+          updateBadge('chatsBadge', unseenChats);
+        }
+      } else {
+        customersLoadedOnce = true;
+      }
+      totalCustomerCount = newCustomerCount;
+
       customerList.innerHTML = '';
       if (querySnapshot.empty) { 
         customerList.innerHTML = '<p style="color:var(--muted);">No customers yet.</p>'; 
         return; 
       }
+
+      const customerItems = [];
+      const fetchLastMsgPromises = [];
 
       querySnapshot.forEach(function(userDoc) {
         const userId = userDoc.id;
@@ -329,17 +415,37 @@
 
         const item = document.createElement('div');
         item.className = 'customer-item';
-        item.innerHTML = `<h4>${displayName}</h4><p>${displayEmail}</p>`;
+        item.id = `customer-${userId}`;
+        item.innerHTML = `<div><h4>${displayName}</h4><p>${displayEmail}</p></div>`;
         
-        // Highlight if this is the currently selected customer
+        // Check if currently selected
         if (userId === selectedCustomerId) {
           item.classList.add('active');
         }
+        
+        item.addEventListener('click', function() { selectCustomer(userId, item); });
+        customerItems.push({ userId, item });
 
-        item.addEventListener('click', function() { 
-          selectCustomer(userId, item); 
+        // Fetch last message for this user to check for red dot
+        const lastMsgRef = db.collection('chats').doc(userId).collection('messages').orderBy('timestamp', 'desc').limit(1);
+        const promise = lastMsgRef.get().then(snapshot => {
+          if (!snapshot.empty) {
+            const msgData = snapshot.docs[0].data();
+            // If last message is from user, and it's not the currently selected chat, add red dot
+            if (msgData.sender === 'user' && userId !== selectedCustomerId) {
+              lastMessageFromUser[userId] = true;
+              item.innerHTML += `<span class="red-dot-ind"></span>`;
+            } else {
+              lastMessageFromUser[userId] = false;
+            }
+          }
         });
-        customerList.appendChild(item);
+        fetchLastMsgPromises.push(promise);
+      });
+
+      // Render items after fetching last messages
+      Promise.all(fetchLastMsgPromises).then(() => {
+        customerItems.forEach(({ item }) => customerList.appendChild(item));
       });
     }, function(err) { 
       console.error("Error loading customers: ", err); 
@@ -349,6 +455,12 @@
 
   function selectCustomer(userId, element) {
     selectedCustomerId = userId;
+    
+    // Clear the red dot for this specific chat
+    lastMessageFromUser[userId] = false;
+    const dot = document.getElementById(`customer-${userId}`).querySelector('.red-dot-ind');
+    if (dot) dot.remove();
+
     document.querySelectorAll('.customer-item').forEach(function(item) { item.classList.remove('active'); });
     element.classList.add('active');
     loadAdminChat(userId);
