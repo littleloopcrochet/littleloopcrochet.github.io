@@ -284,8 +284,9 @@
   const logoutBtn = document.getElementById('logoutBtn');
   let currentUser = null;
 
-  const CANCEL_WINDOW_MS = 24 * 60 * 60 * 1000;
-  const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+  // UPDATED: Cancel and Edit windows are now 6 hours (6 * 60 * 60 * 1000)
+  const CANCEL_WINDOW_MS = 6 * 60 * 60 * 1000;
+  const EDIT_WINDOW_MS = 6 * 60 * 60 * 1000;
 
   auth.onAuthStateChanged(function(user) {
     currentUser = user;
@@ -339,7 +340,8 @@
         const timeDiff = now - createdDate;
 
         let cancelBtn = '';
-        if (timeDiff < CANCEL_WINDOW_MS && status !== 'cancelled' && status !== 'delivered' && status !== 'refunded') {
+        // UPDATED: Added status !== 'shipped' so buttons disappear when shipped
+        if (timeDiff < CANCEL_WINDOW_MS && status !== 'cancelled' && status !== 'delivered' && status !== 'refunded' && status !== 'shipped') {
           cancelBtn = `<button onclick="cancelOrder('${orderId}')" class="cancel-btn">Cancel</button>`;
         }
 
@@ -349,7 +351,8 @@
         }
 
         let editBtn = '';
-        if (timeDiff < EDIT_WINDOW_MS && status !== 'cancelled' && status !== 'refunded' && status !== 'delivered') {
+        // UPDATED: Added status !== 'shipped' so buttons disappear when shipped
+        if (timeDiff < EDIT_WINDOW_MS && status !== 'cancelled' && status !== 'delivered' && status !== 'refunded' && status !== 'shipped') {
           editBtn = `<button onclick="openEditModal('${orderId}')" class="edit-btn">Edit Order Details</button>`;
         }
         
