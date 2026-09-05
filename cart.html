@@ -184,6 +184,19 @@
     .confetti-piece { position: absolute; width: 8px; height: 8px; border-radius: 2px; animation: confettiFall 2.5s ease-in forwards; }
     @keyframes confettiFall { 0% { top: 10%; opacity: 1; transform: rotate(0deg); } 100% { top: 95%; opacity: 0; transform: rotate(360deg); } }
 
+    /* Coupon Styles */
+    .coupon-section { margin-top: 20px; border-top: 1px solid rgba(120,100,120,.15); padding-top: 20px; }
+    .coupon-section h3 { margin-bottom: 10px; font-size: 1.1rem; }
+    .coupon-input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+    .coupon-input-group input { flex: 1; padding: 10px; border: 1px solid rgba(120,100,120,.2); border-radius: 30px; background: var(--bg); color: var(--text); }
+    .coupon-input-group button { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; }
+    .coupon-msg { font-size: 0.85rem; margin-top: 5px; color: var(--muted); }
+    .available-coupons { margin-top: 10px; display: none; }
+    .available-coupons p { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; }
+    .coupon-tag { display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px dashed var(--accent); border-radius: 8px; margin-bottom: 5px; cursor: pointer; }
+    .coupon-tag span { font-weight: bold; color: var(--accent); }
+    .coupon-tag small { font-size: 0.8rem; }
+
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem; position: relative; z-index: 2;}
 
     /* Loader (optimized like Orders/About) */
@@ -524,6 +537,20 @@
           <div class="summary-row"><span>Shipping</span><span>Free</span></div>
           <div class="summary-row total"><span>Total</span><span id="summaryTotal"></span></div>
           
+          <!-- Coupon Section (NEW) -->
+          <div class="coupon-section">
+            <h3>Apply Coupon</h3>
+            <div class="coupon-input-group">
+              <input type="text" id="couponInput" placeholder="Enter code">
+              <button type="button" onclick="applyCouponCode()">Apply</button>
+            </div>
+            <div class="coupon-msg" id="couponMessage"></div>
+            <div class="available-coupons" id="availableCoupons">
+              <p>✨ Available Codes:</p>
+              <div id="couponsList"></div>
+            </div>
+          </div>
+
           <div class="checkout-form">
             <h3>Checkout Details</h3>
             <div class="name-grid">
@@ -649,6 +676,9 @@
           document.getElementById('giftFields').classList.toggle('show', this.checked);
         });
 
+        // Load available coupons (NEW)
+        loadAvailableCoupons();
+
         finishLoading();
       })
       .catch(function(err) {
@@ -657,6 +687,50 @@
       });
   }
 
+  // ===== COUPON FUNCTIONS (NEW) =====
+  function loadAvailableCoupons() {
+    db.collection('coupons').where('active', '==', true).get().then((snapshot) => {
+      const list = document.getElementById('couponsList');
+      const container = document.getElementById('availableCoupons');
+      list.innerHTML = '';
+      if (snapshot.empty) {
+        container.style.display = 'none';
+        return;
+      }
+      container.style.display = 'block';
+      snapshot.forEach(doc => {
+        const code = doc.id;
+        const data = doc.data();
+        const discountText = data.type === 'percentage' ? `${data.value}% OFF` : `₹${data.value} OFF`;
+        
+        const item = document.createElement('div');
+        item.className = 'coupon-tag';
+        item.innerHTML = `<span>${code}</span><small>${discountText}</small>`;
+        
+        // On click, fill the input and auto-apply
+        item.onclick = function() {
+          document.getElementById('couponInput').value = code;
+          applyCouponCode();
+        };
+        
+        list.appendChild(item);
+      });
+    }).catch(err => console.error("Error loading coupons:", err));
+  }
+
+  function applyCouponCode() {
+    const code = document.getElementById('couponInput').value.trim();
+    const message = document.getElementById('couponMessage');
+    if (!code) {
+      message.textContent = "Please enter a code.";
+      message.style.color = "red";
+      return;
+    }
+    message.textContent = `Coupon "${code}" applied! Discount will be calculated at checkout.`;
+    message.style.color = "green";
+  }
+
+  // ===== EXISTING CART FUNCTIONS =====
   window.changeQty = function(itemId, delta) {
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(itemId);
     cartRef.get().then(function(doc) {
@@ -759,10 +833,18 @@
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
+      // NEW: Get coupon code and send it to Worker
+      const couponCode = document.getElementById('couponInput').value.trim();
+
       const orderResponse = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: items, currency: 'INR', receipt: orderDoc.id }) // SENDS ITEMS ONLY, NOT AMOUNT
+        body: JSON.stringify({ 
+          items: items, 
+          currency: 'INR', 
+          receipt: orderDoc.id,
+          coupon: couponCode // SEND COUPON HERE
+        })
       });
       const orderData = await orderResponse.json();
 
@@ -771,7 +853,7 @@
       }
 
       const options = {
-        key: 'rzp_test_TYLpLID3tKkx0o',
+        key: 'rzp_test_TYLpLID3tKkx0o', // Make sure this is your key
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Little Loop',
@@ -785,7 +867,7 @@
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              orderId: orderDoc.id // Only this! No total, items, or email from frontend!
+              orderId: orderDoc.id
             })
           });
           const verifyData = await verifyResponse.json();
