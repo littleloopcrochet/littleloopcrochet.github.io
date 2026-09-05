@@ -150,10 +150,11 @@
     .remove-btn { background: none; border: none; cursor: pointer; color: #ff6b6b; font-size: .9rem; font-weight: 600; }
     .remove-btn:hover { text-decoration: underline; }
 
-    .cart-summary { flex: 1; min-width: 300px; background: var(--card); border-radius: 30px; padding: 30px; height: fit-content; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 20px 60px var(--shadow); position: relative; }
+    .cart-summary { flex: 1; min-width: 300px; background: var(--card); border-radius: 30px; padding: 30px; height: fit-content; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 20px 60px var(--shadow); position: relative; overflow: hidden; }
     .summary-title { font-size: 1.5rem; color: var(--text); margin-bottom: 20px; }
     .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; color: var(--text-soft); }
     .summary-row.total { font-size: 1.5rem; font-weight: bold; color: var(--text); border-top: 1px solid rgba(120,100,120,.2); padding-top: 20px; margin-top: 10px; }
+    .summary-row.discount-row { color: #ff6b6b; font-weight: bold; }
     .continue-shopping { display: inline-block; margin-top: 10px; padding: 12px 25px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease, transform .3s ease; text-align: center; width: 100%; box-sizing: border-box; cursor: pointer; }
     .continue-shopping:hover { background: var(--accent-hover); transform: translateY(-2px); }
     .checkout-form { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
@@ -180,9 +181,8 @@
     .shop-btn { padding: 15px 30px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; display: inline-block; }
     .shop-btn:hover { background: var(--accent-hover); }
 
-    .confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 50; }
-    .confetti-piece { position: absolute; width: 8px; height: 8px; border-radius: 2px; animation: confettiFall 2.5s ease-in forwards; }
-    @keyframes confettiFall { 0% { top: 10%; opacity: 1; transform: rotate(0deg); } 100% { top: 95%; opacity: 0; transform: rotate(360deg); } }
+    /* Confetti Container */
+    .cart-confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 50; }
 
     /* Coupon Styles */
     .coupon-section { margin-top: 20px; border-top: 1px solid rgba(120,100,120,.15); padding-top: 20px; }
@@ -386,6 +386,7 @@
 
   let currentUser = null;
   let productMap = {}; 
+  let currentSubtotal = 0; // GLOBAL VARIABLE TO STORE SUBTOTAL
 
   const authButtonText = document.getElementById('authButtonText');
   const logoutBtn = document.getElementById('logoutBtn');
@@ -445,6 +446,8 @@
           items.push(item);
           total += item.price * item.quantity;
         });
+
+        currentSubtotal = total; // STORE SUBTOTAL GLOBALLY
 
         // Build the items container safely
         const itemsDiv = document.createElement('div');
@@ -531,13 +534,20 @@
         summaryDiv.id = 'cartSummary';
 
         const summaryHTML = `
-          <div class="confetti-container" id="cartConfetti" style="display:none;"></div>
+          <div class="confetti-container cart-confetti-container" id="cartConfetti" style="display:none;"></div>
           <h2 class="summary-title">Order Summary</h2>
           <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal"></span></div>
           <div class="summary-row"><span>Shipping</span><span>Free</span></div>
+          
+          <!-- NEW DISCOUNT ROW -->
+          <div class="summary-row discount-row" id="discountRow" style="display:none;">
+            <span>Discount</span>
+            <span id="discountAmount">-₹0</span>
+          </div>
+
           <div class="summary-row total"><span>Total</span><span id="summaryTotal"></span></div>
           
-          <!-- Coupon Section (NEW) -->
+          <!-- Coupon Section -->
           <div class="coupon-section">
             <h3>Apply Coupon</h3>
             <div class="coupon-input-group">
@@ -676,7 +686,7 @@
           document.getElementById('giftFields').classList.toggle('show', this.checked);
         });
 
-        // Load available coupons (NEW)
+        // Load available coupons
         loadAvailableCoupons();
 
         finishLoading();
@@ -687,7 +697,7 @@
       });
   }
 
-  // ===== COUPON FUNCTIONS (NEW) =====
+  // ===== COUPON FUNCTIONS =====
   function loadAvailableCoupons() {
     db.collection('coupons').where('active', '==', true).get().then((snapshot) => {
       const list = document.getElementById('couponsList');
@@ -718,16 +728,100 @@
     }).catch(err => console.error("Error loading coupons:", err));
   }
 
-  function applyCouponCode() {
-    const code = document.getElementById('couponInput').value.trim();
+  // NEW: Apply Coupon with Live Discount + Confetti
+  async function applyCouponCode() {
+    const codeInput = document.getElementById('couponInput');
+    const code = codeInput.value.trim();
     const message = document.getElementById('couponMessage');
+
     if (!code) {
       message.textContent = "Please enter a code.";
       message.style.color = "red";
       return;
     }
-    message.textContent = `Coupon "${code}" applied! Discount will be calculated at checkout.`;
-    message.style.color = "green";
+
+    try {
+      const docRef = db.collection('coupons').doc(code);
+      const doc = await docRef.get();
+
+      if (doc.exists) {
+        const data = doc.data();
+        if (!data.active) {
+          message.textContent = "This coupon is inactive.";
+          message.style.color = "red";
+          return;
+        }
+
+        let discount = 0;
+        if (data.type === 'percentage') {
+          discount = currentSubtotal * (data.value / 100);
+        } else if (data.type === 'fixed') {
+          discount = data.value;
+        }
+        
+        // Ensure discount doesn't exceed subtotal
+        discount = Math.min(discount, currentSubtotal);
+
+        // Update the UI
+        const discountRow = document.getElementById('discountRow');
+        const discountVal = document.getElementById('discountAmount');
+        const totalVal = document.getElementById('summaryTotal');
+
+        if (discount > 0) {
+          discountRow.style.display = 'flex';
+          discountVal.textContent = `-₹${Math.round(discount)}`;
+          totalVal.textContent = `₹${Math.round(currentSubtotal - discount)}`;
+          
+          message.textContent = `Coupon "${code}" applied! You save ₹${Math.round(discount)}!`;
+          message.style.color = "green";
+          
+          // Launch Confetti inside the summary box!
+          launchCouponConfetti();
+        } else {
+          message.textContent = "Coupon applied, but no discount was given.";
+          message.style.color = "orange";
+        }
+      } else {
+        message.textContent = "Invalid coupon code.";
+        message.style.color = "red";
+      }
+    } catch (err) {
+      console.error("Error checking coupon:", err);
+      message.textContent = "Could not verify coupon.";
+      message.style.color = "red";
+    }
+  }
+
+  // NEW: Launch Confetti in the Order Summary section
+  function launchCouponConfetti() {
+    const container = document.getElementById('cartConfetti');
+    if (!container) return;
+    container.style.display = 'block';
+    container.innerHTML = '';
+    
+    const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4'];
+    const pieces = 60;
+    const summaryRect = document.getElementById('cartSummary').getBoundingClientRect();
+    
+    for (let i = 0; i < pieces; i++) {
+      const confetti = document.createElement('span');
+      confetti.className = 'confetti-piece';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.left = (5 + Math.random() * 90) + '%';
+      confetti.style.width = (6 + Math.random() * 8) + 'px';
+      confetti.style.height = (6 + Math.random() * 8) + 'px';
+      confetti.style.borderRadius = Math.random() > 0.4 ? '50%' : '2px';
+      confetti.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+      confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+      confetti.style.top = '0%';
+      confetti.style.position = 'absolute';
+      container.appendChild(confetti);
+    }
+    
+    setTimeout(() => {
+      container.innerHTML = '';
+      container.style.display = 'none';
+    }, 5000);
   }
 
   // ===== EXISTING CART FUNCTIONS =====
@@ -833,7 +927,7 @@
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      // NEW: Get coupon code and send it to Worker
+      // NEW: Get coupon code
       const couponCode = document.getElementById('couponInput').value.trim();
 
       const orderResponse = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/create-order', {
@@ -843,7 +937,7 @@
           items: items, 
           currency: 'INR', 
           receipt: orderDoc.id,
-          coupon: couponCode // SEND COUPON HERE
+          coupon: couponCode
         })
       });
       const orderData = await orderResponse.json();
