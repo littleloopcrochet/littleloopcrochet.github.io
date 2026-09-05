@@ -17,18 +17,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    :root{
-      --bg:#fffdfb; --surface:#ffffff; --card:#fff9f8; --text:#000000;
-      --text-soft:#222222; --muted:#444444; --accent:#d795a7; --accent-hover:#c98296;
-      --pink:#f8dce4; --green:#dfeee5; --yellow:#f8edcc; --blue:#dceaf3;
-      --nav-bg: transparent; --shadow:rgba(90,70,70,.10); --icon-glow:rgba(130,110,110,.18);
-    }
-    body.dark{
-      --bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd;
-      --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff;
-      --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a;
-      --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75);
-    }
+    :root{--bg:#fffdfb; --surface:#ffffff; --card:#fff9f8; --text:#000000; --text-soft:#222222; --muted:#444444; --accent:#d795a7; --accent-hover:#c98296; --pink:#f8dce4; --green:#dfeee5; --yellow:#f8edcc; --blue:#dceaf3; --nav-bg: transparent; --shadow:rgba(90,70,70,.10); --icon-glow:rgba(130,110,110,.18);}
+    body.dark{--bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd; --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff; --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75);}
     *{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{font-family:"Comfortaa",sans-serif;background:transparent;color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden}
@@ -65,27 +55,8 @@
     body.dark .mute-toggle:hover{border-color:rgba(194,130,255,.45);box-shadow:0 0 12px rgba(180,100,255,.45);}
 
     /* Hamburger */
-    .hamburger{
-      display:none;
-      flex-direction:column;
-      justify-content:space-between;
-      width:30px;
-      height:22px;
-      background:none;
-      border:none;
-      cursor:pointer;
-      z-index:10080;
-      transition:all .3s ease;
-      position:relative;
-    }
-    .hamburger span{
-      display:block;
-      width:100%;
-      height:3px;
-      background:var(--text);
-      border-radius:3px;
-      transition:all .3s ease;
-    }
+    .hamburger{display:none;flex-direction:column;justify-content:space-between;width:30px;height:22px;background:none;border:none;cursor:pointer;z-index:10080;transition:all .3s ease;position:relative;}
+    .hamburger span{display:block;width:100%;height:3px;background:var(--text);border-radius:3px;transition:all .3s ease;}
     .hamburger.active span:nth-child(1){transform:translateY(10px) rotate(45deg);}
     .hamburger.active span:nth-child(2){opacity:0;}
     .hamburger.active span:nth-child(3){transform:translateY(-10px) rotate(-45deg);}
@@ -94,32 +65,8 @@
     @media(max-width:750px){
       nav{padding:15px 4%;}
       .hamburger{display:flex;}
-      .nav-right{
-        display:flex;
-        flex-direction:column;
-        align-items:flex-end;
-        gap:15px;
-        position:fixed;
-        top:0;
-        right:0;
-        width:70%;
-        height:100vh;
-        height:100dvh;
-        background:var(--surface);
-        padding:80px 20px;
-        box-shadow:-5px 0 20px rgba(0,0,0,0.2);
-        transform:translateX(100%);
-        visibility:hidden;
-        pointer-events:none;
-        transition:transform .4s ease, visibility .4s ease;
-        z-index:10050;
-        will-change:transform;
-      }
-      .nav-right.open{
-        transform:translateX(0);
-        visibility:visible;
-        pointer-events:auto;
-      }
+      .nav-right{display:flex;flex-direction:column;align-items:flex-end;gap:15px;position:fixed;top:0;right:0;width:70%;height:100vh;height:100dvh;background:var(--surface);padding:80px 20px;box-shadow:-5px 0 20px rgba(0,0,0,0.2);transform:translateX(100%);visibility:hidden;pointer-events:none;transition:transform .4s ease, visibility .4s ease;z-index:10050;will-change:transform;}
+      .nav-right.open{transform:translateX(0);visibility:visible;pointer-events:auto;}
       .nav-links{flex-direction:column;gap:20px;width:100%;text-align:center;}
       .nav-links li{width:100%;}
       .nav-links a{display:block;width:100%;padding:10px;color:var(--text);font-size:1.1rem;}
@@ -128,7 +75,7 @@
       .theme-toggle,.mute-toggle{width:34px;height:34px;font-size:1rem;}
     }
 
-    /* ===== Cart Styles (unchanged) ===== */
+    /* ===== Cart Styles ===== */
     .cart-page { min-height: 90vh; padding: 100px 7%; max-width: 1200px; margin: 0 auto; }
     .cart-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: var(--text); text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
     body.dark .cart-title { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
@@ -188,18 +135,18 @@
     .coupon-section { margin-top: 20px; border-top: 1px solid rgba(120,100,120,.15); padding-top: 20px; }
     .coupon-section h3 { margin-bottom: 10px; font-size: 1.1rem; }
     .coupon-input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-    .coupon-input-group input { flex: 1; padding: 10px; border: 1px solid rgba(120,100,120,.2); border-radius: 30px; background: var(--bg); color: var(--text); }
-    .coupon-input-group button { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; }
+    .coupon-input-group input { flex: 1; padding: 12px; border: 1px solid rgba(120,100,120,.2); border-radius: 30px; background: var(--bg); color: var(--text); }
+    .coupon-input-group button { padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; }
     .coupon-msg { font-size: 0.85rem; margin-top: 5px; color: var(--muted); }
     .available-coupons { margin-top: 10px; display: none; }
     .available-coupons p { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; }
-    .coupon-tag { display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px dashed var(--accent); border-radius: 8px; margin-bottom: 5px; cursor: pointer; }
+    .coupon-tag { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px dashed var(--accent); border-radius: 8px; margin-bottom: 5px; cursor: pointer; min-height: 44px; }
     .coupon-tag span { font-weight: bold; color: var(--accent); }
     .coupon-tag small { font-size: 0.8rem; }
 
     footer{padding:35px 7%;text-align:center;background:transparent;color:var(--muted);font-size:.8rem; position: relative; z-index: 2;}
 
-    /* Loader (optimized like Orders/About) */
+    /* Loader */
     body.is-loading{overflow:hidden}
     body.is-loading > *:not(#pageLoader):not(nav){filter:blur(7px);transform:scale(.997);transition:filter .5s ease,transform .5s ease}
     .page-loader{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
@@ -221,7 +168,7 @@
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.05))}
     .cart-page,footer{position:relative;z-index:2}
 
-    /* Magic particles & hearts (unchanged) */
+    /* Magic particles & hearts */
     .magic-particles{position:fixed;pointer-events:none;z-index:9999;width:1px;height:1px;}
     .butterfly{position:fixed;width:18px;height:18px;pointer-events:none;opacity:0;animation:butterflyDrift 4.8s cubic-bezier(.25,.65,.35,1) forwards;filter:drop-shadow(0 2px 4px rgba(180,120,160,.18));}
     .butterfly .body{position:absolute;left:50%;top:50%;width:3px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#7d6877;z-index:3;}
@@ -245,6 +192,10 @@
       .address-grid{grid-template-columns:1fr;}
       .address-grid .full-width{grid-column:span 1;}
       .loader-card{width:90vw;padding:20px;max-height:90vh;}
+      
+      /* Mobile specific coupon styling to make it easier to tap */
+      .coupon-input-group input, .coupon-input-group button { padding: 14px; font-size: 1rem; }
+      .coupon-tag { padding: 14px; font-size: 0.9rem; }
     }
   </style>
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
@@ -253,7 +204,7 @@
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
 
-<!-- Loader (same as Orders) -->
+<!-- Loader -->
 <div id="pageLoader" class="page-loader">
   <div class="loader-backdrop"></div>
   <div class="loader-card">
@@ -263,18 +214,14 @@
   </div>
 </div>
 
-<!-- Navigation (optimized) -->
+<!-- Navigation -->
 <nav>
   <a href="index.html" class="logo magic-hover">♡ Little Loop</a>
-  
   <div class="nav-actions">
     <div class="mute-wrapper magic-hover"><button class="mute-toggle" id="muteToggle" aria-label="Toggle sound" title="Mute / Unmute"><span class="mute-icon" id="muteIcon">🔊</span></button></div>
     <div class="theme-wrapper magic-hover"><button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme"><span class="theme-icon" id="themeIcon">☀️</span></button></div>
-    <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu"><span></span><span></span><span></span></button>
   </div>
-
   <div class="nav-right" id="navRight">
     <ul class="nav-links">
       <li><a href="index.html" class="magic-hover">Home</a></li>
@@ -284,13 +231,8 @@
       <li><a href="about.html" class="magic-hover">About</a></li>
       <li><a href="contact.html" class="magic-hover">Contact</a></li>
     </ul>
-    <button class="signin-btn" id="authButton" onclick="window.location.href='index.html'">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      <span id="authButtonText">Account</span>
-    </button>
-    <button id="logoutBtn" class="logout-btn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text);" onclick="logout()" title="Logout">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-    </button>
+    <button class="signin-btn" id="authButton" onclick="window.location.href='index.html'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span id="authButtonText">Account</span></button>
+    <button id="logoutBtn" class="logout-btn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text);" onclick="logout()" title="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button>
   </div>
 </nav>
 
@@ -300,7 +242,7 @@
   <div id="cartContent" class="cart-container"></div>
 </div>
 
-<!-- Standard Footer -->
+<!-- Footer -->
 <footer>
   <p>♡ Little Loop Crochet</p>
   <p>Made by hand · Made with love</p>
@@ -386,7 +328,7 @@
 
   let currentUser = null;
   let productMap = {}; 
-  let currentSubtotal = 0; // GLOBAL VARIABLE TO STORE SUBTOTAL
+  let currentSubtotal = 0; 
 
   const authButtonText = document.getElementById('authButtonText');
   const logoutBtn = document.getElementById('logoutBtn');
@@ -447,7 +389,7 @@
           total += item.price * item.quantity;
         });
 
-        currentSubtotal = total; // STORE SUBTOTAL GLOBALLY
+        currentSubtotal = total; 
 
         // Build the items container safely
         const itemsDiv = document.createElement('div');
@@ -528,7 +470,7 @@
 
         cartContent.appendChild(itemsDiv);
 
-        // Build the summary section safely (the rest is static)
+        // Build the summary section safely
         const summaryDiv = document.createElement('div');
         summaryDiv.className = 'cart-summary';
         summaryDiv.id = 'cartSummary';
@@ -539,7 +481,6 @@
           <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal"></span></div>
           <div class="summary-row"><span>Shipping</span><span>Free</span></div>
           
-          <!-- NEW DISCOUNT ROW -->
           <div class="summary-row discount-row" id="discountRow" style="display:none;">
             <span>Discount</span>
             <span id="discountAmount">-₹0</span>
@@ -564,88 +505,37 @@
           <div class="checkout-form">
             <h3>Checkout Details</h3>
             <div class="name-grid">
-              <div class="form-group">
-                <label>First Name *</label>
-                <input type="text" id="checkoutFirstName" placeholder="John" required>
-              </div>
-              <div class="form-group">
-                <label>Middle Name</label>
-                <input type="text" id="checkoutMiddleName" placeholder="Optional">
-              </div>
-              <div class="form-group">
-                <label>Last Name *</label>
-                <input type="text" id="checkoutLastName" placeholder="Doe" required>
-              </div>
+              <div class="form-group"><label>First Name *</label><input type="text" id="checkoutFirstName" placeholder="John" required></div>
+              <div class="form-group"><label>Middle Name</label><input type="text" id="checkoutMiddleName" placeholder="Optional"></div>
+              <div class="form-group"><label>Last Name *</label><input type="text" id="checkoutLastName" placeholder="Doe" required></div>
             </div>
 
             <div class="phone-grid">
-              <div class="form-group">
-                <label>Country Code</label>
-                <select id="checkoutCountryCode"><option value="+91" selected>+91</option></select>
-              </div>
-              <div class="form-group">
-                <label>Phone Number *</label>
-                <input type="tel" id="checkoutPhone" placeholder="98765 43210" maxlength="10" pattern="[0-9]{10}" required>
-              </div>
+              <div class="form-group"><label>Country Code</label><select id="checkoutCountryCode"><option value="+91" selected>+91</option></select></div>
+              <div class="form-group"><label>Phone Number *</label><input type="tel" id="checkoutPhone" placeholder="98765 43210" maxlength="10" pattern="[0-9]{10}" required></div>
             </div>
 
-            <div class="form-group">
-              <label>Email Address *</label>
-              <input type="email" id="checkoutEmail" placeholder="you@example.com" required>
-            </div>
+            <div class="form-group"><label>Email Address *</label><input type="email" id="checkoutEmail" placeholder="you@example.com" required></div>
 
             <h3 style="margin-top: 10px;">Delivery Address</h3>
-            <div class="form-group">
-              <label>House / Flat / Building No. *</label>
-              <input type="text" id="checkoutHouse" placeholder="Flat 201, Green Residency" required>
-            </div>
-            <div class="form-group">
-              <label>Street / Road Name *</label>
-              <input type="text" id="checkoutStreet" placeholder="MG Road" required>
-            </div>
-            <div class="form-group">
-              <label>Area / Locality *</label>
-              <input type="text" id="checkoutArea" placeholder="Sector 14" required>
-            </div>
-            <div class="form-group">
-              <label>PIN Code *</label>
-              <input type="text" id="checkoutPincode" placeholder="110001" maxlength="6" pattern="[0-9]{6}" required>
-            </div>
+            <div class="form-group"><label>House / Flat / Building No. *</label><input type="text" id="checkoutHouse" placeholder="Flat 201, Green Residency" required></div>
+            <div class="form-group"><label>Street / Road Name *</label><input type="text" id="checkoutStreet" placeholder="MG Road" required></div>
+            <div class="form-group"><label>Area / Locality *</label><input type="text" id="checkoutArea" placeholder="Sector 14" required></div>
+            <div class="form-group"><label>PIN Code *</label><input type="text" id="checkoutPincode" placeholder="110001" maxlength="6" pattern="[0-9]{6}" required></div>
             <div class="address-grid">
-              <div class="form-group">
-                <label>City / Town *</label>
-                <input type="text" id="checkoutCity" placeholder="City" required>
-              </div>
-              <div class="form-group">
-                <label>State *</label>
-                <input type="text" id="checkoutState" placeholder="State" required>
-              </div>
+              <div class="form-group"><label>City / Town *</label><input type="text" id="checkoutCity" placeholder="City" required></div>
+              <div class="form-group"><label>State *</label><input type="text" id="checkoutState" placeholder="State" required></div>
             </div>
 
             <div class="gift-option">
-              <div class="gift-checkbox">
-                <input type="checkbox" id="checkoutGift">
-                <label for="checkoutGift">Send it as a gift 🎁</label>
-              </div>
+              <div class="gift-checkbox"><input type="checkbox" id="checkoutGift"><label for="checkoutGift">Send it as a gift 🎁</label></div>
               <div class="gift-fields" id="giftFields">
-                <div class="form-group">
-                  <label>Recipient's Name</label>
-                  <input type="text" id="checkoutRecipientName" placeholder="Recipient's name">
-                </div>
+                <div class="form-group"><label>Recipient's Name</label><input type="text" id="checkoutRecipientName" placeholder="Recipient's name"></div>
                 <div class="phone-grid">
-                  <div class="form-group">
-                    <label>Recipient Code</label>
-                    <select id="checkoutRecipientCode"><option value="+91" selected>+91</option></select>
-                  </div>
-                  <div class="form-group">
-                    <label>Recipient Phone</label>
-                    <input type="tel" id="checkoutRecipientPhone" placeholder="10-digit number" maxlength="10" pattern="[0-9]{10}">
-                  </div>
+                  <div class="form-group"><label>Recipient Code</label><select id="checkoutRecipientCode"><option value="+91" selected>+91</option></select></div>
+                  <div class="form-group"><label>Recipient Phone</label><input type="tel" id="checkoutRecipientPhone" placeholder="10-digit number" maxlength="10" pattern="[0-9]{10}"></div>
                 </div>
-                <div class="form-group">
-                  <label>Gift Message</label>
-                  <textarea id="checkoutGiftMessage" rows="3" placeholder="Write a heartfelt message..."></textarea>
-                </div>
+                <div class="form-group"><label>Gift Message</label><textarea id="checkoutGiftMessage" rows="3" placeholder="Write a heartfelt message..."></textarea></div>
               </div>
             </div>
 
@@ -653,15 +543,13 @@
             <a href="shop.html" class="continue-shopping magic-hover">Continue Shopping</a>
           </div>
         `;
-        summaryDiv.innerHTML = summaryHTML; // static HTML, safe
+        summaryDiv.innerHTML = summaryHTML; 
 
-        // Now set the totals safely using textContent
         summaryDiv.querySelector('#summarySubtotal').textContent = `₹${total}`;
         summaryDiv.querySelector('#summaryTotal').textContent = `₹${total}`;
 
         cartContent.appendChild(summaryDiv);
 
-        // Attach event listeners (same as before)
         document.getElementById('checkoutPincode').addEventListener('input', async function() {
           const pincode = this.value.trim();
           if (pincode.length === 6 && /^[0-9]{6}$/.test(pincode)) {
@@ -676,9 +564,7 @@
                 document.getElementById('checkoutCity').value = '';
                 document.getElementById('checkoutState').value = '';
               }
-            } catch (error) {
-              console.error("Error fetching pincode details:", error);
-            }
+            } catch (error) { console.error("Error fetching pincode details:", error); }
           }
         });
 
@@ -686,7 +572,6 @@
           document.getElementById('giftFields').classList.toggle('show', this.checked);
         });
 
-        // Load available coupons
         loadAvailableCoupons();
 
         finishLoading();
@@ -697,7 +582,7 @@
       });
   }
 
-  // ===== COUPON FUNCTIONS =====
+  // ===== COUPON FUNCTIONS (Fixed for Mobile) =====
   function loadAvailableCoupons() {
     db.collection('coupons').where('active', '==', true).get().then((snapshot) => {
       const list = document.getElementById('couponsList');
@@ -717,7 +602,6 @@
         item.className = 'coupon-tag';
         item.innerHTML = `<span>${code}</span><small>${discountText}</small>`;
         
-        // On click, fill the input and auto-apply
         item.onclick = function() {
           document.getElementById('couponInput').value = code;
           applyCouponCode();
@@ -725,13 +609,15 @@
         
         list.appendChild(item);
       });
-    }).catch(err => console.error("Error loading coupons:", err));
+    }).catch(err => {
+      console.error("Error loading coupons (Rules might be blocking read):", err);
+      // Fallback: Keep it hidden if rules are wrong
+      document.getElementById('availableCoupons').style.display = 'none';
+    });
   }
 
-  // NEW: Apply Coupon with Live Discount + Confetti
   async function applyCouponCode() {
-    const codeInput = document.getElementById('couponInput');
-    const code = codeInput.value.trim();
+    const code = document.getElementById('couponInput').value.trim();
     const message = document.getElementById('couponMessage');
 
     if (!code) {
@@ -759,10 +645,8 @@
           discount = data.value;
         }
         
-        // Ensure discount doesn't exceed subtotal
         discount = Math.min(discount, currentSubtotal);
 
-        // Update the UI
         const discountRow = document.getElementById('discountRow');
         const discountVal = document.getElementById('discountAmount');
         const totalVal = document.getElementById('summaryTotal');
@@ -775,7 +659,6 @@
           message.textContent = `Coupon "${code}" applied! You save ₹${Math.round(discount)}!`;
           message.style.color = "green";
           
-          // Launch Confetti inside the summary box!
           launchCouponConfetti();
         } else {
           message.textContent = "Coupon applied, but no discount was given.";
@@ -787,12 +670,11 @@
       }
     } catch (err) {
       console.error("Error checking coupon:", err);
-      message.textContent = "Could not verify coupon.";
+      message.textContent = "Could not verify coupon. Please check your internet connection.";
       message.style.color = "red";
     }
   }
 
-  // NEW: Launch Confetti in the Order Summary section
   function launchCouponConfetti() {
     const container = document.getElementById('cartConfetti');
     if (!container) return;
@@ -801,7 +683,6 @@
     
     const colors = ['#ff6b6b', '#ffa500', '#ffd700', '#4CAF50', '#2196F3', '#9C27B0', '#ff69b4'];
     const pieces = 60;
-    const summaryRect = document.getElementById('cartSummary').getBoundingClientRect();
     
     for (let i = 0; i < pieces; i++) {
       const confetti = document.createElement('span');
@@ -818,10 +699,7 @@
       container.appendChild(confetti);
     }
     
-    setTimeout(() => {
-      container.innerHTML = '';
-      container.style.display = 'none';
-    }, 5000);
+    setTimeout(() => { container.innerHTML = ''; container.style.display = 'none'; }, 5000);
   }
 
   // ===== EXISTING CART FUNCTIONS =====
@@ -845,21 +723,6 @@
   window.removeItem = function(itemId) {
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(itemId);
     cartRef.delete().then(loadCart);
-  };
-
-  window.quickAdd = function(id, name, price, image) {
-    if (!currentUser) { alert('Please sign in to add items to your cart.'); return; }
-    const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(id);
-    cartRef.get().then(function(doc) {
-      if (doc.exists) {
-        return cartRef.update({ quantity: firebase.firestore.FieldValue.increment(1) });
-      } else {
-        return cartRef.set({ id, name, price, image, quantity: 1 });
-      }
-    }).then(function() {
-      alert(name + ' added to cart!');
-      loadCart();
-    });
   };
 
   window.placeOrder = async function() {
@@ -927,18 +790,12 @@
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      // NEW: Get coupon code
       const couponCode = document.getElementById('couponInput').value.trim();
 
       const orderResponse = await fetch('https://little-loop-payments.mayankverma01092003.workers.dev/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          items: items, 
-          currency: 'INR', 
-          receipt: orderDoc.id,
-          coupon: couponCode
-        })
+        body: JSON.stringify({ items: items, currency: 'INR', receipt: orderDoc.id, coupon: couponCode })
       });
       const orderData = await orderResponse.json();
 
@@ -947,7 +804,7 @@
       }
 
       const options = {
-        key: 'rzp_test_TYLpLID3tKkx0o', // Make sure this is your key
+        key: 'rzp_test_TYLpLID3tKkx0o',
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Little Loop',
@@ -1012,13 +869,10 @@
       confetti.style.animationDelay = (Math.random() * 0.5) + 's';
       container.appendChild(confetti);
     }
-    setTimeout(() => {
-      container.innerHTML = '';
-      container.style.display = 'none';
-    }, 5000);
+    setTimeout(() => { container.innerHTML = ''; container.style.display = 'none'; }, 5000);
   }
 
-  // ===== Landscape Canvas (same as others) =====
+  // ===== Landscape Canvas =====
   (function() {
     const canvas=document.getElementById('aboutCanvas'); if(!canvas)return;
     const ctx=canvas.getContext('2d',{alpha:true});
