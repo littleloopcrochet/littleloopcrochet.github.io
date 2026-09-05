@@ -20,14 +20,18 @@
   <style>
     :root{--bg:#fffdfb;--surface:#ffffff;--card:#fff9f8;--text:#000000;--text-soft:#222222;--muted:#444444;--accent:#d795a7;--accent-hover:#c98296;--pink:#f8dce4;--green:#dfeee5;--yellow:#f8edcc;--blue:#dceaf3;--shadow:rgba(90,70,70,.10);}
     body.dark{--bg:#09070d;--surface:#110d17;--card:#17111f;--text:#f7effd;--text-soft:#c8b9d1;--muted:#9989a4;--accent:#bd7cff;--accent-hover:#d19cff;--pink:#352039;--green:#1b3028;--yellow:#342b18;--blue:#20243a;}
+    
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:"Comfortaa",sans-serif;background:linear-gradient(135deg,var(--bg),#f0e5e5);color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;min-height:100vh;}
     body.dark{background:linear-gradient(135deg,#09070d,#1a1220);}
 
     .admin-header{padding:20px 7%;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.2);position:sticky;top:0;z-index:100;}
     .admin-header h1{color:var(--text);font-size:1.8rem;}
-    .admin-header button{background:var(--accent);border:none;padding:10px 20px;border-radius:50px;color:white;cursor:pointer;font-family:inherit;font-size:0.9rem;transition:all .3s ease;}
-    .admin-header button:hover{background:var(--accent-hover);transform:translateY(-2px);}
+    .header-btn{background:var(--accent);border:none;padding:10px 20px;border-radius:50px;color:white;cursor:pointer;font-family:inherit;font-size:0.9rem;transition:all .3s ease;}
+    .header-btn:hover{background:var(--accent-hover);transform:translateY(-2px);}
+    
+    /* Dark Mode Toggle */
+    #darkModeToggle{background:var(--surface);color:var(--text);border:1px solid var(--shadow);margin-right:10px;}
 
     .admin-tabs{display:flex;gap:20px;padding:20px 7%;background:transparent;overflow-x:auto;}
     .admin-tab{padding:10px 25px;border-radius:50px;background:var(--card);cursor:pointer;font-weight:600;color:var(--muted);transition:all .3s ease;box-shadow:0 2px 8px var(--shadow);display:flex;align-items:center;white-space:nowrap;}
@@ -37,25 +41,26 @@
     .admin-container{padding:30px 7%;display:none;}
     .admin-container.active{display:block;}
 
-    /* Dashboard Sub-Tabs */
+    /* Dashboard */
     .dash-sub-tabs{display:flex;gap:15px;margin-bottom:30px;border-bottom:2px solid var(--pink);padding-bottom:10px;}
     .sub-tab{padding:10px 20px;cursor:pointer;font-weight:600;color:var(--muted);border-radius:20px;}
     .sub-tab.active{background:var(--accent);color:white;}
-
     .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
     .dash-card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); border-left: 5px solid var(--accent); }
     .dash-card h4 { color: var(--muted); font-size: 0.9rem; }
     .dash-card p { font-size: 2rem; font-weight: bold; color: var(--text); }
     .chart-container { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 20px; }
 
-    /* Order Card Styles */
-    .order-admin-card{background:var(--surface);border-radius:15px;padding:20px;margin-bottom:15px;box-shadow:0 5px 15px var(--shadow);border-left:4px solid var(--accent);}
+    /* Order Cards */
+    .order-admin-card{background:var(--surface);border-radius:15px;padding:20px;margin-bottom:15px;box-shadow:0 5px 15px var(--shadow);border-left:4px solid var(--accent);position:relative;}
     .order-admin-card h4{color:var(--text);font-size:1rem;margin-bottom:5px;}
     .order-admin-card p{font-size:0.85rem;color:var(--muted);margin-bottom:5px;}
     .order-items-admin{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;margin-top:10px;}
     .order-item-admin{background:var(--pink);padding:5px 10px;border-radius:10px;font-size:0.8rem;}
+    
+    /* Blue Dot for Order Updates */
+    .blue-dot { position: absolute; top: 10px; right: 10px; width: 12px; height: 12px; border-radius: 50%; background: #007aff; display: none; }
 
-    /* Status Button Colors */
     .status-select{padding:10px 15px;border-radius:50px;border:none;font-family:inherit;font-weight:700;cursor:pointer;margin-right:10px;outline:none;}
     .status-select.pending{background:var(--yellow);color:#8a6d1e;}
     .status-select.paid{background:var(--green);color:#2d6a4f;}
@@ -68,26 +73,41 @@
     .btn:hover { background: var(--accent-hover); }
     .btn-secondary { background: var(--muted); }
 
-    /* Chats */
-    .customer-item{padding:15px;border-radius:15px;margin-bottom:10px;cursor:pointer;background:var(--surface);transition:all 0.3s ease;}
+    /* Professional Chat UI */
+    .customer-list{flex:1;background:var(--card);border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.3);overflow-y:auto;box-shadow:0 10px 30px var(--shadow);}
+    .customer-item{padding:15px;border-radius:15px;margin-bottom:10px;cursor:pointer;background:var(--surface);transition:all 0.3s ease;position:relative;}
     .customer-item:hover,.customer-item.active{background:var(--pink);}
+    .customer-item h4{margin-bottom:5px;font-size:1rem;color:var(--text);}
+    .customer-item p{font-size:0.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    
+    .red-dot { position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; border-radius: 50%; background: #ff3b30; display: none; }
 
-    /* Modal */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; }
-    .modal-box { background: var(--card); padding: 30px; border-radius: 20px; max-width: 700px; width: 95%; position: relative; max-height: 90vh; overflow-y: auto; }
-    .close-modal { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 24px; color: var(--muted); }
+    .admin-chat{flex:2;background:var(--card);border-radius:20px;padding:20px;border:1px solid rgba(255,255,255,0.3);display:flex;flex-direction:column;box-shadow:0 10px 30px var(--shadow);}
+    .chat-window{flex-grow:1;overflow-y:auto;margin-bottom:20px;background:var(--bg);padding:20px;border-radius:15px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--shadow);}
+    
+    .chat-msg { max-width: 75%; padding: 10px 15px; border-radius: 15px; font-size: 0.9rem; position: relative; word-wrap: break-word; }
+    .chat-msg.user { align-self: flex-start; background: var(--surface); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--shadow); }
+    .chat-msg.admin { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+    
+    .chat-time { font-size: 0.7rem; opacity: 0.7; margin-top: 4px; display: block; text-align: right; }
 
-    /* Coming Soon */
-    .coming-soon { display: flex; justify-content: center; align-items: center; height: 60vh; flex-direction: column; text-align: center; }
-    .coming-soon h2 { margin-bottom: 20px; color: var(--accent); }
+    .chat-input-area{display:flex;gap:10px;}
+    .chat-input{flex:1;padding:14px;border:1px solid rgba(120,100,120,.2);border-radius:30px;background:var(--surface);color:var(--text);font-size:1rem;outline:none;}
+    .chat-input:focus{border-color:var(--accent);}
+    .chat-send{padding:12px 24px;border:none;border-radius:30px;background:var(--accent);color:white;cursor:pointer;font-weight:600;}
 
-    /* Coupon Form Styles */
+    /* Coupon / Modal / Misc */
     .form-box { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); max-width: 500px; }
     .form-box h3 { margin-bottom: 15px; }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text-soft); }
     .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 30px; border: 1px solid var(--muted); background: var(--surface); color: var(--text); outline: none; }
     .coupon-list-item { background: var(--surface); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; }
+    .modal-box { background: var(--card); padding: 30px; border-radius: 20px; max-width: 700px; width: 95%; position: relative; max-height: 90vh; overflow-y: auto; }
+    .close-modal { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 24px; color: var(--muted); }
+    .coming-soon { display: flex; justify-content: center; align-items: center; height: 60vh; flex-direction: column; text-align: center; }
+    .coming-soon h2 { margin-bottom: 20px; color: var(--accent); }
   </style>
 </head>
 <body>
@@ -95,7 +115,10 @@
 <div id="adminContent" style="display:none;">
   <div class="admin-header">
     <h1>♡ Little Loop Admin</h1>
-    <button onclick="logoutAdmin()">Logout</button>
+    <div>
+      <button class="header-btn" id="darkModeToggle">🌙 Dark</button>
+      <button class="header-btn" onclick="logoutAdmin()">Logout</button>
+    </div>
   </div>
   
   <div class="admin-tabs">
@@ -113,8 +136,6 @@
       <div class="sub-tab active" id="dashTabOverview" onclick="switchDashTab('overview')">📈 Overview</div>
       <div class="sub-tab" id="dashTabProducts" onclick="switchDashTab('products')">📦 Product Analytics</div>
     </div>
-
-    <!-- Overview Sub-Tab -->
     <div id="dashOverviewContent">
       <div class="dash-cards">
         <div class="dash-card"><h4>Total Revenue</h4><p id="totalRevenue">₹0</p></div>
@@ -124,22 +145,11 @@
         <div class="dash-card"><h4>Pending Orders</h4><p id="pendingOrders">0</p></div>
         <div class="dash-card"><h4>Refunded Amount</h4><p id="refundedAmount">₹0</p></div>
       </div>
-      <div class="chart-container">
-        <h3>Sales (Last 7 Days)</h3>
-        <canvas id="salesChart" height="100"></canvas>
-      </div>
+      <div class="chart-container"><h3>Sales (Last 7 Days)</h3><canvas id="salesChart" height="100"></canvas></div>
     </div>
-
-    <!-- Product Analytics Sub-Tab -->
     <div id="dashProductsContent" style="display:none;">
-      <div class="chart-container">
-        <h3>Top 5 Products by Revenue</h3>
-        <canvas id="topProductsPieChart" height="100"></canvas>
-      </div>
-      <div class="chart-container">
-        <h3>Quantity Sold per Product</h3>
-        <canvas id="productBarChart" height="100"></canvas>
-      </div>
+      <div class="chart-container"><h3>Top 5 Products by Revenue</h3><canvas id="topProductsPieChart" height="100"></canvas></div>
+      <div class="chart-container"><h3>Quantity Sold per Product</h3><canvas id="productBarChart" height="100"></canvas></div>
       <div class="chart-container">
         <h3>Detailed Product Data</h3>
         <div style="overflow-x:auto;">
@@ -171,43 +181,37 @@
     <div id="allOrdersList"></div>
   </div>
 
-  <!-- Chats -->
+  <!-- Chats (Professional UI) -->
   <div class="admin-container" id="chatsContainer">
     <div style="display: flex; gap: 20px;">
       <div class="customer-list" id="customerList" style="width:300px;"></div>
       <div class="admin-chat" style="flex:1;">
-        <div class="chat-window" id="adminChatWindow" style="height:400px; overflow-y:auto; background:var(--surface); padding:20px; border-radius:20px;"></div>
-        <div class="chat-input-area" style="margin-top:20px; display:flex; gap:10px;">
-          <input type="text" class="chat-input" id="adminChatInput" placeholder="Type your reply..." style="flex:1; padding:14px; border-radius:30px; background:var(--surface); border:none; outline:none;" />
-          <button class="chat-send" onclick="sendAdminMessage()" style="padding:14px 24px; border-radius:30px; background:var(--accent); color:white; border:none; cursor:pointer;">Send</button>
+        <div class="chat-window" id="adminChatWindow"></div>
+        <div class="chat-input-area">
+          <input type="text" class="chat-input" id="adminChatInput" placeholder="Type your reply..." />
+          <button class="chat-send" onclick="sendAdminMessage()">Send</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Inventory (On Hold) -->
+  <!-- Placeholders -->
   <div class="admin-container" id="inventoryContainer"><div class="coming-soon"><h2>🛍️ Inventory Management</h2><p>Coming soon. Request backend code to activate.</p></div></div>
-
-  <!-- Coupons (LIVE!) -->
   <div class="admin-container" id="couponsContainer">
     <div class="form-box">
       <h3>➕ Add New Coupon</h3>
-      <div class="form-group"><label>Coupon Code (e.g., LOOP10)</label><input type="text" id="couponCodeInput" placeholder="LOOP10"></div>
+      <div class="form-group"><label>Coupon Code</label><input type="text" id="couponCodeInput" placeholder="LOOP10"></div>
       <div class="form-group"><label>Discount Type</label><select id="couponTypeInput"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed Amount (₹)</option></select></div>
-      <div class="form-group"><label>Value (e.g., 10 for 10% or ₹10)</label><input type="number" id="couponValueInput" placeholder="10"></div>
+      <div class="form-group"><label>Value</label><input type="number" id="couponValueInput" placeholder="10"></div>
       <button class="btn" onclick="addCoupon()">Add Coupon</button>
     </div>
     <h3 style="margin-bottom:20px;">🎟️ Existing Coupons</h3>
     <div id="couponsList"></div>
   </div>
-
-  <!-- Shipping (On Hold) -->
   <div class="admin-container" id="shippingContainer"><div class="coming-soon"><h2>🚚 Shipping & Logistics</h2><p>Coming soon. Request backend code to activate.</p></div></div>
 </div>
 
-<!-- Customer Modal -->
 <div id="customerModal" class="modal-overlay"><div class="modal-box"><span class="close-modal" onclick="closeCustomerModal()">&times;</span><div id="customerModalContent">Loading...</div></div></div>
-
 <div class="admin-login-required" id="loginRequired">Loading Admin Panel... Please Log In.</div>
 
 <script>
@@ -223,13 +227,33 @@
   let selectedCustomerId = null;
   let currentTab = 'orders';
   let currentDashTab = 'overview';
+  
   let unsubscribeChat = null;
   let unsubscribeOrders = null;
   let unsubscribeCustomers = null;
   let allOrders = [];
+  
   let salesChart = null;
   let pieChart = null;
   let barChart = null;
+
+  // DOT / NOTIFICATION LOGIC
+  let unseenOrders = 0;
+  let unseenChats = 0;
+  let ordersLoadedOnce = false;
+  let customersLoadedOnce = false;
+  let totalOrderCount = 0;
+  let totalCustomerCount = 0;
+
+  // ===== DARK MODE LOGIC =====
+  const darkToggle = document.getElementById('darkModeToggle');
+  const savedTheme = localStorage.getItem('adminTheme');
+  if (savedTheme === 'dark') { document.body.classList.add('dark'); darkToggle.textContent = '☀️ Light'; }
+  darkToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      darkToggle.textContent = document.body.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';
+      localStorage.setItem('adminTheme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  });
 
   auth.onAuthStateChanged(function(user) {
     if (user && (user.email === ADMIN_EMAIL || user.uid === ADMIN_UID)) {
@@ -248,7 +272,9 @@
   });
 
   function logoutAdmin() { 
-    if(unsubscribeOrders) unsubscribeOrders(); if(unsubscribeCustomers) unsubscribeCustomers(); if(unsubscribeChat) unsubscribeChat();
+    if(unsubscribeOrders) unsubscribeOrders(); 
+    if(unsubscribeCustomers) unsubscribeCustomers(); 
+    if(unsubscribeChat) unsubscribeChat();
     auth.signOut().then(() => window.location.href = 'index.html'); 
   }
 
@@ -259,11 +285,21 @@
     document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
     document.getElementById(tab + 'Container').classList.add('active');
     
-    if (tab === 'dashboard') loadDashboardAndOrders();
-    if (tab === 'orders') { document.getElementById('ordersBadge').style.display = 'none'; loadDashboardAndOrders(); }
-    if (tab === 'chats') { document.getElementById('chatsBadge').style.display = 'none'; loadCustomers(); }
-    if (tab === 'coupons') loadCoupons(); // NEW: This loads coupons!
+    // Reset badges when switching tabs
+    if (tab === 'orders') { unseenOrders = 0; document.getElementById('ordersBadge').style.display = 'none'; loadDashboardAndOrders(); }
+    if (tab === 'chats') { unseenChats = 0; document.getElementById('chatsBadge').style.display = 'none'; loadCustomers(); }
+    if (tab === 'coupons') loadCoupons();
   };
+
+  function updateBadge(id, count) {
+    const badge = document.getElementById(id);
+    if (count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 
   window.switchDashTab = function(tab) {
     currentDashTab = tab;
@@ -273,23 +309,34 @@
     document.getElementById('dashProductsContent').style.display = tab === 'products' ? 'block' : 'none';
   };
 
+  // ===== DASHBOARD & ORDERS (with Blue Dots) =====
   function loadDashboardAndOrders() {
     if (unsubscribeOrders) unsubscribeOrders();
     unsubscribeOrders = db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+      
+      // Tab Badge Logic
+      if (ordersLoadedOnce) {
+        if (snapshot.size > totalOrderCount && currentTab !== 'orders') {
+          unseenOrders += (snapshot.size - totalOrderCount);
+          updateBadge('ordersBadge', unseenOrders);
+        }
+      } else {
+        ordersLoadedOnce = true;
+      }
+      totalOrderCount = snapshot.size;
+
       allOrders = [];
       snapshot.forEach(doc => allOrders.push({ id: doc.id, ...doc.data() }));
 
-      // DASHBOARD CALCULATIONS (USES DISCOUNTED TOTAL)
+      // Dashboard Calculations
       let revenue = 0, pending = 0, refunded = 0, totalUnits = 0;
       let productMap = {};
-      let orderDateSum = {};
 
       allOrders.forEach(order => {
-        // Calculate the actual paid amount. If discount exists, subtract it. Else use total.
         let originalTotal = Number(order.total) || 0;
         let discount = Number(order.discount) || 0;
-        let finalPaid = originalTotal - discount; // This is the ACTUAL revenue
-        if (finalPaid < 0) finalPaid = 0; // Ensure not negative
+        let finalPaid = originalTotal - discount;
+        if (finalPaid < 0) finalPaid = 0;
 
         if (order.status === 'paid' || order.status === 'delivered' || order.status === 'shipped') revenue += finalPaid;
         if (order.status === 'pending') pending++;
@@ -304,7 +351,6 @@
         });
       });
 
-      // Update Main Dashboard
       document.getElementById('totalRevenue').textContent = '₹' + revenue;
       document.getElementById('totalOrders').textContent = allOrders.length;
       document.getElementById('avgOrderValue').textContent = '₹' + (allOrders.length ? Math.round(revenue / allOrders.length) : 0);
@@ -332,9 +378,8 @@
       if(salesChart) salesChart.destroy();
       salesChart = new Chart(document.getElementById('salesChart'), { type: 'bar', data: { labels: days, datasets: [{ label: 'Sales (₹)', data: sales, backgroundColor: '#d795a7' }] }, options: { responsive: true } });
 
-      // PRODUCT ANALYTICS CHARTS & TABLE (Keep using original item prices)
+      // Product Charts
       let sortedProducts = Object.entries(productMap).sort((a,b) => b[1].revenue - a[1].revenue);
-      
       document.getElementById('productDataTable').innerHTML = sortedProducts.map(p => 
         `<tr><td>${p[0]}</td><td>₹${p[1].price}</td><td>${p[1].qty}</td><td>₹${p[1].revenue}</td></tr>`
       ).join('') || '<tr><td colspan="4">No products sold yet.</td></tr>';
@@ -345,7 +390,6 @@
         type: 'pie', data: { labels: top5.map(p => p[0]), datasets: [{ data: top5.map(p => p[1].revenue), backgroundColor: ['#d795a7', '#c98296', '#b06ab3', '#8a6d1e', '#1e4e6a'] }] },
         options: { responsive: true }
       });
-
       if(barChart) barChart.destroy();
       barChart = new Chart(document.getElementById('productBarChart'), {
         type: 'bar', data: { labels: sortedProducts.map(p => p[0]), datasets: [{ label: 'Qty Sold', data: sortedProducts.map(p => p[1].qty), backgroundColor: '#1e4e6a' }] },
@@ -387,12 +431,19 @@
       const addressStr = typeof address === 'object' ? JSON.stringify(address) : address;
       const itemsHTML = (order.items || []).map(item => `<div class="order-item-admin">${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}</div>`).join('');
 
-      // Pricing Logic with Discount
+      // Pricing Logic
       const originalTotal = Number(order.total) || 0;
       const discount = Number(order.discount) || 0;
       const couponUsed = order.coupon ? `<span style="background: var(--blue); padding: 2px 8px; border-radius: 5px; font-weight: bold;">Coupon: ${order.coupon}</span>` : '';
       let finalPaid = originalTotal - discount;
       if (finalPaid < 0) finalPaid = 0;
+
+      // TIME LOGIC (Order Time & Refund Time)
+      const orderTime = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+      const refundTime = order.refundedAt ? new Date(order.refundedAt.seconds * 1000).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+
+      // Blue Dot for recent modifications
+      const hasBlueDot = order.refundedAt || (order.status === 'paid' && order.paidAt) ? '<div class="blue-dot" style="display:block;"></div>' : '';
 
       const statusClass = status; 
       const statusOptions = ['pending','paid','shipped','delivered','cancelled','refunded'].map(s => 
@@ -401,8 +452,10 @@
 
       const cardHTML = `
         <div class="order-admin-card" id="order-${orderId}" data-email="${email}" data-name="${name}" data-total="${finalPaid}">
+          ${hasBlueDot}
           <h4>Order #${orderId.slice(-6).toUpperCase()} (${name}) ${couponUsed}</h4>
-          <p><strong>Date:</strong> ${order.createdAt ? order.createdAt.toDate().toLocaleDateString('en-IN') : 'N/A'}</p>
+          <p><strong>Ordered:</strong> ${orderTime}</p>
+          <p><strong>Refunded:</strong> ${refundTime}</p>
           <p><strong>Phone:</strong> ${phone}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Address:</strong> ${addressStr}</p>
@@ -445,7 +498,6 @@
     if (!confirm('Confirm status change to ' + newStatus + '?')) { filterOrders(); return; }
     const idToken = await currentUser.getIdToken();
     const order = allOrders.find(o => o.id === orderId);
-    // Send the actual paid amount to the worker for refunds
     let original = Number(order.total) || 0;
     let discount = Number(order.discount) || 0;
     let paid = original - discount;
@@ -464,43 +516,68 @@
     } catch (e) { console.error(e); }
   };
 
+  // ===== CHATS (Professional UI + Red Dots) =====
   function loadCustomers() {
     if (unsubscribeCustomers) unsubscribeCustomers();
     unsubscribeCustomers = db.collection('chats').onSnapshot(snapshot => {
-      const list = document.getElementById('customerList');
-      list.innerHTML = '';
+      
+      // Tab Badge Logic
+      if (customersLoadedOnce) {
+        if (snapshot.size > totalCustomerCount && currentTab !== 'chats') {
+          unseenChats += (snapshot.size - totalCustomerCount);
+          updateBadge('chatsBadge', unseenChats);
+        }
+      } else {
+        customersLoadedOnce = true;
+      }
+      totalCustomerCount = snapshot.size;
+
+      const customerList = document.getElementById('customerList');
+      customerList.innerHTML = '';
+      if (snapshot.empty) { customerList.innerHTML = '<p style="color:var(--muted);">No customers yet.</p>'; return; }
+
+      const customerPromises = [];
       snapshot.forEach(userDoc => {
+        const userId = userDoc.id;
         const data = userDoc.data();
         const item = document.createElement('div');
         item.className = 'customer-item';
-        item.innerHTML = `<h4>${data.userName || 'No name'}</h4><p>${data.userEmail || 'No email'}</p>`;
-        item.onclick = () => { selectCustomer(userDoc.id, item); openCustomerModal(userDoc.id); };
-        list.appendChild(item);
+        item.innerHTML = `<h4>${data.userName || 'No name'}</h4><p>${data.userEmail || 'No email'}</p><div class="red-dot" id="redDot-${userId}"></div>`;
+        
+        item.onclick = () => { selectCustomer(userDoc.id, item); };
+
+        // Fetch last message to check for Red Dot
+        const lastMsgPromise = db.collection('chats').doc(userId).collection('messages').orderBy('timestamp', 'desc').limit(1).get().then(msgSnap => {
+          if (!msgSnap.empty) {
+            const lastMsg = msgSnap.docs[0].data();
+            if (lastMsg.sender === 'user' && userId !== selectedCustomerId) {
+              item.querySelector('.red-dot').style.display = 'block';
+            }
+          }
+        });
+        customerPromises.push(lastMsgPromise);
+        customerList.appendChild(item);
+      });
+
+      Promise.all(customerPromises).then(() => {
+        // If currently selected, remove red dot
+        if (selectedCustomerId) {
+          const dot = document.getElementById(`redDot-${selectedCustomerId}`);
+          if (dot) dot.style.display = 'none';
+        }
       });
     });
   }
-
-  async function openCustomerModal(userId) {
-    document.getElementById('customerModal').style.display = 'flex';
-    document.getElementById('customerModalContent').innerHTML = 'Loading...';
-    const orders = await db.collection('orders').where('userId', '==', userId).get();
-    let html = '<h4>Order History</h4>';
-    orders.forEach(doc => {
-      const order = doc.data();
-      let original = Number(order.total) || 0;
-      let discount = Number(order.discount) || 0;
-      let paid = original - discount;
-      if (paid < 0) paid = 0;
-      html += `<p style="margin-bottom:10px;">Order #${doc.id.slice(-6)} - ₹${paid} - <strong>${order.status}</strong></p>`;
-    });
-    document.getElementById('customerModalContent').innerHTML = html;
-  }
-  window.closeCustomerModal = function() { document.getElementById('customerModal').style.display = 'none'; };
 
   function selectCustomer(userId, element) {
     selectedCustomerId = userId;
     document.querySelectorAll('.customer-item').forEach(i => i.classList.remove('active'));
     element.classList.add('active');
+    
+    // Remove Red Dot on click
+    const dot = document.getElementById(`redDot-${userId}`);
+    if (dot) dot.style.display = 'none';
+
     loadAdminChat(userId);
   }
 
@@ -515,7 +592,10 @@
         const msgDiv = document.createElement('div');
         msgDiv.classList.add('chat-msg');
         msgDiv.classList.add(data.sender === 'user' ? 'user' : 'admin');
-        msgDiv.textContent = data.text;
+        
+        const timeStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+        msgDiv.innerHTML = `${data.text}<span class="chat-time">${timeStr}</span>`;
+        
         chatWindow.appendChild(msgDiv);
       });
       chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -529,6 +609,24 @@
     db.collection('chats').doc(selectedCustomerId).collection('messages').add({ sender: 'admin', text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
       .then(() => input.value = '').catch(err => console.error(err));
   }
+
+  function openCustomerModal(userId) {
+    document.getElementById('customerModal').style.display = 'flex';
+    document.getElementById('customerModalContent').innerHTML = 'Loading...';
+    const orders = await db.collection('orders').where('userId', '==', userId).get();
+    let html = '<h4>Order History</h4>';
+    orders.forEach(doc => {
+      const order = doc.data();
+      let original = Number(order.total) || 0;
+      let discount = Number(order.discount) || 0;
+      let paid = original - discount;
+      if (paid < 0) paid = 0;
+      const time = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString('en-IN') : 'N/A';
+      html += `<p style="margin-bottom:10px;">Order #${doc.id.slice(-6)} - ₹${paid} - <strong>${order.status}</strong> (${time})</p>`;
+    });
+    document.getElementById('customerModalContent').innerHTML = html;
+  }
+  window.closeCustomerModal = function() { document.getElementById('customerModal').style.display = 'none'; };
 
   // ===== COUPON FUNCTIONS =====
   function loadCoupons() {
@@ -555,19 +653,13 @@
     const value = Number(document.getElementById('couponValueInput').value);
     if (!code || !value) { alert("Please fill all fields"); return; }
     db.collection('coupons').doc(code).set({ type, value, active: true })
-      .then(() => { 
-        alert('Coupon added!'); 
-        loadCoupons(); 
-        document.getElementById('couponCodeInput').value = '';
-        document.getElementById('couponValueInput').value = '';
-      })
+      .then(() => { alert('Coupon added!'); loadCoupons(); document.getElementById('couponCodeInput').value = ''; document.getElementById('couponValueInput').value = ''; })
       .catch(err => alert(err.message));
   };
 
   window.toggleCoupon = function(id) {
     db.collection('coupons').doc(id).get().then(doc => {
-      db.collection('coupons').doc(id).update({ active: !doc.data().active })
-        .then(() => loadCoupons());
+      db.collection('coupons').doc(id).update({ active: !doc.data().active }).then(() => loadCoupons());
     });
   };
 </script>
