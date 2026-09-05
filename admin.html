@@ -80,6 +80,14 @@
     /* Coming Soon */
     .coming-soon { display: flex; justify-content: center; align-items: center; height: 60vh; flex-direction: column; text-align: center; }
     .coming-soon h2 { margin-bottom: 20px; color: var(--accent); }
+
+    /* Coupon Form Styles */
+    .form-box { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); max-width: 500px; }
+    .form-box h3 { margin-bottom: 15px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text-soft); }
+    .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 30px; border: 1px solid var(--muted); background: var(--surface); color: var(--text); outline: none; }
+    .coupon-list-item { background: var(--surface); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
   </style>
 </head>
 <body>
@@ -177,9 +185,23 @@
     </div>
   </div>
 
-  <!-- Placeholders -->
+  <!-- Inventory (On Hold) -->
   <div class="admin-container" id="inventoryContainer"><div class="coming-soon"><h2>🛍️ Inventory Management</h2><p>Coming soon. Request backend code to activate.</p></div></div>
-  <div class="admin-container" id="couponsContainer"><div class="coming-soon"><h2>🎟️ Coupon Management</h2><p>Coming soon. Request backend code to activate.</p></div></div>
+
+  <!-- Coupons (LIVE!) -->
+  <div class="admin-container" id="couponsContainer">
+    <div class="form-box">
+      <h3>➕ Add New Coupon</h3>
+      <div class="form-group"><label>Coupon Code (e.g., LOOP10)</label><input type="text" id="couponCodeInput" placeholder="LOOP10"></div>
+      <div class="form-group"><label>Discount Type</label><select id="couponTypeInput"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed Amount (₹)</option></select></div>
+      <div class="form-group"><label>Value (e.g., 10 for 10% or ₹10)</label><input type="number" id="couponValueInput" placeholder="10"></div>
+      <button class="btn" onclick="addCoupon()">Add Coupon</button>
+    </div>
+    <h3 style="margin-bottom:20px;">🎟️ Existing Coupons</h3>
+    <div id="couponsList"></div>
+  </div>
+
+  <!-- Shipping (On Hold) -->
   <div class="admin-container" id="shippingContainer"><div class="coming-soon"><h2>🚚 Shipping & Logistics</h2><p>Coming soon. Request backend code to activate.</p></div></div>
 </div>
 
@@ -236,9 +258,11 @@
     document.querySelectorAll('.admin-container').forEach(el => el.classList.remove('active'));
     document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
     document.getElementById(tab + 'Container').classList.add('active');
+    
     if (tab === 'dashboard') loadDashboardAndOrders();
     if (tab === 'orders') { document.getElementById('ordersBadge').style.display = 'none'; loadDashboardAndOrders(); }
     if (tab === 'chats') { document.getElementById('chatsBadge').style.display = 'none'; loadCustomers(); }
+    if (tab === 'coupons') loadCoupons(); // NEW: This loads coupons!
   };
 
   window.switchDashTab = function(tab) {
@@ -300,12 +324,10 @@
       // PRODUCT ANALYTICS CHARTS & TABLE
       let sortedProducts = Object.entries(productMap).sort((a,b) => b[1].revenue - a[1].revenue);
       
-      // Table
       document.getElementById('productDataTable').innerHTML = sortedProducts.map(p => 
         `<tr><td>${p[0]}</td><td>₹${p[1].price}</td><td>${p[1].qty}</td><td>₹${p[1].revenue}</td></tr>`
       ).join('') || '<tr><td colspan="4">No products sold yet.</td></tr>';
 
-      // Pie Chart (Top 5 by Revenue)
       let top5 = sortedProducts.slice(0, 5);
       if(pieChart) pieChart.destroy();
       pieChart = new Chart(document.getElementById('topProductsPieChart'), {
@@ -313,14 +335,12 @@
         options: { responsive: true }
       });
 
-      // Bar Chart (Quantity Sold)
       if(barChart) barChart.destroy();
       barChart = new Chart(document.getElementById('productBarChart'), {
         type: 'bar', data: { labels: sortedProducts.map(p => p[0]), datasets: [{ label: 'Qty Sold', data: sortedProducts.map(p => p[1].qty), backgroundColor: '#1e4e6a' }] },
         options: { responsive: true }
       });
 
-      // ORDERS LIST
       renderOrders();
     });
   }
@@ -356,7 +376,6 @@
       const addressStr = typeof address === 'object' ? JSON.stringify(address) : address;
       const itemsHTML = (order.items || []).map(item => `<div class="order-item-admin">${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}</div>`).join('');
 
-      // Color Coded Status Button
       const statusClass = status; 
       const statusOptions = ['pending','paid','shipped','delivered','cancelled','refunded'].map(s => 
         `<option value="${s}" ${status===s?'selected':''}>${s.toUpperCase()}</option>`
@@ -477,6 +496,48 @@
     db.collection('chats').doc(selectedCustomerId).collection('messages').add({ sender: 'admin', text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
       .then(() => input.value = '').catch(err => console.error(err));
   }
+
+  // ===== NEW COUPON FUNCTIONS =====
+  function loadCoupons() {
+    db.collection('coupons').get().then(snapshot => {
+      const list = document.getElementById('couponsList');
+      list.innerHTML = '';
+      if (snapshot.empty) { list.innerHTML = '<p style="color:var(--muted);">No coupons added yet.</p>'; return; }
+      
+      snapshot.forEach(doc => {
+        const c = doc.data();
+        const statusLabel = c.active ? '🟢 Active' : '🔴 Inactive';
+        const discountLabel = c.type === 'percentage' ? c.value + '% off' : '₹' + c.value + ' off';
+        list.innerHTML += `<div class="coupon-list-item">
+          <div><strong>${doc.id}</strong><br><small>${discountLabel} | ${statusLabel}</small></div>
+          <button class="btn btn-secondary" onclick="toggleCoupon('${doc.id}')">Toggle</button>
+        </div>`;
+      });
+    });
+  }
+
+  window.addCoupon = function() {
+    const code = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+    const type = document.getElementById('couponTypeInput').value;
+    const value = Number(document.getElementById('couponValueInput').value);
+    if (!code || !value) { alert("Please fill all fields"); return; }
+    db.collection('coupons').doc(code).set({ type, value, active: true })
+      .then(() => { 
+        alert('Coupon added!'); 
+        loadCoupons(); 
+        // Clear the form
+        document.getElementById('couponCodeInput').value = '';
+        document.getElementById('couponValueInput').value = '';
+      })
+      .catch(err => alert(err.message));
+  };
+
+  window.toggleCoupon = function(id) {
+    db.collection('coupons').doc(id).get().then(doc => {
+      db.collection('coupons').doc(id).update({ active: !doc.data().active })
+        .then(() => loadCoupons());
+    });
+  };
 </script>
 </body>
 </html>
