@@ -17,24 +17,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    :root{--bg:#fffdfb; --surface:#ffffff; --card:#fff9f8; --text:#000000; --text-soft:#222222; --muted:#444444; --accent:#d795a7; --accent-hover:#c98296; --pink:#f8dce4; --green:#dfeee5; --yellow:#f8edcc; --blue:#dceaf3; --nav-bg: transparent; --shadow:rgba(90,70,70,.10); --icon-glow:rgba(130,110,110,.18);}
-    body.dark{--bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd; --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff; --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75);}
+    :root{--bg:#fffdfb; --surface:#ffffff; --card:#fff9f8; --text:#000000;
+      --text-soft:#222222; --muted:#444444; --accent:#d795a7; --accent-hover:#c98296;
+      --pink:#f8dce4; --green:#dfeee5; --yellow:#f8edcc; --blue:#dceaf3;
+      --nav-bg: transparent; --shadow:rgba(90,70,70,.10); --icon-glow:rgba(130,110,110,.18);}
+    body.dark{--bg:#09070d; --surface:#110d17; --card:#17111f; --text:#f7effd;
+      --text-soft:#c8b9d1; --muted:#9989a4; --accent:#bd7cff; --accent-hover:#d19cff;
+      --pink:#352039; --green:#1b3028; --yellow:#342b18; --blue:#20243a; --nav-bg: transparent; --shadow:rgba(0,0,0,.45); --icon-glow:rgba(174,92,255,.75);}
     *{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{font-family:"Comfortaa",sans-serif;background:transparent;color:var(--text);line-height:1.6;transition:background .5s ease,color .5s ease;overflow-x:hidden}
     a{color:inherit;text-decoration:none}
     
-    /* Navigation (optimized like Orders/About) */
+    /* Navigation */
     nav{width:100%;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);position:sticky;top:0;z-index:10080;transition:background .5s ease}
     nav a, nav .logo, .nav-links a { text-shadow: 0 1px 3px rgba(255,255,255,0.6); }
     body.dark nav a, body.dark nav .logo, body.dark .nav-links a { text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
     .logo{font-size:1.35rem;font-weight:700;color:var(--text);transition:transform .3s ease,color .3s ease;white-space:nowrap}
     .logo:hover{transform:translateY(-2px);color:var(--accent)}
 
-    /* Nav Actions wrapper */
     .nav-actions{display:flex;align-items:center;gap:10px;margin-left:auto;}
-
-    /* Sliding panel (mobile) */
     .nav-right{display:flex;align-items:center;gap:28px}
     .nav-links{display:flex;gap:30px;list-style:none;font-size:.9rem}
     .nav-links a{display:inline-block;transition:color .3s ease,transform .3s ease}
@@ -43,7 +45,6 @@
     .signin-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;background:var(--accent);color:#fff;font-size:.85rem;font-weight:600;border:none;cursor:pointer;transition:background .3s ease, transform .3s ease, box-shadow .3s ease;text-shadow:none;box-shadow:0 8px 20px rgba(215,149,167,.3)}
     .signin-btn:hover{background:var(--accent-hover);transform:translateY(-3px);box-shadow:0 12px 25px rgba(215,149,167,.4)}
 
-    /* Theme & Mute - z-index 10000 (under sliding panel) */
     .theme-wrapper{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;z-index:10000}
     .theme-toggle{width:46px;height:46px;border:1px solid rgba(120,100,120,.12);border-radius:50%;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem;position:relative;z-index:5;transition:transform .4s ease,background .5s ease,color .5s ease,box-shadow .5s ease}
     .theme-toggle:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 0 20px var(--icon-glow)}
@@ -54,14 +55,12 @@
     body.dark .mute-toggle{border-color:rgba(194,130,255,.3);}
     body.dark .mute-toggle:hover{border-color:rgba(194,130,255,.45);box-shadow:0 0 12px rgba(180,100,255,.45);}
 
-    /* Hamburger */
     .hamburger{display:none;flex-direction:column;justify-content:space-between;width:30px;height:22px;background:none;border:none;cursor:pointer;z-index:10080;transition:all .3s ease;position:relative;}
     .hamburger span{display:block;width:100%;height:3px;background:var(--text);border-radius:3px;transition:all .3s ease;}
     .hamburger.active span:nth-child(1){transform:translateY(10px) rotate(45deg);}
     .hamburger.active span:nth-child(2){opacity:0;}
     .hamburger.active span:nth-child(3){transform:translateY(-10px) rotate(-45deg);}
 
-    /* Mobile Menu Panel */
     @media(max-width:750px){
       nav{padding:15px 4%;}
       .hamburger{display:flex;}
@@ -128,8 +127,8 @@
     .shop-btn { padding: 15px 30px; background: var(--accent); color: white; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background .3s ease; display: inline-block; }
     .shop-btn:hover { background: var(--accent-hover); }
 
-    /* Confetti Container */
-    .cart-confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 50; }
+    /* ===== FIXED CONFETTI CONTAINER ===== */
+    .cart-confetti-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 50; }
 
     /* Coupon Styles */
     .coupon-section { margin-top: 20px; border-top: 1px solid rgba(120,100,120,.15); padding-top: 20px; }
@@ -193,7 +192,6 @@
       .address-grid .full-width{grid-column:span 1;}
       .loader-card{width:90vw;padding:20px;max-height:90vh;}
       
-      /* Mobile specific coupon styling to make it easier to tap */
       .coupon-input-group input, .coupon-input-group button { padding: 14px; font-size: 1rem; }
       .coupon-tag { padding: 14px; font-size: 0.9rem; }
     }
@@ -204,7 +202,6 @@
 <body class="is-loading">
 <canvas id="aboutCanvas" aria-hidden="true"></canvas>
 
-<!-- Loader -->
 <div id="pageLoader" class="page-loader">
   <div class="loader-backdrop"></div>
   <div class="loader-card">
@@ -214,7 +211,6 @@
   </div>
 </div>
 
-<!-- Navigation -->
 <nav>
   <a href="index.html" class="logo magic-hover">♡ Little Loop</a>
   <div class="nav-actions">
@@ -236,13 +232,11 @@
   </div>
 </nav>
 
-<!-- Cart Page -->
 <div class="cart-page">
   <h1 class="cart-title">Your Cart</h1>
   <div id="cartContent" class="cart-container"></div>
 </div>
 
-<!-- Footer -->
 <footer>
   <p>♡ Little Loop Crochet</p>
   <p>Made by hand · Made with love</p>
@@ -303,7 +297,6 @@
     if(window.aboutArt) window.aboutArt.updateTheme(isDark); 
   });
 
-  // ===== HAMBURGER MENU LOGIC =====
   window.toggleMenu = function() {
     const navRight = document.getElementById('navRight');
     const hamburger = document.querySelector('.hamburger');
@@ -391,7 +384,6 @@
 
         currentSubtotal = total; 
 
-        // Build the items container safely
         const itemsDiv = document.createElement('div');
         itemsDiv.className = 'cart-items';
 
@@ -399,7 +391,6 @@
           const itemDiv = document.createElement('div');
           itemDiv.className = 'cart-item';
 
-          // Image / Emoji
           const imgDiv = document.createElement('div');
           imgDiv.className = 'cart-item-img';
           const imgPath = productMap[item.id] || '';
@@ -409,22 +400,18 @@
             img.alt = item.name;
             imgDiv.appendChild(img);
           } else {
-            imgDiv.textContent = item.image || '🧸'; // safe
+            imgDiv.textContent = item.image || '🧸';
           }
 
-          // Details
           const detailsDiv = document.createElement('div');
           detailsDiv.className = 'cart-item-details';
-          
           const nameH = document.createElement('h3');
-          nameH.textContent = item.name; // SAFE! No innerHTML
+          nameH.textContent = item.name;
           detailsDiv.appendChild(nameH);
-          
           const priceP = document.createElement('p');
           priceP.textContent = `Price: ₹${item.price}`;
           detailsDiv.appendChild(priceP);
 
-          // Controls
           const controlsDiv = document.createElement('div');
           controlsDiv.className = 'cart-item-controls';
 
@@ -470,7 +457,6 @@
 
         cartContent.appendChild(itemsDiv);
 
-        // Build the summary section safely
         const summaryDiv = document.createElement('div');
         summaryDiv.className = 'cart-summary';
         summaryDiv.id = 'cartSummary';
@@ -582,16 +568,12 @@
       });
   }
 
-  // ===== COUPON FUNCTIONS (Fixed for Mobile) =====
   function loadAvailableCoupons() {
     db.collection('coupons').where('active', '==', true).get().then((snapshot) => {
       const list = document.getElementById('couponsList');
       const container = document.getElementById('availableCoupons');
       list.innerHTML = '';
-      if (snapshot.empty) {
-        container.style.display = 'none';
-        return;
-      }
+      if (snapshot.empty) { container.style.display = 'none'; return; }
       container.style.display = 'block';
       snapshot.forEach(doc => {
         const code = doc.id;
@@ -610,8 +592,7 @@
         list.appendChild(item);
       });
     }).catch(err => {
-      console.error("Error loading coupons (Rules might be blocking read):", err);
-      // Fallback: Keep it hidden if rules are wrong
+      console.error("Error loading coupons:", err);
       document.getElementById('availableCoupons').style.display = 'none';
     });
   }
@@ -620,11 +601,7 @@
     const code = document.getElementById('couponInput').value.trim();
     const message = document.getElementById('couponMessage');
 
-    if (!code) {
-      message.textContent = "Please enter a code.";
-      message.style.color = "red";
-      return;
-    }
+    if (!code) { message.textContent = "Please enter a code."; message.style.color = "red"; return; }
 
     try {
       const docRef = db.collection('coupons').doc(code);
@@ -632,19 +609,11 @@
 
       if (doc.exists) {
         const data = doc.data();
-        if (!data.active) {
-          message.textContent = "This coupon is inactive.";
-          message.style.color = "red";
-          return;
-        }
+        if (!data.active) { message.textContent = "This coupon is inactive."; message.style.color = "red"; return; }
 
         let discount = 0;
-        if (data.type === 'percentage') {
-          discount = currentSubtotal * (data.value / 100);
-        } else if (data.type === 'fixed') {
-          discount = data.value;
-        }
-        
+        if (data.type === 'percentage') { discount = currentSubtotal * (data.value / 100); }
+        else if (data.type === 'fixed') { discount = data.value; }
         discount = Math.min(discount, currentSubtotal);
 
         const discountRow = document.getElementById('discountRow');
@@ -670,7 +639,7 @@
       }
     } catch (err) {
       console.error("Error checking coupon:", err);
-      message.textContent = "Could not verify coupon. Please check your internet connection.";
+      message.textContent = "Could not verify coupon.";
       message.style.color = "red";
     }
   }
@@ -702,20 +671,13 @@
     setTimeout(() => { container.innerHTML = ''; container.style.display = 'none'; }, 5000);
   }
 
-  // ===== EXISTING CART FUNCTIONS =====
   window.changeQty = function(itemId, delta) {
     const cartRef = db.collection('users').doc(currentUser.uid).collection('cart').doc(itemId);
     cartRef.get().then(function(doc) {
       if (doc.exists) {
         const newQty = doc.data().quantity + delta;
-        if (newQty <= 0) {
-          return cartRef.delete().then(loadCart);
-        } else {
-          return cartRef.update({ quantity: newQty }).then(function() {
-            if (delta > 0) { launchConfetti(); }
-            loadCart();
-          });
-        }
+        if (newQty <= 0) { return cartRef.delete().then(loadCart); }
+        else { return cartRef.update({ quantity: newQty }).then(function() { if (delta > 0) { launchConfetti(); } loadCart(); }); }
       }
     });
   };
@@ -760,18 +722,9 @@
       let total = 0;
       const items = [];
       const cartSnapshot = await db.collection('users').doc(currentUser.uid).collection('cart').get();
-      cartSnapshot.forEach(doc => {
-        const item = doc.data();
-        items.push(item);
-        total += item.price * item.quantity;
-      });
+      cartSnapshot.forEach(doc => { const item = doc.data(); items.push(item); total += item.price * item.quantity; });
 
-      if (items.length === 0) {
-        alert("Your cart is empty.");
-        btn.disabled = false;
-        btn.textContent = "Place Order";
-        return;
-      }
+      if (items.length === 0) { alert("Your cart is empty."); btn.disabled = false; btn.textContent = "Place Order"; return; }
 
       const orderDoc = await db.collection('orders').add({
         userId: currentUser.uid,
@@ -799,9 +752,7 @@
       });
       const orderData = await orderResponse.json();
 
-      if (!orderData.id) {
-        throw new Error(orderData.error || "Failed to create order");
-      }
+      if (!orderData.id) { throw new Error(orderData.error || "Failed to create order"); }
 
       const options = {
         key: 'rzp_test_TYLpLID3tKkx0o',
@@ -827,11 +778,8 @@
             const batch = db.batch();
             cartSnapshot.forEach(doc => batch.delete(doc.ref));
             await batch.commit();
-            if (verifyData.emailSent) {
-              alert('Payment successful! Confirmation email sent to ' + email + '.');
-            } else {
-              alert('Payment successful! Order confirmed.');
-            }
+            if (verifyData.emailSent) { alert('Payment successful! Confirmation email sent to ' + email + '.'); }
+            else { alert('Payment successful! Order confirmed.'); }
             loadCart();
           }
         },
@@ -929,7 +877,7 @@
 (function() {
   const audioManager = {
     muted: false, currentTheme: null, audioElements: [], config: null, started: false,
-    defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.25 }, { src: 's2d.mp3', volume: 0.15 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.25 }, { src: 's2n.mp3', volume: 0.15 }]}},
+    defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.5 }, { src: 's2d.mp3', volume: 0.3 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.5 }, { src: 's2n.mp3', volume: 0.5 }]}},
     async init() {
       const paths = ['sound-config.json', './sound-config.json', '/sound-config.json'];
       for (const path of paths) {
