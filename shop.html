@@ -53,7 +53,7 @@
       --cover-tap-color: #f2a6b8;
       --cover-bg-opacity: 0.5;
       --cover-logo-size: cover;
-      --cover-bg-color: #080A31;  /* NEW: Dark purple background to match logo */
+      --cover-bg-color: #080A31;
     }
 
     /* ===== MOBILE OVERRIDES ===== */
@@ -80,7 +80,7 @@
       --cover-title-color: #bd7cff;
       --cover-tap-color: #bd7cff;
       --cover-bg-opacity: 0.5;
-      --cover-bg-color: #080A31; /* Same in dark mode */
+      --cover-bg-color: #080A31;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:auto; overflow-x:hidden;}
@@ -338,6 +338,22 @@
       display: block; 
     }
     
+    /* ===== FIXED: TAPE STRIP ===== */
+    .tape-strip {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: 85px;
+      height: 28px;
+      background: rgba(244, 219, 170, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 12;
+      pointer-events: none;
+    }
+    
+    /* ===== FIXED: NAME STICKER IN FRONT ===== */
     .name-sticker { 
       position: absolute; 
       bottom: -12px; 
@@ -348,7 +364,7 @@
       border: 2px solid white; 
       border-radius: 8px; 
       box-shadow: 2px 2px 5px rgba(0,0,0,0.3); 
-      z-index: 10; 
+      z-index: 20; 
       transform: rotate(-12deg); 
       transition: transform 0.3s, box-shadow 0.3s; 
     }
@@ -368,6 +384,7 @@
       margin-top: 10px; 
       transform: rotate(2deg); 
       z-index: 10; 
+      position: relative;
       transition: transform 0.3s, box-shadow 0.3s; 
     }
     .diary-text:hover { transform: rotate(2deg) translateY(-5px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
@@ -690,8 +707,8 @@
             <div class="photo-frame magic-hover">
               ${imgSrc ? `<img src="${imgSrc}" onerror="this.parentElement.style.display='none'">` : `<div style="font-size:4rem;">${pageInfo.emoji || '🧸'}</div>`}
             </div>
-            <img src="${gifSrc}" class="photo-pop" onerror="this.remove()" alt="decorative animation" style="${inlineStyle}">
             <div class="tape-strip"></div>
+            <img src="${gifSrc}" class="photo-pop" onerror="this.remove()" alt="decorative animation" style="${inlineStyle}">
             <div class="name-sticker magic-hover"><h3>${pageInfo.name || 'Untitled'}</h3></div>
           </div>
           <div class="diary-text magic-hover"><p>${pageInfo.description || ''}</p><p style="font-size:1.2rem; font-weight:bold; color:var(--accent);">₹${pageInfo.price}</p></div>
@@ -766,7 +783,7 @@
   (function() {
     const audioManager = {
       muted: false, currentTheme: null, audioElements: [], config: null, started: false,
-      defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.25 }, { src: 's2d.mp3', volume: 0.15 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.25 }, { src: 's2n.mp3', volume: 0.15 }]}},
+      defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.5 }, { src: 's2d.mp3', volume: 0.3 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.5 }, { src: 's2n.mp3', volume: 0.5 }]}},
       async init() {
         const paths = ['sound-config.json', './sound-config.json', '/sound-config.json'];
         for (const path of paths) {
