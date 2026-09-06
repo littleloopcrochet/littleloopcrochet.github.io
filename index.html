@@ -736,7 +736,7 @@
   // ===== Audio Manager =====
   const audioManager = {
     muted: false, currentTheme: null, audioElements: [], config: null, started: false,
-    defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.25 }, { src: 's2d.mp3', volume: 0.15 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.25 }, { src: 's2n.mp3', volume: 0.15 }]}},
+    defaultConfig: { day: { tracks: [{ src: 's1d.mp3', volume: 0.15 }, { src: 's2d.mp3', volume: 0.05 }]}, night: { tracks: [{ src: 's1n.mp3', volume: 0.15 }, { src: 's2n.mp3', volume: 0.05 }]}},
     async init() {
       const paths = ['sound-config.json', './sound-config.json', '/sound-config.json'];
       for (const path of paths) {
